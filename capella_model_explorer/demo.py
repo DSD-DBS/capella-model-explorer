@@ -1,35 +1,97 @@
+# Copyright DB InfraGO AG and contributors
+# SPDX-License-Identifier: Apache-2.0
+
+import pathlib
+
 import capellambse
 import pandas as pd
 import streamlit as st
 from jinja2.environment import Environment
 
+WORKSPACE = pathlib.Path("~/models").expanduser()
+
 env = Environment()
 
+if "all_models" not in st.session_state:
+    st.session_state["all_models"] = {
+        i.name: i for i in WORKSPACE.rglob("*.aird")
+    }
 
-@st.cache_resource
-def load_model() -> capellambse.MelodyModel:
-    return capellambse.MelodyModel(
-        path="automated-train",
-        entrypoint="/automated-train.aird",
+with st.sidebar:
+    model_name = st.selectbox(
+        "Select the Capella model",
+        st.session_state["all_models"].keys(),
+        index=None,
     )
 
+if not model_name:
+    st.stop()
 
-model = load_model()
+if (
+    "model_name" not in st.session_state
+    or st.session_state["model_name"] != model_name
+):
+    all_models = st.session_state["all_models"]
+    st.session_state.clear()
+    st.session_state["all_models"] = all_models
+    st.session_state["model"] = capellambse.MelodyModel(
+        st.session_state["all_models"][model_name]
+    )
+    st.session_state["model_name"] = model_name
+model = st.session_state["model"]
+with st.sidebar:
+    st.write(f"Loaded model {model.name!r}")
+
+sys_caps = model.sa.all_capabilities
+sys_caps_idx = {cap.name: cap for cap in sys_caps}
+
+sys_fncs = model.sa.all_functions[1:]
+sys_fncs_idx = {fnc.name: fnc for fnc in sys_fncs}
+
+if "current_viewpoint" not in st.session_state:
+    st.session_state["current_viewpoint"] = {}
+if "current_object" not in st.session_state:
+    st.session_state["current_object"] = {}
+
+
+def jump_to(vp: str, name: str) -> None:
+    st.session_state["current_viewpoint"] = {"index": viewpoints.index(vp)}
+    if vp == "Capabilities":
+        st.session_state["current_object"] = {
+            "index": sys_caps.index(sys_caps_idx[name])
+        }
+    elif vp == "Functions":
+        st.session_state["current_object"] = {
+            "index": sys_fncs.index(sys_fncs_idx[name])
+        }
+
 
 with st.sidebar:
     st.write("# Sidebar!")
+    viewpoints = ["Capabilities", "Functions", "Interfaces"]
     viewpoint = st.radio(
-        "Viewpoint:", ["Capabilities", "Functions", "Interfaces"]
+        "Viewpoint:",
+        viewpoints,
+        **st.session_state["current_viewpoint"],
     )
+    st.session_state["current_viewpoint"] = {}
 
 
 if viewpoint == "Capabilities":
     with st.sidebar:
-        sys_caps = model.sa.all_capabilities
-        sys_caps_idx = {cap.name: cap for cap in sys_caps}
+        if not sys_caps_idx:
+            st.write(
+                '<span style="color: red">The model has no Capabilities.</span>',
+                unsafe_allow_html=True,
+            )
+            st.stop()
         selected_name = st.selectbox(
-            "Select System Capability", options=sys_caps_idx.keys()
+            "Select System Capability",
+            options=sys_caps_idx.keys(),
+            **st.session_state["current_object"],
         )
+        st.session_state["current_object"] = {}
+
     cap = sys_caps_idx[selected_name]
     st.write(f"# {cap.name}")
 
@@ -45,21 +107,35 @@ if viewpoint == "Capabilities":
     )
     st.image(cap.context_diagram.as_svg)
 
-    st.write("""
-             ## Functional Requirements
+    st.write("## Data Flow Diagram")
+    st.image(cap.data_flow_view.as_svg)
 
-             This section provides a summary of what functions are required from the System and the actors to enable the system Capability.
-             """)
-    
+    st.write(
+        """\
+        ## Functional Requirements
+
+        This section provides a summary of what functions are required from the
+        System and the actors to enable the system Capability.
+        """
+    )
+
     cap_real_entities = {
         entity.owner for entity in cap.involved_functions if entity.owner
     }
 
     for entity in cap_real_entities:
-        st.write(f"### {entity.name} \nTo enable the system Capability **{cap.name}** the **{entity.name}** shall:")
+        st.write(
+            f"### {entity.name}\n"
+            f"To enable the system Capability **{cap.name}**"
+            f" the **{entity.name}** shall:"
+        )
         for fnc in cap.involved_functions:
             if fnc.owner == entity:
-                st.button(fnc.name)
+                st.button(
+                    fnc.name,
+                    on_click=jump_to,
+                    args=("Functions", fnc.name),
+                )
 
     table = pd.DataFrame(
         [
@@ -79,39 +155,69 @@ if viewpoint == "Capabilities":
     #     table.style.set_properties(**{"white-space": "pre-wrap"}),
     #     hide_index=True,
     # )
+    st.divider()
+    st.write(cap.__html__(), unsafe_allow_html=True)
 
 elif viewpoint == "Functions":
-    table_template = """
-    To realize this capability the System and involved actors are required to perform the following functions:</p>
-    <table>
-    <tr>
-        <th>Involved Entity</th><th>Required function</th>
-    </tr>
-    <tbody>
-    {% for owner, fncs in cap.involved_functions | rejectattr("owner","none") | groupby("owner.name") %}
-    <tr>
-        <td>{{owner}}</td>
-        <td>
-        {% for fnc in fncs %}
-        - {{fnc.name}}
-        {% endfor %}
-        </td>
-    </tr>
-    {% endfor %}
-    </tbody>
-    </table>
-    """
-    template = env.from_string(table_template)
-    st.markdown(template.render(cap=obj), unsafe_allow_html=True)
+    with st.sidebar:
+        selected_name = st.selectbox(
+            "Select System Function",
+            options=sys_fncs_idx.keys(),
+            **st.session_state["current_object"],
+        )
+        st.session_state["current_object"] = {}
 
-    fncs = model.sa.all_functions
+    fnc = sys_fncs_idx[selected_name]
+    st.write(f"# {fnc.name}")
 
-    st.write("# Functions")
-    sys_fncs = {fnc.name: fnc for fnc in fncs}
-    selected_fnc_name = st.selectbox(
-        "Select Function", options=sys_fncs.keys()
+    st.write("## Allocated component")
+    if fnc.owner is not None:
+        st.write(fnc.owner.name)
+    else:
+        st.write(
+            '<span style="color: red">This function is not allocated to a component.</span>',
+            unsafe_allow_html=True,
+        )
+
+    st.write("## Description")
+    if fnc.description:
+        st.write(fnc.description, unsafe_allow_html=True)
+    else:
+        st.write(
+            '<span style="color: red">This function has no description.</span>',
+            unsafe_allow_html=True,
+        )
+
+    st.write("## Context Diagram")
+    st.write(
+        """\
+        The image below provides an overview over the actors immediately
+        involved in the Function.
+        """
     )
-    fnc_obj = sys_fncs[selected_fnc_name]
+    st.image(fnc.context_diagram.as_svg)
 
-    card = f"""{fnc_obj.context_diagram.as_svg}"""
-    st.markdown(card, unsafe_allow_html=True)
+    st.write(
+        """\
+        ## Involving Capabilities
+        The following Capabilities require this function.
+        """
+    )
+
+    has_caps = False
+    for cap in model.search("Capability"):
+        if fnc in cap.involved_functions:
+            st.button(
+                cap.name,
+                on_click=jump_to,
+                args=("Capabilities", cap.name),
+            )
+            has_caps = True
+    if not has_caps:
+        st.write(
+            '<span style="color: red">This function is not involved in any Capability.</span>',
+            unsafe_allow_html=True,
+        )
+
+    st.divider()
+    st.write(fnc.__html__(), unsafe_allow_html=True)
