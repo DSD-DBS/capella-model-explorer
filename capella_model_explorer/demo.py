@@ -45,10 +45,22 @@ if viewpoint == "Capabilities":
     )
     st.image(cap.context_diagram.as_svg)
 
-    st.write("## Required Functions")
+    st.write("""
+             ## Functional Requirements
+
+             This section provides a summary of what functions are required from the System and the actors to enable the system Capability.
+             """)
+    
     cap_real_entities = {
         entity.owner for entity in cap.involved_functions if entity.owner
     }
+
+    for entity in cap_real_entities:
+        st.write(f"### {entity.name} \nTo enable the system Capability **{cap.name}** the **{entity.name}** shall:")
+        for fnc in cap.involved_functions:
+            if fnc.owner == entity:
+                st.button(fnc.name)
+
     table = pd.DataFrame(
         [
             {
@@ -63,10 +75,10 @@ if viewpoint == "Capabilities":
         ]
     )
 
-    st.dataframe(
-        table.style.set_properties(**{"white-space": "pre-wrap"}),
-        hide_index=True,
-    )
+    # st.dataframe(
+    #     table.style.set_properties(**{"white-space": "pre-wrap"}),
+    #     hide_index=True,
+    # )
 
 elif viewpoint == "Functions":
     table_template = """
