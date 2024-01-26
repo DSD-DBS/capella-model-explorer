@@ -27,7 +27,13 @@ classifiers = [
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
 ]
-dependencies = []
+dependencies = [
+  "capellambse",
+  "capellambse-context-diagrams",
+  "jinja2",
+  "pandas",
+  "streamlit",
+]
 
 [project.urls]
 Homepage = "https://github.com/DSD-DBS/capella-model-explorer"
