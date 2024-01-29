@@ -43,6 +43,8 @@ with st.sidebar:
     )
 
 if not model_name:
+    st.session_state["model_name"] = None
+    st.session_state["model"] = None
     st.stop()
 
 if st.session_state.get("model_name") != model_name:
