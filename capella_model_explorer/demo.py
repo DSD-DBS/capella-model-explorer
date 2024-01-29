@@ -85,10 +85,10 @@ def jump_to(vp: str, name: str) -> None:
 
 
 with st.sidebar:
-    st.write("# Sidebar!")
+    st.write("# System Analysis")
     viewpoints = ["Capabilities", "Functions", "Interfaces"]
     viewpoint = st.radio(
-        "Viewpoint:",
+        "Perspective:",
         viewpoints,
         **st.session_state["current_viewpoint"],
     )
@@ -114,16 +114,19 @@ if viewpoint == "Capabilities":
     st.write(f"# {cap.name}")
 
     st.write("## Description")
-    st.write(cap.description, unsafe_allow_html=True)
+    if cap.description:
+        st.write(cap.description, unsafe_allow_html=True)
+    else:
+        red_text("There is no description")
     st.write("### Pre-condition")
     if cap.precondition:
-        st.write(cap.precondition.specification)
+        st.write(cap.precondition.specification['capella:linkedText'], unsafe_allow_html=True)
     else:
         red_text("No pre-condition defined")
 
     st.write("### Post-condition")
     if cap.postcondition:
-        st.write(cap.postcondition.specification)
+        st.write(cap.postcondition.specification['capella:linkedText'], unsafe_allow_html=True)
     else:
         red_text("No post-condition defined")
     st.write(
@@ -158,6 +161,8 @@ if viewpoint == "Capabilities":
         entity.owner for entity in cap.involved_functions if entity.owner
     }
 
+    # there might be no entities with allocated functions
+    # there also might be allocated functions with no owning entity
     for entity in cap_real_entities:
         st.write(
             f"### {entity.name}\n"
@@ -172,24 +177,6 @@ if viewpoint == "Capabilities":
                     args=("Functions", fnc.name),
                 )
 
-    table = pd.DataFrame(
-        [
-            {
-                "name": obj.name,
-                "functions": "; ".join(
-                    fnc.name
-                    for fnc in cap.involved_functions
-                    if fnc.owner == obj
-                ),
-            }
-            for obj in cap_real_entities
-        ]
-    )
-
-    # st.dataframe(
-    #     table.style.set_properties(**{"white-space": "pre-wrap"}),
-    #     hide_index=True,
-    # )
     st.divider()
     st.write("# All the other attributes of the object")
     st.write(cap.__html__(), unsafe_allow_html=True)
@@ -206,29 +193,37 @@ elif viewpoint == "Functions":
     fnc = sys_fncs_idx[selected_name]
     st.write(f"# {fnc.name}")
 
-    st.write("## Allocated component")
-    if fnc.owner is not None:
-        st.write(fnc.owner.name)
-    else:
-        st.write(
-            '<span style="color: red">This function is not allocated to a component.</span>',
-            unsafe_allow_html=True,
-        )
-
     st.write("## Description")
     if fnc.description:
         st.write(fnc.description, unsafe_allow_html=True)
     else:
-        st.write(
-            '<span style="color: red">This function has no description.</span>',
-            unsafe_allow_html=True,
-        )
+        red_text("This function has no description")
+
+    st.write(f"""\
+        ## Function owner
+        """)
+    if fnc.owner is not None:
+        st.write(f"An Entity that is responsible for providing this function: **{fnc.owner.name}**")
+    else:
+        red_text("This function is not allocated to any entity / no entity is responsible for it.")
+
+    st.write(f"## Conditional availability")
+    if fnc.available_in_states:
+        st.write(env.from_string(
+            """The function is available in the following Entity states:
+
+            {% for state in fnc.available_in_states %}
+            - {{ state.name }}
+            {% endfor %}
+            """).render(fnc=fnc))
+        
+    else:
+        st.write("The function is always available (unconditionally) / not bound to specific Entity states")
 
     st.write("## Context Diagram")
     st.write(
         """\
-        The image below provides an overview over the actors immediately
-        involved in the Function.
+        The diagram below provides an overview over the functional context: functions on the left provide functional inputs to the function of interest, functions on the right consume the outputs of the function of interest. The system is responsible for the functions with the green background. Functions with the blue background are allocated to external actors.
         """
     )
     st.image(fnc.context_diagram.as_svg)
@@ -236,7 +231,7 @@ elif viewpoint == "Functions":
     st.write(
         """\
         ## Involving Capabilities
-        The following Capabilities require this function.
+        The following System Capabilities require this function.
         """
     )
 
