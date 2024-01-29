@@ -22,6 +22,14 @@ WORKSPACE = pathlib.Path(workspace_path).expanduser()
 
 env = Environment()
 
+
+def red_text(text):
+    st.write(
+            f'<span style="color: red">{text}</span>',
+            unsafe_allow_html=True,
+        )
+
+
 if "all_models" not in st.session_state:
     st.session_state["all_models"] = {
         i.name: i for i in WORKSPACE.rglob("*.aird")
@@ -107,17 +115,34 @@ if viewpoint == "Capabilities":
 
     st.write("## Description")
     st.write(cap.description, unsafe_allow_html=True)
+    st.write("### Pre-condition")
+    if cap.precondition:
+        st.write(cap.precondition.specification)
+    else:
+        red_text("No pre-condition defined")
 
-    st.write("## Context Diagram")
+    st.write("### Post-condition")
+    if cap.postcondition:
+        st.write(cap.postcondition.specification)
+    else:
+        red_text("No post-condition defined")
     st.write(
         """\
-        The image below provides an overview over the actors immediately
-        involved in the Capability.
+        ## Context Diagram
+
+        The diagram below provides an overview over the entities immediately
+        involved in the Capability and related Capabilities.
         """
     )
     st.image(cap.context_diagram.as_svg)
 
-    st.write("## Data Flow Diagram")
+    st.write(
+        """\
+        ## Data Flow Diagram
+        
+        The diagram below provides an overview of the System (green) and actor 
+        (blue) functions that are required to realize the Capability.
+        """)
     st.image(cap.data_flow_view.as_svg)
 
     st.write(
@@ -166,6 +191,7 @@ if viewpoint == "Capabilities":
     #     hide_index=True,
     # )
     st.divider()
+    st.write("# All the other attributes of the object")
     st.write(cap.__html__(), unsafe_allow_html=True)
 
 elif viewpoint == "Functions":
