@@ -28,6 +28,14 @@ def red_text(text):
             f'<span style="color: red">{text}</span>',
             unsafe_allow_html=True,
         )
+    
+
+def describe_object(obj):
+    st.write("## Description")
+    if obj.description:
+        st.write(obj.description, unsafe_allow_html=True)
+    else:
+        red_text("There is no description yet")
 
 
 if "all_models" not in st.session_state:
@@ -66,6 +74,9 @@ sys_caps_idx = {cap.name: cap for cap in sys_caps}
 sys_fncs = model.sa.all_functions[1:]
 sys_fncs_idx = {fnc.name: fnc for fnc in sys_fncs}
 
+sys_excs = model.sa.all_component_exchanges
+sys_exc_idx = {exc.name: exc for exc in sys_excs}
+
 if "current_viewpoint" not in st.session_state:
     st.session_state["current_viewpoint"] = {}
 if "current_object" not in st.session_state:
@@ -81,6 +92,10 @@ def jump_to(vp: str, name: str) -> None:
     elif vp == "Functions":
         st.session_state["current_object"] = {
             "index": sys_fncs.index(sys_fncs_idx[name])
+        }
+    elif vp == "Interfaces":
+        st.session_state["current_object"] = {
+            "index": sys_excs.index(sys_exc_idx[name])
         }
 
 
@@ -98,10 +113,7 @@ with st.sidebar:
 if viewpoint == "Capabilities":
     with st.sidebar:
         if not sys_caps_idx:
-            st.write(
-                '<span style="color: red">The model has no Capabilities.</span>',
-                unsafe_allow_html=True,
-            )
+            red_text("The model has no System Capabilities")
             st.stop()
         selected_name = st.selectbox(
             "Select System Capability",
@@ -113,11 +125,8 @@ if viewpoint == "Capabilities":
     cap = sys_caps_idx[selected_name]
     st.write(f"# {cap.name}")
 
-    st.write("## Description")
-    if cap.description:
-        st.write(cap.description, unsafe_allow_html=True)
-    else:
-        red_text("There is no description")
+    describe_object(cap)
+
     st.write("### Pre-condition")
     if cap.precondition:
         st.write(cap.precondition.specification['capella:linkedText'], unsafe_allow_html=True)
@@ -193,11 +202,7 @@ elif viewpoint == "Functions":
     fnc = sys_fncs_idx[selected_name]
     st.write(f"# {fnc.name}")
 
-    st.write("## Description")
-    if fnc.description:
-        st.write(fnc.description, unsafe_allow_html=True)
-    else:
-        red_text("This function has no description")
+    describe_object(fnc)
 
     st.write(f"""\
         ## Function owner
@@ -252,3 +257,29 @@ elif viewpoint == "Functions":
 
     st.divider()
     st.write(fnc.__html__(), unsafe_allow_html=True)
+elif viewpoint == "Interfaces":
+    with st.sidebar:
+        if not sys_excs:
+            red_text("System has no interfaces yet")
+            st.stop()
+        selected_name = st.selectbox(
+            "Select System Interface",
+            options=sys_exc_idx.keys(),
+            **st.session_state["current_object"],
+        )
+        st.session_state["current_object"] = {}
+    
+    exc = sys_exc_idx[selected_name]
+    st.write("# System Interfaces Overview")
+    st.image(model.sa.root_component.context_diagram.as_svg)
+
+    st.write(f"# Interface {exc.name}")
+    describe_object(exc)
+
+    st.write("## Interface Context Diagram")
+    st.write(
+        """\
+        The diagram below provides an overview over the functional context of the interface: it shows the functions of the interface partners that depend on the interface and outlines the functional interactions (exchanges).
+        """
+    )
+    st.image(exc.context_diagram.as_svg)
