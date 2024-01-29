@@ -1,6 +1,7 @@
 # Copyright DB InfraGO AG and contributors
 # SPDX-License-Identifier: Apache-2.0
 
+import sys
 import pathlib
 
 import capellambse
@@ -8,7 +9,16 @@ import pandas as pd
 import streamlit as st
 from jinja2.environment import Environment
 
-WORKSPACE = pathlib.Path("~/models").expanduser()
+workspace_path = '~/workspace'
+
+# Parse command-line arguments manually
+for arg in sys.argv:
+    if arg.startswith('--workspace='):
+        workspace_path = arg.split('=')[1]
+        break
+
+WORKSPACE = pathlib.Path(workspace_path).expanduser()
+
 
 env = Environment()
 
