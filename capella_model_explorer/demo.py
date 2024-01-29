@@ -45,17 +45,17 @@ with st.sidebar:
 if not model_name:
     st.stop()
 
-if (
-    "model_name" not in st.session_state
-    or st.session_state["model_name"] != model_name
-):
+if st.session_state.get("model_name") != model_name:
     all_models = st.session_state["all_models"]
     st.session_state.clear()
     st.session_state["all_models"] = all_models
-    st.session_state["model"] = capellambse.MelodyModel(
-        st.session_state["all_models"][model_name]
-    )
-    st.session_state["model_name"] = model_name
+
+    with st.sidebar, st.spinner(f"Loading {model_name}..."):
+        st.session_state["model"] = capellambse.MelodyModel(
+            st.session_state["all_models"][model_name]
+        )
+        st.session_state["model_name"] = model_name
+
 model = st.session_state["model"]
 with st.sidebar:
     st.write(f"Loaded model {model.name!r}")
