@@ -1,0 +1,21 @@
+capella\_model\_explorer package
+================================
+
+Submodules
+----------
+
+capella\_model\_explorer.demo module
+------------------------------------
+
+.. automodule:: capella_model_explorer.demo
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: capella_model_explorer
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,7 @@
+capella-model-explorer
+======================
+
+.. toctree::
+   :maxdepth: 4
+
+   capella_model_explorer
