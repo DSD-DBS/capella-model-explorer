@@ -1,0 +1,6 @@
+template: system_capability.j2.html
+name: System Capability
+variable: 
+  name: object
+  type: Capability
+  below: sa
