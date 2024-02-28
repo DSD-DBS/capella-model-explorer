@@ -1,5 +1,6 @@
 import click
 from fastapi import FastAPI
+from fastapi.responses import HTMLResponse
 import uvicorn
 import capellambse
 from pathlib import Path
@@ -76,7 +77,7 @@ def render_template(template_name: str, object_id: str):
     object = app.model.by_uuid(object_id)
     # render the template with the object
     rendered = template.render(object=object)
-    return rendered
+    return HTMLResponse(content=rendered, status_code=200)
 
 
 if __name__ == "__main__":

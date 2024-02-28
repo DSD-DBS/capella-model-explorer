@@ -1,6 +1,25 @@
-<h1>{{ object.name }}</h1>
+<h1>{{ object.name | capitalize }}</h1>
 {% if object.description %}
 <p>{{ object.description }}</p>
 {% else %}
-<p>No description available.</p>
+<p style="color:red">No description available.</p>
 {% endif %}
+
+<b>Pre-condition</b>: 
+{% if object.precondition %}
+{{ object.precondition.specification['capella:linkedText']|safe }}
+{% else %}
+<p style="color:red">No pre-condition defined</p>
+{% endif %}
+
+<b>Post-condition</b>:
+{% if object.postcondition %}
+{{ object.postcondition.specification['capella:linkedText']|safe }}
+{% else %}
+<p style="color:red">No post-condition defined</p>
+{% endif %}
+
+<h2>Context Diagram</h2>
+<p>The diagram below provides an overview over the entities immediately involved in the Capability and related Capabilities.</p>
+
+{{ object.context_diagram.as_svg|safe}}
