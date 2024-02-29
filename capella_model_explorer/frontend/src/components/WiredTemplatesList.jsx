@@ -1,9 +1,11 @@
 import React, {useState, useEffect} from 'react';
+import { useNavigate } from 'react-router-dom';
 import { TemplatesList } from './TemplatesList';
 
 
 export const WiredTemplatesList = ({templates_endpoint}) => {
     const [templates, setTemplates] = useState([])
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchTemplates = async () => {
@@ -26,4 +28,4 @@ export const WiredTemplatesList = ({templates_endpoint}) => {
         fetchTemplates();
     }, [templates_endpoint]);
 
-    return <TemplatesList templates={templates} />;}
+    return <TemplatesList templates={templates} cardClickCallback={(idx) => navigate(`/templates/${idx}`)} />;}
