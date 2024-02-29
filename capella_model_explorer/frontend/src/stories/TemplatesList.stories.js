@@ -19,13 +19,16 @@ export const Demo = {
         templates: [
             {
                 name: "System Capability",
-                description: "Specifies what the system should be capable of and how it needs to interact with external actors."    
+                description: "Specifies what the system should be capable of and how it needs to interact with external actors.",
+                idx: 1  
             },
             {
                 name: "System Function",
-                description: "Specifies how the system or actor shall behave."    
+                description: "Specifies how the system or actor shall behave.",
+                idx: 2
             }
-        ]
+        ],
+        cardClickCallback: (idx) => alert(idx)
     },
 };
 

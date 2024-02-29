@@ -15,8 +15,12 @@ export default {
 
 export const Demo = {
     args: {
-        name: "System Capability",
-        description: "Specifies what the system should be capable of and how it needs to interact with external actors."
+        template: {
+            name: "System Capability",
+            description: "Specifies what the system should be capable of and how it needs to interact with external actors.",
+            idx: "THE IDENTIFIER"
+        },
+        onClickCallback: (idx) => alert(idx)
     },
 };
 

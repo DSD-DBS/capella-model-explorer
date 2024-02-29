@@ -1,10 +1,10 @@
 import React from 'react';
 import { TemplateCard } from './TemplateCard';
 
-export const TemplatesList = ({templates}) => (
+export const TemplatesList = ({templates, cardClickCallback}) => (
     <div className='flex flex-wrap justify-center items-center'>
         {templates.map(template => (
-          <TemplateCard name={template.name} description={template.description} />  
+          <TemplateCard key={template.idx} template={template} onClickCallback={cardClickCallback} />  
         ))}
     </div>
     );

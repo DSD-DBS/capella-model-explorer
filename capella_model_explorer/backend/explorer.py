@@ -7,6 +7,7 @@ import pathlib
 import typing as t
 import urllib.parse as urlparse
 from pathlib import Path
+from fastapi.middleware.cors import CORSMiddleware
 
 import capellambse
 import yaml
@@ -28,6 +29,13 @@ class CapellaModelExplorerBackend:
 
     def __post_init__(self):
         self.app = FastAPI()
+        self.app.add_middleware(
+            CORSMiddleware,
+            allow_origins=["*"],
+            allow_credentials=True,
+            allow_methods=["*"],
+            allow_headers=["*"],
+        )
         self.env = Environment()
         self.templates = index_templates(self.templates_path)
 
@@ -38,7 +46,7 @@ class CapellaModelExplorerBackend:
         def read_root():
             return {"badge": self.model.description_badge}
 
-        @self.app.get("/templates")
+        @self.app.get("/api/templates")
         def read_templates():
             # list all templates in the templates folder from .yaml
             self.templates = index_templates(self.templates_path)
@@ -47,7 +55,7 @@ class CapellaModelExplorerBackend:
                 for key, template in self.templates.items()
             ]
 
-        @self.app.get("/templates/{template_name}")
+        @self.app.get("/api/templates/{template_name}")
         def read_template(template_name: str):
             base = self.templates[urlparse.quote(template_name)]
             variable = base["variable"]
@@ -59,7 +67,7 @@ class CapellaModelExplorerBackend:
             ]
             return base
 
-        @self.app.get("/templates/{template_name}/{object_id}")
+        @self.app.get("/api/templates/{template_name}/{object_id}")
         def render_template(template_name: str, object_id: str):
             base = self.templates[urlparse.quote(template_name)]
             template_filename = base["template"]
@@ -78,7 +86,7 @@ def index_templates(path: pathlib.Path) -> dict[str, t.Any]:
     templates: dict[str, t.Any] = {}
     for template_file in path.glob("*.yaml"):
         template = yaml.safe_load(template_file.read_text(encoding="utf8"))
-        name = template.get("name", template_file.name.replace(".yaml", ""))
+        name = template_file.name.replace(".yaml", "")
         templates[urlparse.quote(name)] = template
         # later we could add here count of objects that can be rendered
         # with this template
