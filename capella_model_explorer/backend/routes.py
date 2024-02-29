@@ -9,8 +9,10 @@ import urllib.parse as urlparse
 import yaml
 from fastapi.responses import HTMLResponse
 
+from . import explorer
 
-def configure_routes(backend):
+
+def configure_routes(backend: explorer.CapellaModelExplorerBackend):
     @backend.app.get("/")
     def read_root():
         return {"badge": backend.model.description_badge}
@@ -19,7 +21,9 @@ def configure_routes(backend):
     def read_templates():
         # list all templates in the templates folder from .yaml
         backend.templates = index_templates(backend.templates_path)
-        return backend.templates
+        return [
+            {"idx": key, **backend.templates[key]} for key in backend.templates
+        ]
 
     @backend.app.get("/templates/{template_name}")
     def read_template(template_name: str):
