@@ -1,0 +1,51 @@
+<h1>{{ object.name | capitalize }}</h1>
+{% if object.description %}
+<p>{{ object.description }}</p>
+{% else %}
+<p style="color:red">No description available.</p>
+{% endif %}
+
+<br><b>Pre-condition</b>: 
+{% if object.precondition %}
+{{ object.precondition.specification['capella:linkedText']|safe }}
+{% else %}
+<p style="color:red">No pre-condition defined</p>
+{% endif %}
+
+<br><b>Post-condition</b>:
+{% if object.postcondition %}
+{{ object.postcondition.specification['capella:linkedText']|safe }}
+{% else %}
+<p style="color:red">No post-condition defined</p>
+{% endif %}
+
+<h2>Context Diagram</h2>
+<p>The diagram below provides an overview over the entities immediately involved in the Capability and related Capabilities.</p>
+
+{{ object.context_diagram.as_svg|safe}}
+
+<h2>Data Flow Diagram</h2>
+
+<p>The diagram below provides an overview of the System (green) and actor 
+    (blue) functions that are required to realize the Capability.</p>
+        
+{{ object.data_flow_view.as_svg | safe }}
+
+<h2>Functional Requirements</h2>
+
+<p>This section provides a summary of what functions are required from the
+    System and the actors to enable the system Capability.</p>
+
+{% set real_entities = object.involved_functions | selectattr("owner") | map(attribute="owner") | unique %}
+
+{% for entity in real_entities %}
+<h3>{{ entity.name }}</h3>
+<p>To enable the system Capability <b>{{object.name}}</b> the <b>{{entity.name}}</b> shall:</p>
+<ul>
+    {% for fnc in object.involved_functions %}
+        {% if fnc.owner == entity %}
+            <li><a href="/templates/system_function/{{ fnc.uuid }}">{{ fnc.name }}</a></li>
+        {% endif %}
+    {% endfor %}
+</ul>
+{% endfor %}

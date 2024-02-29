@@ -1,4 +1,4 @@
-template: system_capability.j2.html
+template: system_capability.html.j2
 name: System Capability
 variable: 
   name: object
