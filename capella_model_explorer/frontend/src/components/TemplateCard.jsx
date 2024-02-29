@@ -1,17 +1,12 @@
 import React from 'react';
 
-export const ObjectList = ({objects}) => (
-    <div>
-        <h1>Object List</h1>
-        {/* if objects is an empty list or undefined lets say that no objects found */}
-        {objects.length === 0 && <p>No objects found</p>}
-        {/* if objects is not an empty list or undefined lets display the list of objects */}   
-        {objects.length > 0 && 
-            <ul>
-                {objects.map((object) => (
-                    <li key={object.uuid}>{object.name}</li>
-                ))}
-            </ul>
-        }
+export const TemplateCard = ({name, description}) => (
+    <div className='max-w-sm bg-white rounded-lg border border-gray-200 shadow-md m-4'>
+        <div className='p-5'>
+            <h5 className='mb-2 text-2xl font-bold text-gray-900'>
+                {name}
+            </h5>
+            <p className='mb-3 font-normal text-gray-700'>{description}</p>
+        </div>
     </div>
     );

@@ -55,7 +55,8 @@ def read_root():
 def read_templates():
     # list all templates in the templates folder (files that end with .yaml)
     app.templates = index_templates(app.templates_path)
-    return app.templates
+    templates = [dict(idx=key, **app.templates[key]) for key in app.templates]
+    return templates
 
 
 @app.get("/templates/{template_name}")
