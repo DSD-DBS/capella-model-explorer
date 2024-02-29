@@ -1,0 +1,6 @@
+template: system_function.html.j2
+name: System Function
+variable: 
+  name: object
+  type: SystemFunction
+  below: sa
