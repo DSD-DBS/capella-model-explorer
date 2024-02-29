@@ -38,6 +38,16 @@ pip install -e '.[docs,test]'
 pre-commit install
 ```
 
+# Front-end development
+
+To develop the frontend:
+
+```bash
+cd frontend
+npm install
+```
+then, to develop components `npm run storybook` and to develop the whole app `npm run dev`
+
 # Contributing
 
 We'd love to see your bug reports and improvement suggestions! Please take a
