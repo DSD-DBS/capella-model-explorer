@@ -33,6 +33,8 @@ dependencies = [
   "jinja2",
   "pandas",
   "streamlit",
+  "fastapi",
+  "uvicorn"
 ]
 
 [project.urls]

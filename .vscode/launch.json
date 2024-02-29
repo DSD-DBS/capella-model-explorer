@@ -1,0 +1,15 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug CapellaModelExplorer Backend",
+      "type": "debugpy",
+      "request": "launch",
+      "console": "integratedTerminal",
+      "envFile": ".env",
+      "pythonArgs": ["-Xdev"],
+      "module": "capella_model_explorer.backend",
+      "args": ["MODELPATH", "./templates"]
+    }
+  ]
+}
