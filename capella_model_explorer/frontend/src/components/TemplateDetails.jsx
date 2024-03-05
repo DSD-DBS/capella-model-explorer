@@ -1,18 +1,18 @@
 import React, {useEffect, useState} from 'react';
-import { useLocation } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { Card } from './Card';
 
 export const TemplateDetails = ({endpoint}) => {
-    const location = useLocation();
-    const template_id = location.state.idx;
+    let { templateName, objectID } = useParams();
     const [details, setDetails] = useState([]);
     const navigate = useNavigate();
+    const [filterText, setFilterText] = useState('');
 
     useEffect(() => {
         const fetchDetails = async () => {
             try {
-                const response = await fetch(endpoint + template_id, {
+                const response = await fetch(endpoint + templateName, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json'
@@ -25,28 +25,38 @@ export const TemplateDetails = ({endpoint}) => {
             finally {}
         };
         fetchDetails();
-    }, [endpoint]);
+        console.log(objectID)
+    }, [endpoint, objectID]);
     
     return (
-    <div>
+    <div className='flex flex-col h-screen'>
+        <a href='/templates' className='flex-initial p-4'>Back to template selection</a>
         <div className='p-5'>
             <h5 className='mb-2 text-2xl font-bold text-gray-900 dark:text-white'>
                 {details.name}
             </h5>
             <p className='mb-3 font-normal text-gray-700 dark:text-white'>{details.description}</p>
+            <input
+                type="text"
+                value={filterText}
+                onChange={(e) => setFilterText(e.target.value)}
+                placeholder="Filter objects"
+                className="mb-3 p-2 border rounded"
+            />
         </div>
-        <div className='flex flex-wrap justify-center items-center'>
+        <div className='flex flex-wrap justify-center items-center overflow-auto'>
             {details.objects && details.objects.length === 0 && <p>No objects found</p>}
-            {details.objects && details.objects.length > 0 && details.objects.map(object => (
-                <Card key={object.idx}
-                    onClick={() => navigate(`/templates/${template_id}/${object.idx}`)}
+            {details.objects && details.objects.length > 0 && details.objects.filter(object => object.name.toLowerCase().includes(filterText.toLowerCase())).map(object => (
+                <div key={object.idx}
+                    onClick={() => {navigate(`/templates/${templateName}/${object.idx}`);}}
+                    className={'bg-white dark:bg-gray-800 ' + (objectID && object.idx === objectID ? 'bg-blue-800 dark:bg-blue-800 text-white' : '') + ' max-w-sm  rounded-lg border border-gray-200 shadow-md m-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 dark:border-gray-700'}
                 >
-                    <div className='p-4'>
-                        <h5 className='text-lg font-bold text-gray-900 dark:text-white'>
+                    <div className='p-2'>
+                        <h5 className='text-md font-bold text-gray-900 dark:text-white'>
                             {object.name}
                         </h5>
                     </div>
-                </Card>
+                </div>
             ))}
         </div>
     </div>

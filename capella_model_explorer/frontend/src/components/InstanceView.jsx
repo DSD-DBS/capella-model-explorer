@@ -1,13 +1,13 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useRef} from 'react';
 import { useParams } from 'react-router-dom';
 import { Spinner } from './Spinner';
 import { SVGDisplay } from './SVGDisplay';
 
 
-export const InstanceView = ({endpoint}) => {
-    let { templateName, objectID } = useParams();
+export const InstanceView = ({templateName, objectID, endpoint}) => {
     const [details, setDetails] = useState([]);
     const [loading, setLoading] = useState(true);
+    const contentRef = useRef(null);
 
     useEffect(() => {
         const url = endpoint + `${templateName}/${objectID}`;
@@ -33,15 +33,16 @@ export const InstanceView = ({endpoint}) => {
             });
             setDetails(contentItems);
             setLoading(false);
+            if (contentRef.current) contentRef.current.scrollIntoView();
         })
         .catch((error) => {
             setLoading(false);
             setDetails("Error fetching data ", error);
         });
-    }, [endpoint]);
+    }, [endpoint, objectID, templateName]);
     if (loading) return (<div><Spinner />;</div>)
     return (
-    <div className='html-content bg-white shadow-lg mx-auto my-8 p-8 w-[210mm] max-w-full overflow-auto print:shadow-none print:m-0 print:p-0 print:bg-transparent'>
+    <div ref={contentRef} className='html-content bg-white shadow-lg dark:shadow-white dark:text-gray-700 mx-auto my-8 p-8 w-[210mm] max-w-full overflow-auto print:shadow-none print:m-0 print:p-0 print:bg-transparent'>
         {details.map((item, idx) => {
             if (item.type === "SVGDisplay") {
                 return (
