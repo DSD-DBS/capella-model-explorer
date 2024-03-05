@@ -24,8 +24,7 @@ export const TemplateDetails = ({endpoint}) => {
             catch (error) {}
             finally {}
         };
-        fetchDetails();
-        console.log(objectID)
+        fetchDetails(); 
     }, [endpoint, objectID]);
     
     return (
