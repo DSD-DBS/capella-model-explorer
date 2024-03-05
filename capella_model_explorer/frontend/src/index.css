@@ -71,3 +71,29 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+.html-content {
+  text-align: left;
+}
+
+.html-content svg {
+  display: block;
+  @apply max-w-full h-auto;
+  text-align: center;
+}
+
+.html-content h1 {
+  @apply text-4xl mb-4 mt-5;
+}
+
+.html-content h2 {
+  @apply text-3xl mb-3 mt-5;
+} 
+
+.html-content h3 {
+  @apply text-2xl mb-3 mt-5;
+}
+
+ul {
+  @apply list-disc pl-5;
+}
