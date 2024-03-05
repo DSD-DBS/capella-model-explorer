@@ -1,0 +1,6 @@
+template: classes.html.j2
+name: Data Class
+description: Specifies structure of a data class. A class may be used to describe anything from a simple object relationship to a message on a bus.
+variable: 
+  name: object
+  type: Class

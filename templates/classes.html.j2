@@ -1,0 +1,26 @@
+<h1>{{ object.name | capitalize }}</h1>
+{% if object.description %}
+<p>{{ object.description }}</p>
+{% else %}
+<p style="color:red">No description available.</p>
+{% endif %}
+
+<h2>Owned Properties</h2>
+{% if object.owned_properties %}
+    <p>The object owns the following properties:</p>
+    <ul>
+        {% for property in object.owned_properties %}
+            <li>
+                {{ property.name }}
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p style="color:red">No properties are owned by this object.</p>
+{% endif %}
+
+
+<h2>Object Relationships</h2>
+<p>The diagram below provides a view on raletionships between the {{ object.name }} and other objects.</p>
+
+{{ object.tree_view.as_svg|safe}}

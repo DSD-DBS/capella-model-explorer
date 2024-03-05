@@ -59,8 +59,9 @@ class CapellaModelExplorerBackend:
         def read_template(template_name: str):
             base = self.templates[urlparse.quote(template_name)]
             variable = base["variable"]
+            below = variable.get("below") or None
             objects = find_objects(
-                self.model, variable["type"], variable["below"]
+                self.model, variable["type"], below=below
             )
             base["objects"] = [
                 {"idx": obj.uuid, "name": obj.name} for obj in objects
