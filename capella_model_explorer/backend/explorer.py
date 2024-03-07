@@ -8,12 +8,16 @@ import typing as t
 import urllib.parse as urlparse
 from pathlib import Path
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 
 import capellambse
 import yaml
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from jinja2 import Environment
+
+PATH_TO_FRONTEND = Path("./frontend/dist")
 
 
 @dataclasses.dataclass
@@ -38,13 +42,12 @@ class CapellaModelExplorerBackend:
         )
         self.env = Environment()
         self.templates = index_templates(self.templates_path)
+        self.app.templates =templates = Jinja2Templates(directory=PATH_TO_FRONTEND)
 
         self.configure_routes()
 
     def configure_routes(self):
-        @self.app.get("/")
-        def read_root():
-            return {"badge": self.model.description_badge}
+        self.app.mount("/assets", StaticFiles(directory=PATH_TO_FRONTEND.joinpath("assets"), html=True))
 
         @self.app.get("/api/templates")
         def read_templates():
@@ -81,6 +84,10 @@ class CapellaModelExplorerBackend:
             # render the template with the object
             rendered = template.render(object=object)
             return HTMLResponse(content=rendered, status_code=200)
+        
+        @self.app.get("/{rest_of_path:path}")
+        async def catch_all(request: Request, rest_of_path: str):
+            return self.app.templates.TemplateResponse("index.html", {"request": request})
 
 
 def index_templates(path: pathlib.Path) -> dict[str, t.Any]:

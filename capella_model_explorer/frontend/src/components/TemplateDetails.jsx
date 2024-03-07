@@ -48,10 +48,10 @@ export const TemplateDetails = ({endpoint}) => {
             {details.objects && details.objects.length > 0 && details.objects.filter(object => object.name.toLowerCase().includes(filterText.toLowerCase())).map(object => (
                 <div key={object.idx}
                     onClick={() => {navigate(`/templates/${templateName}/${object.idx}`);}}
-                    className={'bg-white dark:bg-gray-800 ' + (objectID && object.idx === objectID ? 'bg-blue-800 dark:bg-blue-800 text-white' : '') + ' max-w-sm  rounded-lg border border-gray-200 shadow-md m-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 dark:border-gray-700'}
+                    className={(objectID && object.idx === objectID ? 'bg-blue-800 dark:bg-blue-800 text-white hover:dark:text-white hover:text-blue-800' : 'text-gray-900') + ' max-w-sm rounded-lg border border-gray-200 shadow-md m-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 dark:border-gray-700'}
                 >
                     <div className='p-2'>
-                        <h5 className='text-md font-bold text-gray-900 dark:text-white'>
+                        <h5 className={'text-md font-bold dark:text-white ' + (objectID && object.idx === objectID ? '' : '')}>
                             {object.name}
                         </h5>
                     </div>
