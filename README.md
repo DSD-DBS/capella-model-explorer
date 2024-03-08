@@ -15,6 +15,17 @@ A webapp for exploring Capella models through simple textual and graphical views
 We see a larger non-MBSE crowd struggling with the things hidden in the model. With this app we expose model contents in an easy to review readable form with basic graphical annotations. Under the hood it uses Jinja templates enabling the tooling teams to support thier users with model-derived documents of any shape and form.
 
 
+# Quick start
+
+Clone, then build and run locally with Docker:
+
+```bash
+docker build -t model-explorer:latest .
+docker run -v /absolute/path/to/your/model/folder/on/host:/model -v $(pwd)/templates:/templates -p 8000:8000 model-explorer
+```
+
+Then open your browser at `http://localhost:8000/templates` and start exploring your model.
+
 # Documentation
 
 Read the [full documentation on Github pages](https://dsd-dbs.github.io/capella-model-explorer).

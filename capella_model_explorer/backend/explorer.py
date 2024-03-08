@@ -17,7 +17,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from jinja2 import Environment
 
-PATH_TO_FRONTEND = Path("../frontend/dist")
+PATH_TO_FRONTEND = Path("./frontend/dist")
 
 
 @dataclasses.dataclass

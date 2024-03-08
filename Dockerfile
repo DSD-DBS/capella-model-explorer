@@ -1,6 +1,6 @@
 # Build frontend
 FROM node:20 as build-frontend
-WORKDIR /capella_model_explorer
+WORKDIR /app
 COPY frontend/package*.json ./
 RUN npm install
 COPY frontend/ ./
@@ -8,9 +8,10 @@ RUN npm run build
 
 # Build backend
 FROM python:3.12-slim-bookworm
-WORKDIR /capella_model_explorer
+WORKDIR /app
 COPY ./capella_model_explorer ./capella_model_explorer
 COPY ./pyproject.toml ./
+COPY ./.git ./.git
 RUN apt-get update && apt-get install -y git
 RUN pip install .
 COPY --from=build-frontend /app/dist/ ./frontend/dist/
@@ -19,4 +20,4 @@ COPY --from=build-frontend /app/dist/ ./frontend/dist/
 EXPOSE 8000
 
 # Start the application
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["python", "-m", "capella_model_explorer.backend", "/model", "/templates"]
