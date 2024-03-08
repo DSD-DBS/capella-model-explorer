@@ -8,7 +8,12 @@
 ![image](https://github.com/DSD-DBS/capella-model-explorer/actions/workflows/build-test-publish.yml/badge.svg)
 ![image](https://github.com/DSD-DBS/capella-model-explorer/actions/workflows/lint.yml/badge.svg)
 
-A webapp for exploring Capella models
+A webapp for exploring Capella models through simple textual and graphical views. 
+
+**Longer story**:
+
+We see a larger non-MBSE crowd struggling with the things hidden in the model. With this app we expose model contents in an easy to review readable form with basic graphical annotations. Under the hood it uses Jinja templates enabling the tooling teams to support thier users with model-derived documents of any shape and form.
+
 
 # Documentation
 

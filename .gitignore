@@ -158,3 +158,6 @@ dmypy.json
 cython_debug/
 
 node_modules/
+
+# Mac stuff
+.DS_Store
