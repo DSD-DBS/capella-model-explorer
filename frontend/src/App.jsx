@@ -14,6 +14,7 @@ function App() {
   return (
     <Router>
       <Routes>
+        <Route path="/" element={<p>this view is WIP, checkout <a href='/templates'>templates</a> instead.</p>} />
         <Route path="/templates" element={<WiredTemplatesList endpoint="http://localhost:8000/api/templates" />} />
         <Route path="/templates/:templateName" element={<TemplateView endpoint="http://localhost:8000/api/templates/" />} />
         <Route path="/templates/:templateName/:objectID" element={<TemplateView endpoint="http://localhost:8000/api/templates/" />} />

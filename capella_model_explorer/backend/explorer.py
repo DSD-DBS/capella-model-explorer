@@ -63,8 +63,9 @@ class CapellaModelExplorerBackend:
             base = self.templates[urlparse.quote(template_name)]
             variable = base["variable"]
             below = variable.get("below") or None
+            attr = variable.get("attr") or None
             objects = find_objects(
-                self.model, variable["type"], below=below
+                self.model, variable["type"], below=below, attr=attr
             )
             base["objects"] = [
                 {"idx": obj.uuid, "name": obj.name} for obj in objects
@@ -101,7 +102,10 @@ def index_templates(path: pathlib.Path) -> dict[str, t.Any]:
     return templates
 
 
-def find_objects(model, obj_type, below=None):
+def find_objects(model, obj_type, below=None, attr=None):
+    if attr:
+        getter = operator.attrgetter(attr)
+        return getter(model)
     if below:
         getter = operator.attrgetter(below)
         return model.search(obj_type, below=getter(model))
