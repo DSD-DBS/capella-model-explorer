@@ -1,9 +1,9 @@
 import React from 'react';
-import { TemplatesList } from '../components/TemplatesList';
+import { TemplatesList } from '../components/viewsList';
 
 
 export default {
-    title: 'Example/TemplatesList',
+    title: 'Example/viewsList',
     component: TemplatesList,
     // This component will have an automatically generated Autodocs entry: https://storybook.js.org/docs/writing-docs/autodocs
     tags: ['autodocs'],

@@ -25,11 +25,11 @@ export const TemplateDetails = ({endpoint}) => {
             finally {}
         };
         fetchDetails(); 
-    }, [endpoint, objectID]);
+    }, [endpoint, templateName, objectID]);
     
     return (
-    <div className='flex flex-col h-screen'>
-        <a href='/templates' className='flex-initial p-4'>Back to template selection</a>
+    <div className='flex flex-col'>
+        <a href='/views' className='flex-initial p-4'>Back to template selection</a>
         <div className='p-5'>
             <h5 className='mb-2 text-2xl font-bold text-gray-900 dark:text-white'>
                 {details.name}
@@ -47,7 +47,7 @@ export const TemplateDetails = ({endpoint}) => {
             {details.objects && details.objects.length === 0 && <p>No objects found</p>}
             {details.objects && details.objects.length > 0 && details.objects.filter(object => object.name.toLowerCase().includes(filterText.toLowerCase())).map(object => (
                 <div key={object.idx}
-                    onClick={() => {navigate(`/templates/${templateName}/${object.idx}`);}}
+                    onClick={() => {navigate(`/views/${templateName}/${object.idx}`);}}
                     className={(objectID && object.idx === objectID ? 'bg-blue-800 dark:bg-blue-800 text-white hover:dark:text-white hover:text-blue-800' : 'text-gray-900') + ' max-w-sm rounded-lg border border-gray-200 shadow-md m-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 dark:border-gray-700'}
                 >
                     <div className='p-2'>

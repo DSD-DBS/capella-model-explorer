@@ -49,7 +49,7 @@ class CapellaModelExplorerBackend:
     def configure_routes(self):
         self.app.mount("/assets", StaticFiles(directory=PATH_TO_FRONTEND.joinpath("assets"), html=True))
 
-        @self.app.get("/api/templates")
+        @self.app.get("/api/views")
         def read_templates():
             # list all templates in the templates folder from .yaml
             self.templates = index_templates(self.templates_path)
@@ -57,8 +57,18 @@ class CapellaModelExplorerBackend:
                 {"idx": key, **template}
                 for key, template in self.templates.items()
             ]
+        
+        @self.app.get("/api/objects/{uuid}")
+        def read_object(uuid: str):
+            obj = self.model.by_uuid(uuid)
+            return {
+                "idx": obj.uuid,
+                "name": obj.name,
+                "type": obj.xtype
+            }
 
-        @self.app.get("/api/templates/{template_name}")
+
+        @self.app.get("/api/views/{template_name}")
         def read_template(template_name: str):
             base = self.templates[urlparse.quote(template_name)]
             variable = base["variable"]
@@ -72,7 +82,7 @@ class CapellaModelExplorerBackend:
             ]
             return base
 
-        @self.app.get("/api/templates/{template_name}/{object_id}")
+        @self.app.get("/api/views/{template_name}/{object_id}")
         def render_template(template_name: str, object_id: str):
             base = self.templates[urlparse.quote(template_name)]
             template_filename = base["template"]

@@ -15,7 +15,7 @@ export default {
 
 export const GoodEndpoint = {
     args: {
-        templates_endpoint: "http://localhost:8000/api/templates"
+        templates_endpoint: "http://localhost:8000/api/views"
     },
 };
 
