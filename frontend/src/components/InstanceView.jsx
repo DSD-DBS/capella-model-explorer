@@ -42,7 +42,7 @@ export const InstanceView = ({templateName, objectID, endpoint}) => {
     }, [endpoint, objectID, templateName]);
     if (loading) return (<div><Spinner />;</div>)
     return (
-    <div ref={contentRef} className='html-content bg-white shadow-lg dark:shadow-white dark:text-gray-700 mx-auto md:my-8 p-8 md:w-[210mm] max-w-full overflow-auto print:shadow-none print:m-0 print:p-0 print:bg-transparent'>
+    <div ref={contentRef} className='html-content bg-white shadow-lg dark:shadow-white text-gray-700 mx-auto md:my-8 p-8 md:w-[210mm] max-w-full overflow-auto print:shadow-none print:m-0 print:p-0 print:bg-transparent'>
         {details.map((item, idx) => {
             if (item.type === "SVGDisplay") {
                 return (

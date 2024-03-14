@@ -9,6 +9,7 @@ import { TemplateDetails } from './TemplateDetails';
 import { useLocation, useParams, Navigate } from 'react-router-dom';
 import { InstanceView } from './InstanceView';
 import { Breadcrumbs } from './Breadcrumbs';
+import { ThemeSwitcher } from './ThemeSwitcher';
 
 export const TemplateView = ({endpoint}) => {
     let { templateName, objectID } = useParams();
@@ -23,7 +24,7 @@ export const TemplateView = ({endpoint}) => {
             <header className=" text-gray-700 p-4 flex justify-between items-center">
                 <div><Breadcrumbs /></div>
                 <div></div>
-                <div>light dark</div>
+                <div><ThemeSwitcher /></div>
             </header>
 
             {/* Body: Sidebar + Main Content */}
