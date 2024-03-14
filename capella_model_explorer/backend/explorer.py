@@ -96,9 +96,14 @@ class CapellaModelExplorerBackend:
             rendered = template.render(object=object)
             return HTMLResponse(content=rendered, status_code=200)
         
+        @self.app.get("/api/model-info")
+        def model_info():
+            return self.model.info
+        
         @self.app.get("/{rest_of_path:path}")
         async def catch_all(request: Request, rest_of_path: str):
             return self.app.templates.TemplateResponse("index.html", {"request": request})
+        
 
 
 def index_templates(path: pathlib.Path) -> dict[str, t.Any]:
