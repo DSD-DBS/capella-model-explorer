@@ -15,7 +15,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from jinja2 import Environment
+from jinja2 import Environment, TemplateSyntaxError
 
 PATH_TO_FRONTEND = Path("./frontend/dist")
 
@@ -96,11 +96,15 @@ class CapellaModelExplorerBackend:
             content = (self.templates_path / template_filename).read_text(
                 encoding="utf8"
             )
-            template = self.env.from_string(content)
             object = self.model.by_uuid(object_id)
-            # render the template with the object
-            rendered = template.render(object=object)
-            return HTMLResponse(content=rendered, status_code=200)
+            try:
+                # render the template with the object
+                template = self.env.from_string(content)
+                rendered = template.render(object=object)
+                return HTMLResponse(content=rendered, status_code=200)
+            except TemplateSyntaxError as e:
+                error_message = f"<p style='color:red'>Template syntax error: {e.message}, line {e.lineno}</p>"
+                return HTMLResponse(content=error_message)
 
         @self.app.get("/api/model-info")
         def model_info():
