@@ -14,10 +14,10 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<p>this view is WIP, checkout <a href='/templates'>templates</a> instead.</p>} />
-        <Route path="/templates" element={<WiredTemplatesList endpoint="http://localhost:8000/api/templates" />} />
-        <Route path="/templates/:templateName" element={<TemplateView endpoint="http://localhost:8000/api/templates/" />} />
-        <Route path="/templates/:templateName/:objectID" element={<TemplateView endpoint="http://localhost:8000/api/templates/" />} />
+        <Route path="/" element={<p>this view is WIP, checkout <a href='/views'>templates</a> instead.</p>} />
+        <Route path="/views" element={<WiredTemplatesList endpoint="http://localhost:8000/api/views" />} />
+        <Route path="/views/:templateName" element={<TemplateView endpoint="http://localhost:8000/api/views/" />} />
+        <Route path="/views/:templateName/:objectID" element={<TemplateView endpoint="http://localhost:8000/api/views/" />} />
       </Routes>
     </Router>
   )

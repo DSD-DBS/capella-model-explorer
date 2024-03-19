@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import { useNavigate } from 'react-router-dom';
-import { TemplatesList } from './TemplatesList';
+import { ViewsList } from './ViewsList';
 
 
 export const WiredTemplatesList = ({endpoint}) => {
@@ -25,4 +25,4 @@ export const WiredTemplatesList = ({endpoint}) => {
         fetchTemplates();
     }, [endpoint]);
 
-    return <TemplatesList templates={templates} cardClickCallback={(idx) => navigate(`/templates/${idx}`, {state: {idx: idx}})} />;}
+    return <ViewsList templates={templates} cardClickCallback={(idx) => navigate(`/views/${idx}`, {state: {idx: idx}})} />;}

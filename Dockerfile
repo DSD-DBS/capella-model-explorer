@@ -20,4 +20,4 @@ COPY --from=build-frontend /app/dist/ ./frontend/dist/
 EXPOSE 8000
 
 # Start the application
-CMD ["python", "-m", "capella_model_explorer.backend", "/model", "/templates"]
+CMD ["python", "-m", "capella_model_explorer.backend", "/model", "/views"]

@@ -27,10 +27,10 @@ Clone, then build and run locally with Docker:
 
 ```bash
 docker build -t model-explorer:latest .
-docker run -v /absolute/path/to/your/model/folder/on/host:/model -v $(pwd)/templates:/templates -p 8000:8000 model-explorer
+docker run -v /absolute/path/to/your/model/folder/on/host:/model -v $(pwd)/views:/views -p 8000:8000 model-explorer
 ```
 
-Then open your browser at `http://localhost:8000/templates` and start exploring your model.
+Then open your browser at `http://localhost:8000/views` and start exploring your model.
 
 While the thing is running you can edit the templates in the `templates` folder and see the changes immediately in the browser.
 

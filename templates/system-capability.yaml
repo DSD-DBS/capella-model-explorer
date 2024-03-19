@@ -1,4 +1,4 @@
-template: system_capability.html.j2
+template: system-capability.html.j2
 name: System Capability
 description: Specifies what the system should be capable of and how it needs to interact with external actors.
 variable: 
