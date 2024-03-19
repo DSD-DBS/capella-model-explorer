@@ -1,10 +1,28 @@
 {% macro properties_table(properties, object) %}
+<style>
+    .table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    th, td {
+        padding: 8px;
+
+        text-align: left;
+    }
+
+    tr:hover, th {
+        background-color: #f2f2f2;
+    }
+</style>
+
 <table class="min-w-full divide-y divide-gray-200">
     <thead>
         <tr>
             <th>Property Name</th>
             <th>Type</th>
             <th>Multiplicity</th>
+            <th>Description</th>
         </tr>
     </thead>
     <tbody
@@ -18,23 +36,30 @@
                     {{ property.type.name }}</td>
                 {% endif %}
             <td>{{ property.min_card.value }} .. {{ property.max_card.value }}</td>
-            
+            <td>{% if property.description %}
+            {{ property.description }}
+            {% else %}
+<p style="color:red">No description available.</p>
+            {% endif %}
+            </td>
         </tr>
     {% endfor %}
     </tbody>
 </table>
 {% endmacro %}
 
-<h1>{{ object.name | capitalize }}</h1>
+<h1>{{ object.name }}</h1>
+<p>{{ object.parent._short_html_() }}</p><br>
 {% if object.description %}
 <p>{{ object.description }}</p>
 {% else %}
 <p style="color:red">No description available.</p>
 {% endif %}
 
+
 <h2>Owned Properties</h2>
 {% if object.owned_properties %}
-    <p>The object owns the following properties:</p>
+    <p>The object owns the following properties:</p><br>
     {{ properties_table(object.owned_properties, object) }}
 {% else %}
     <p style="color:red">No properties are owned by this object.</p>
