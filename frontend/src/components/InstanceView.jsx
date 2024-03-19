@@ -48,7 +48,7 @@ export const InstanceView = ({ templateName, objectID, endpoint }) => {
     if (loading)
         return (
             <div>
-                <Spinner />;
+                <Spinner />
             </div>
         );
     return (
