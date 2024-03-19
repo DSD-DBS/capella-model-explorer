@@ -8,6 +8,9 @@ export default {
     extend: {
       boxShadow: {
         white: '0 0 15px rgba(255, 255, 255, 0.1)',
+      },
+      animation: {
+        'spin-slow': 'spin 1.6s linear infinite',
       }
     }
   },
