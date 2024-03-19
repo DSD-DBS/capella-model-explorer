@@ -1,0 +1,7 @@
+template: logical-component.html.j2
+name: Logical Component
+description: Specifies a logical component.
+variable: 
+  name: object
+  type: LogicalComponent
+  below: la

@@ -74,12 +74,16 @@ class CapellaModelExplorerBackend:
             variable = base["variable"]
             below = variable.get("below") or None
             attr = variable.get("attr") or None
-            objects = find_objects(
-                self.model, variable["type"], below=below, attr=attr
-            )
-            base["objects"] = [
-                {"idx": obj.uuid, "name": obj.name} for obj in objects
-            ]
+            try:
+                objects = find_objects(
+                    self.model, variable["type"], below=below, attr=attr
+                )
+                base["objects"] = [
+                    {"idx": obj.uuid, "name": obj.name} for obj in objects
+                ]
+            except Exception as e:
+                base["objects"] = []
+                base["error"] = str(e)
             return base
 
         @self.app.get("/api/views/{template_name}/{object_id}")
