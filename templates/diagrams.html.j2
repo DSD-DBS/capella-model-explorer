@@ -1,3 +1,21 @@
 
 <h1>{{ object.name }}</h1>
 {{ object.as_svg }}
+
+<h2>Description</h2>
+{% if object.description %}
+<p>{{ object.description }}</p>
+{% else %}
+<p style="color:red">No description available.</p>
+{% endif %}
+
+<h2>Referenced Objects</h2>
+{% if object.nodes %}
+<ul>
+{% for node in object.nodes %}
+<li><a href="#{{ node.uuid }}">{{ node.name }}</a></li>
+{% endfor %}
+</ul>
+{% else %}
+<p style="color:red">No referenced objects available.</p>
+{% endif %}

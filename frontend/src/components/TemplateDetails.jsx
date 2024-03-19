@@ -28,8 +28,7 @@ export const TemplateDetails = ({endpoint}) => {
     }, [endpoint, templateName, objectID]);
     
     return (
-    <div className='flex flex-col'>
-        <a href='/views' className='flex-initial p-4'>Back to template selection</a>
+    <div className='flex flex-col h-full'>
         <div className='p-5'>
             <h5 className='mb-2 text-2xl font-bold text-gray-900 dark:text-white'>
                 {details.name}
