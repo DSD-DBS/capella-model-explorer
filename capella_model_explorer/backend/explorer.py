@@ -7,14 +7,14 @@ import pathlib
 import typing as t
 import urllib.parse as urlparse
 from pathlib import Path
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
 
 import capellambse
 import yaml
 from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 from jinja2 import Environment
 
 PATH_TO_FRONTEND = Path("./frontend/dist")
@@ -42,12 +42,19 @@ class CapellaModelExplorerBackend:
         )
         self.env = Environment()
         self.templates = index_templates(self.templates_path)
-        self.app.templates =templates = Jinja2Templates(directory=PATH_TO_FRONTEND)
+        self.app.state.templates = templates = Jinja2Templates(
+            directory=PATH_TO_FRONTEND
+        )
 
         self.configure_routes()
 
     def configure_routes(self):
-        self.app.mount("/assets", StaticFiles(directory=PATH_TO_FRONTEND.joinpath("assets"), html=True))
+        self.app.mount(
+            "/assets",
+            StaticFiles(
+                directory=PATH_TO_FRONTEND.joinpath("assets"), html=True
+            ),
+        )
 
         @self.app.get("/api/views")
         def read_templates():
@@ -57,16 +64,11 @@ class CapellaModelExplorerBackend:
                 {"idx": key, **template}
                 for key, template in self.templates.items()
             ]
-        
+
         @self.app.get("/api/objects/{uuid}")
         def read_object(uuid: str):
             obj = self.model.by_uuid(uuid)
-            return {
-                "idx": obj.uuid,
-                "name": obj.name,
-                "type": obj.xtype
-            }
-
+            return {"idx": obj.uuid, "name": obj.name, "type": obj.xtype}
 
         @self.app.get("/api/views/{template_name}")
         def read_template(template_name: str):
@@ -99,15 +101,16 @@ class CapellaModelExplorerBackend:
             # render the template with the object
             rendered = template.render(object=object)
             return HTMLResponse(content=rendered, status_code=200)
-        
+
         @self.app.get("/api/model-info")
         def model_info():
             return self.model.info
-        
+
         @self.app.get("/{rest_of_path:path}")
         async def catch_all(request: Request, rest_of_path: str):
-            return self.app.templates.TemplateResponse("index.html", {"request": request})
-        
+            return self.app.state.templates.TemplateResponse(
+                "index.html", {"request": request}
+            )
 
 
 def index_templates(path: pathlib.Path) -> dict[str, t.Any]:

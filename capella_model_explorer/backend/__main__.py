@@ -13,11 +13,18 @@ from . import explorer
 HOST = os.getenv("CAPELLA_MODEL_EXPLORER_HOST_IP", "0.0.0.0")
 PORT = os.getenv("CAPELLA_MODEL_EXPLORER_PORT", "8000")
 
+PATH_TO_TEMPLATES = Path(__file__).parent.parent.parent / "templates"
+
 
 @click.command()
 @click.argument("model", type=capellambse.ModelCLI())
-@click.argument("templates", type=click.Path(exists=True))
-def run(model: capellambse.MelodyModel, templates: Path | str):
+@click.argument(
+    "templates",
+    type=click.Path(path_type=Path, exists=True),
+    required=False,
+    default=PATH_TO_TEMPLATES,
+)
+def run(model: capellambse.MelodyModel, templates: Path):
     backend = explorer.CapellaModelExplorerBackend(Path(templates), model)
     uvicorn.run(backend.app, host=HOST, port=int(PORT))
 
