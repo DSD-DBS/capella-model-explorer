@@ -105,6 +105,11 @@ class CapellaModelExplorerBackend:
             except TemplateSyntaxError as e:
                 error_message = f"<p style='color:red'>Template syntax error: {e.message}, line {e.lineno}</p>"
                 return HTMLResponse(content=error_message)
+            except Exception as e:
+                error_message = (
+                    f"<p style='color:red'>Unexpected error: {str(e)}</p>"
+                )
+                return HTMLResponse(content=error_message)
 
         @self.app.get("/api/model-info")
         def model_info():
