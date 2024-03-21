@@ -13,7 +13,9 @@
 {% if object.nodes %}
 <ul>
 {% for node in object.nodes %}
+{% if node.name %}
 <li><a href="#{{ node.uuid }}">{{ node.name }}</a></li>
+{% endif %}
 {% endfor %}
 </ul>
 {% else %}

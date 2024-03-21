@@ -31,7 +31,7 @@ export const TemplateView = ({endpoint}) => {
 
                 {/* Main Content */}
                 <main className="flex-1 overflow-hidden p-4">
-                    <div className="w-full p-4 max-w-none lg:max-w-4xl min-w-0 lg:min-w-[850px] overflow-y-auto h-full flex items-center justify-center"> {/* Ensure main content is scrollable and fills the height */}
+                    <div className="w-full p-4 max-w-none lg:max-w-4xl min-w-0 lg:min-w-[850px] overflow-y-hidden h-full flex items-center justify-center"> {/* Ensure main content is scrollable and fills the height */}
                         { !!!objectID && <p className='text-xl text-gray-700'>Select an Instance</p>}
                         { objectID && <InstanceView endpoint={endpoint} objectID={objectID} templateName={templateName} /> }
                     </div>
