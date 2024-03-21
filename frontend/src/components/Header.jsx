@@ -1,10 +1,13 @@
-const Header = () => {
+import React from "react";
+import {Breadcrumbs} from "./Breadcrumbs";
+import {ThemeSwitcher} from "./ThemeSwitcher";
+
+export const Header = () => {
     return (
-      <div className="sticky top-0 z-50 shadow bg-indigo-500 text-indigo-50">
-        <header>
-        <p>Stuff goes here</p>
-        </header>
-      </div>
+      <header className=" text-gray-700 p-4 flex justify-between items-center">
+          <div><Breadcrumbs /></div>
+          <div></div>
+          <div><ThemeSwitcher /></div>
+      </header>
     );
   };
-  export default Header;

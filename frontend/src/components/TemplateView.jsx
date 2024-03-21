@@ -8,8 +8,7 @@ import React, {useEffect, useState} from 'react';
 import { TemplateDetails } from './TemplateDetails';
 import { useLocation, useParams, Navigate } from 'react-router-dom';
 import { InstanceView } from './InstanceView';
-import { Breadcrumbs } from './Breadcrumbs';
-import { ThemeSwitcher } from './ThemeSwitcher';
+import { Header } from './Header';
 
 export const TemplateView = ({endpoint}) => {
     let { templateName, objectID } = useParams();
@@ -21,11 +20,7 @@ export const TemplateView = ({endpoint}) => {
     return (
         <div className="flex flex-col h-screen"> {/* Use h-screen to ensure the container fits the viewport height */}
             {/* Header */}
-            <header className=" text-gray-700 p-4 flex justify-between items-center">
-                <div><Breadcrumbs /></div>
-                <div></div>
-                <div><ThemeSwitcher /></div>
-            </header>
+            <Header />
 
             {/* Body: Sidebar + Main Content */}
             <div className="flex flex-1 overflow-hidden"> {/* This ensures the remaining height is distributed here */}

@@ -6,6 +6,7 @@ export const Breadcrumbs = () => {
   const location = useLocation();
   const [breadcrumbLabels, setBreadcrumbLabels] = useState({});
   const pathnames = location.pathname.split('/').filter(x => x);
+  const [error, setError] = useState(null);
 
   const fetchModelInfo = async () => {
     const response = await fetch(API_BASE_URL + `/model-info`);
