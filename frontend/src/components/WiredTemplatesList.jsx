@@ -5,6 +5,7 @@ import { ViewsList } from './ViewsList';
 
 export const WiredTemplatesList = ({endpoint}) => {
     const [templates, setTemplates] = useState([])
+    const [error, setError] = useState(null);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -19,10 +20,22 @@ export const WiredTemplatesList = ({endpoint}) => {
                 const data = await response.json();
                 setTemplates(data);
             }
-            catch (error) {}
+            catch (error) {
+                setError(error.message)
+            }
             finally {}
         };
         fetchTemplates();
     }, [endpoint]);
 
+    if (error) {
+        return (
+        <div className='bg-red-500 text-white p-4 rounded text-2xl'>
+            {error === 'Failed to fetch' ? 
+            "Can't connect to the server. Maybe your session was inactive for too long? if that's the case, request a new session / restart the app." 
+            : 
+            error
+            }   
+        </div>);
+    }
     return <ViewsList templates={templates} cardClickCallback={(idx) => navigate(`/views/${idx}`, {state: {idx: idx}})} />;}

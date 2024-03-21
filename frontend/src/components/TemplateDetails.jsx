@@ -5,6 +5,7 @@ import { Card } from './Card';
 
 export const TemplateDetails = ({endpoint}) => {
     let { templateName, objectID } = useParams();
+    const [error, setError] = useState(null);
     const [details, setDetails] = useState([]);
     const navigate = useNavigate();
     const [filterText, setFilterText] = useState('');
@@ -21,12 +22,20 @@ export const TemplateDetails = ({endpoint}) => {
                 const data = await response.json();
                 setDetails(data);
             }
-            catch (error) {}
+            catch (error) {
+                setError(error.message);
+            }
             finally {}
         };
         fetchDetails(); 
     }, [endpoint, templateName, objectID]);
-    
+    if (error) {
+        return (
+        <div className='bg-red-500 text-white p-4 rounded text-2xl'>
+            {error}
+        </div>
+        )
+    }
     return (
     <div className='flex flex-col h-full'>
         <h5 className='mb-2 text-2xl font-bold text-gray-900 dark:text-white'>
