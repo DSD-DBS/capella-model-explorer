@@ -32,6 +32,5 @@ The figure below provides an overview of the logical subsystem and external enti
     {% for lexc in (spp + tpp) %}
         <h4>Logical interface {{ lexc.name }}</h4>
         {{ lexc.context_diagram.as_svg|safe  }}
-        {{ 8/0 }}
     {% endfor %}
 {% endfor %}
