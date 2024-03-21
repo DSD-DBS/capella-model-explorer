@@ -1,9 +1,10 @@
 import React, {useState, useEffect} from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ViewsList } from './ViewsList';
+import { API_BASE_URL } from '../APIConfig';
 
 
-export const WiredTemplatesList = ({endpoint}) => {
+export const WiredTemplatesList = () => {
     const [templates, setTemplates] = useState([])
     const [error, setError] = useState(null);
     const navigate = useNavigate();
@@ -11,7 +12,7 @@ export const WiredTemplatesList = ({endpoint}) => {
     useEffect(() => {
         const fetchTemplates = async () => {
             try {
-                const response = await fetch(endpoint, {
+                const response = await fetch(API_BASE_URL + "/views", {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json'
@@ -26,7 +27,7 @@ export const WiredTemplatesList = ({endpoint}) => {
             finally {}
         };
         fetchTemplates();
-    }, [endpoint]);
+    }, []);
 
     if (error) {
         return (
@@ -38,4 +39,4 @@ export const WiredTemplatesList = ({endpoint}) => {
             }   
         </div>);
     }
-    return <ViewsList templates={templates} cardClickCallback={(idx) => navigate(`/views/${idx}`, {state: {idx: idx}})} />;}
+    return <ViewsList templates={templates} cardClickCallback={(idx) => navigate(`/${idx}`, {state: {idx: idx}})} />;}

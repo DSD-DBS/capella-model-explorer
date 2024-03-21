@@ -38,11 +38,9 @@ export const Breadcrumbs = () => {
       for (let i = 0; i < pathnames.length; i++) {
         const to = `/${pathnames.slice(0, i + 1).join('/')}`;
   
-        if (pathnames[i] === 'views') {
-          labels[to] = 'Views';
-        } else if (i === 1 && pathnames[0] === 'views') {
+        if (i === 0) {
           labels[to] = await fetchViewName(pathnames[i]);
-        } else if (i === 2 && pathnames[0] === 'views') {
+        } else if (i === 1) {
           labels[to] = await fetchObjectName(pathnames[i]);
         } else {
           labels[to] = pathnames[i];
@@ -62,7 +60,7 @@ export const Breadcrumbs = () => {
     <nav aria-label="breadcrumb" className="flex items-center">
       <ol className="flex items-center">
         <li className="flex items-center dark:text-gray-200">
-          <span>{breadcrumbLabels['/']}</span>
+          <Link to={"/"}>{breadcrumbLabels['/']}</Link>
           <span className="mx-2">/</span>
         </li>
         {visible_pathnames.slice(1).map((value, index) => {

@@ -4,8 +4,8 @@ import viteLogo from '/vite.svg'
 import './App.css'
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
 import { WiredTemplatesList } from './components/WiredTemplatesList'
-import { TemplateView } from './components/TemplateView'
-import { InstanceView } from './components/InstanceView'
+import { TemplateView } from './views/TemplateView'
+import { HomeView } from './views/HomeView'
 
 
 function App() {
@@ -14,10 +14,10 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<p>this view is WIP, checkout <a href='/views'>templates</a> instead.</p>} />
-        <Route path="/views" element={<WiredTemplatesList endpoint="http://localhost:8000/api/views" />} />
-        <Route path="/views/:templateName" element={<TemplateView endpoint="http://localhost:8000/api/views/" />} />
-        <Route path="/views/:templateName/:objectID" element={<TemplateView endpoint="http://localhost:8000/api/views/" />} />
+        <Route path="/" element={<HomeView/>} />
+        {/* <Route path="/views" element={<WiredTemplatesList endpoint="http://localhost:8000/api/views" />} /> */}
+        <Route path="/:templateName" element={<TemplateView endpoint="http://localhost:8000/api/views/" />} />
+        <Route path="/:templateName/:objectID" element={<TemplateView endpoint="http://localhost:8000/api/views/" />} />
       </Routes>
     </Router>
   )

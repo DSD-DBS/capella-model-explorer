@@ -64,7 +64,7 @@ export const TemplateDetails = ({endpoint}) => {
     ) : (
         details.objects && details.objects.filter(object => object.name.toLowerCase().includes(filterText.toLowerCase())).map(object => (
             <div key={object.idx}
-                onClick={() => {navigate(`/views/${templateName}/${object.idx}`);}}
+                onClick={() => {navigate(`/${templateName}/${object.idx}`);}}
                 className={(objectID && object.idx === objectID ? 'bg-blue-800 dark:bg-blue-800 text-white hover:dark:text-white hover:text-blue-800' : 'text-gray-900') + ' max-w-sm rounded-lg border border-gray-200 shadow-md m-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 dark:border-gray-700'}
             >
                 <div className='p-2'>

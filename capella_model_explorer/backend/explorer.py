@@ -113,7 +113,15 @@ class CapellaModelExplorerBackend:
 
         @self.app.get("/api/model-info")
         def model_info():
-            return self.model.info
+            info = self.model.info
+            return dict(
+                title=info.title,
+                revision=info.revision,
+                hash=info.rev_hash,
+                capella_version=info.capella_version,
+                branch=info.branch,
+                badge=self.model.description_badge
+            )
 
         @self.app.get("/{rest_of_path:path}")
         async def catch_all(request: Request, rest_of_path: str):

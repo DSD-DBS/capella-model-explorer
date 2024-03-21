@@ -5,10 +5,10 @@ In this component we show list of template instances, and when we click on a tem
 */
 
 import React, {useEffect, useState} from 'react';
-import { TemplateDetails } from './TemplateDetails';
+import { TemplateDetails } from '../components/TemplateDetails';
 import { useLocation, useParams, Navigate } from 'react-router-dom';
-import { InstanceView } from './InstanceView';
-import { Header } from './Header';
+import { InstanceView } from '../components/InstanceView';
+import { Header } from '../components/Header';
 
 export const TemplateView = ({endpoint}) => {
     let { templateName, objectID } = useParams();
