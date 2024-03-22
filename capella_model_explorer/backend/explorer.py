@@ -41,7 +41,7 @@ class CapellaModelExplorerBackend:
             allow_headers=["*"],
         )
         self.env = Environment()
-        self.templates = index_templates(self.templates_path)
+        self.grouped_templates, self.templates = index_templates(self.templates_path)
         self.app.state.templates = templates = Jinja2Templates(
             directory=PATH_TO_FRONTEND
         )
@@ -59,11 +59,8 @@ class CapellaModelExplorerBackend:
         @self.app.get("/api/views")
         def read_templates():
             # list all templates in the templates folder from .yaml
-            self.templates = index_templates(self.templates_path)
-            return [
-                {"idx": key, **template}
-                for key, template in self.templates.items()
-            ]
+            self.grouped_templates, self.templates = index_templates(self.templates_path)
+            return self.grouped_templates
 
         @self.app.get("/api/objects/{uuid}")
         def read_object(uuid: str):
@@ -144,14 +141,25 @@ class CapellaModelExplorerBackend:
 
 
 def index_templates(path: pathlib.Path) -> dict[str, t.Any]:
+    templates_grouped: dict[str, t.Any] = {"other": []}
     templates: dict[str, t.Any] = {}
     for template_file in path.glob("*.yaml"):
         template = yaml.safe_load(template_file.read_text(encoding="utf8"))
+        idx = urlparse.quote(template_file.name.replace(".yaml", ""))
+        record = {"idx": idx, **template}
+        if "category" in template:
+            category = template["category"]
+            if category not in templates_grouped:
+                templates_grouped[category] = []
+            templates_grouped[category].append(record)
+        else:
+            templates_grouped["other"].append(record)
+        templates[idx] = template
         name = template_file.name.replace(".yaml", "")
         templates[urlparse.quote(name)] = template
         # later we could add here count of objects that can be rendered
         # with this template
-    return templates
+    return templates_grouped, templates
 
 
 def find_objects(model, obj_type, below=None, attr=None):

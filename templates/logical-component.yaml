@@ -1,6 +1,7 @@
 template: logical-component.html.j2
 name: Logical Component
 description: Specifies a logical component. This is a ported template from a prototype project.
+category: la
 variable: 
   name: object
   type: LogicalComponent

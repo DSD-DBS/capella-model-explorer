@@ -1,6 +1,7 @@
 template: system_function.html.j2
 name: System Function
 description: Specifies what the system should do and how it needs to interact with external actors.
+category: sa
 variable: 
   name: object
   type: SystemFunction

@@ -18,10 +18,11 @@ export const Breadcrumbs = () => {
   const fetchViewName = async (idx) => {
     const response = await fetch(API_BASE_URL + `/views`);
     
-    const views = await response.json();
-    const view = views.find(v => v.idx.toString() === idx);
+    const viewsDict = await response.json();
+    const allViews = Object.values(viewsDict).flat();
+    const view = allViews.find(v => v.idx.toString() === idx);
     return view ? view.name : idx;
-  };
+};
 
   // Function to fetch object names
   const fetchObjectName = async (uuid) => {
