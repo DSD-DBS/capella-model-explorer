@@ -72,6 +72,9 @@ class CapellaModelExplorerBackend:
 
         @self.app.get("/api/views/{template_name}")
         def read_template(template_name: str):
+            template_name = urlparse.unquote(template_name)
+            if not template_name in self.templates:
+                return {"error": f"Template {template_name} not found"}
             base = self.templates[urlparse.quote(template_name)]
             variable = base["variable"]
             below = variable.get("below") or None
@@ -90,13 +93,23 @@ class CapellaModelExplorerBackend:
 
         @self.app.get("/api/views/{template_name}/{object_id}")
         def render_template(template_name: str, object_id: str):
-            base = self.templates[urlparse.quote(template_name)]
-            template_filename = base["template"]
-            # load the template file from the templates folder
-            content = (self.templates_path / template_filename).read_text(
-                encoding="utf8"
-            )
-            object = self.model.by_uuid(object_id)
+            content = None
+            object = None
+            try:
+                base = self.templates[urlparse.quote(template_name)]
+                template_filename = base["template"]
+                # load the template file from the templates folder
+                content = (self.templates_path / template_filename).read_text(
+                    encoding="utf8"
+                )
+            except Exception as e:
+                error_message = f"<p style='color:red'>Template not found: {str(e)}</p>"
+                return HTMLResponse(content=error_message)
+            try:
+                object = self.model.by_uuid(object_id)
+            except Exception as e:
+                error_message = f"<p style='color:red'>Requested object not found: {str(e)}</p>"
+                return HTMLResponse(content=error_message)
             try:
                 # render the template with the object
                 template = self.env.from_string(content)
