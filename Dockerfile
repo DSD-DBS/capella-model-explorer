@@ -12,7 +12,21 @@ WORKDIR /app
 COPY ./capella_model_explorer ./capella_model_explorer
 COPY ./pyproject.toml ./
 COPY ./.git ./.git
-RUN apt-get update && apt-get install -y git
+
+USER root
+
+RUN apt-get update && \
+    apt-get install --yes --no-install-recommends \
+    git \
+    git-lfs \
+    libgirepository1.0-dev \
+    libcairo2-dev \
+    gir1.2-pango-1.0 \
+    graphviz \
+    nodejs \
+    npm && \
+    rm -rf /var/lib/apt/lists/*
+
 RUN pip install .
 COPY --from=build-frontend /app/dist/ ./frontend/dist/
 
