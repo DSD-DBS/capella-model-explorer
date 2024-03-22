@@ -1,3 +1,6 @@
+// Copyright DB InfraGO AG and contributors
+// SPDX-License-Identifier: Apache-2.0
+
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { API_BASE_URL } from '../APIConfig';
@@ -17,7 +20,7 @@ export const Breadcrumbs = () => {
   // Function to fetch view names
   const fetchViewName = async (idx) => {
     const response = await fetch(API_BASE_URL + `/views`);
-    
+
     const viewsDict = await response.json();
     const allViews = Object.values(viewsDict).flat();
     const view = allViews.find(v => v.idx.toString() === idx);
@@ -35,10 +38,10 @@ export const Breadcrumbs = () => {
     const updateLabels = async () => {
       const title = await fetchModelInfo();
       const labels = { '/': title };
-  
+
       for (let i = 0; i < pathnames.length; i++) {
         const to = `/${pathnames.slice(0, i + 1).join('/')}`;
-  
+
         if (i === 0) {
           labels[to] = await fetchViewName(pathnames[i]);
         } else if (i === 1) {
@@ -48,10 +51,10 @@ export const Breadcrumbs = () => {
         }
       }
       console.log(labels);
-  
+
       setBreadcrumbLabels(labels);
     };
-  
+
     updateLabels();
   }, [location]);
 
@@ -68,7 +71,7 @@ export const Breadcrumbs = () => {
           const last = index === visible_pathnames.length - 2;
           const to = `/${visible_pathnames.slice(1, index + 2).join('/')}`;
           const label = breadcrumbLabels[to] || value;
-  
+
           return (
             <li className="flex items-center" key={to}>
               {!last && <Link to={to}>{label}</Link>}

@@ -1,8 +1,11 @@
+# Copyright DB InfraGO AG and contributors
+# SPDX-License-Identifier: Apache-2.0
+
 template: diagrams.html.j2
 name: Diagrams
 description: Provides access to all human-made diagrams inside the model
 category: xc
-variable: 
+variable:
   name: object
   type: AbstractDiagram
   attr: diagrams

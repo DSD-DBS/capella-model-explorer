@@ -1,3 +1,6 @@
+// Copyright DB InfraGO AG and contributors
+// SPDX-License-Identifier: Apache-2.0
+
 import React, { useState, useEffect } from 'react';
 import {WiredTemplatesList} from '../components/WiredTemplatesList';
 import { API_BASE_URL } from '../APIConfig';

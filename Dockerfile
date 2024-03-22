@@ -1,3 +1,9 @@
+// Copyright DB InfraGO AG and contributors
+// SPDX-License-Identifier: Apache-2.0
+
+# Copyright DB InfraGO AG and contributors
+# SPDX-License-Identifier: Apache-2.0
+
 # Build frontend
 FROM node:20 as build-frontend
 WORKDIR /app

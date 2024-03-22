@@ -1,3 +1,8 @@
+/*
+ * Copyright DB InfraGO AG and contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 // Spinner.stories.js
 import React from 'react';
 import { Spinner } from '../components/Spinner';
@@ -14,4 +19,3 @@ export const Demo = {
         },
     },
 };
-

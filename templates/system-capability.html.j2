@@ -1,3 +1,8 @@
+{#
+    Copyright DB InfraGO AG and contributors
+    SPDX-License-Identifier: Apache-2.0
+#}
+
 <h1>{{ object.name }}</h1>
 {% if object.description %}
 <p>{{ object.description }}</p>
@@ -5,7 +10,7 @@
 <p style="color:red">No description available.</p>
 {% endif %}
 
-<br><b>Pre-condition</b>: 
+<br><b>Pre-condition</b>:
 {% if object.precondition %}
 {{ object.precondition.specification['capella:linkedText']|safe }}
 {% else %}
@@ -26,9 +31,9 @@
 
 <h2>Data Flow Diagram</h2>
 
-<p>The diagram below provides an overview of the System (green) and actor 
+<p>The diagram below provides an overview of the System (green) and actor
     (blue) functions that are required to realize the Capability.</p>
-        
+
 {{ object.data_flow_view.as_svg | safe }}
 
 <h2>Functional Requirements</h2>

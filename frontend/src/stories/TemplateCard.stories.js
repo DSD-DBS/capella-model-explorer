@@ -1,3 +1,8 @@
+/*
+ * Copyright DB InfraGO AG and contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import React from 'react';
 import {TemplateCard} from '../components/TemplateCard';
 
@@ -23,4 +28,3 @@ export const Demo = {
         onClickCallback: (idx) => alert(idx)
     },
 };
-

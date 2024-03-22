@@ -1,3 +1,6 @@
+// Copyright DB InfraGO AG and contributors
+// SPDX-License-Identifier: Apache-2.0
+
 import React, {useEffect, useState} from 'react';
 import { useParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
@@ -27,7 +30,7 @@ export const TemplateDetails = ({endpoint}) => {
             }
             finally {}
         };
-        fetchDetails(); 
+        fetchDetails();
     }, [endpoint, templateName, objectID]);
     if (error) {
         return (
@@ -78,6 +81,6 @@ export const TemplateDetails = ({endpoint}) => {
 </div>
         </>
     )}
-        
+
     </div>
     );}

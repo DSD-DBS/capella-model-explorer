@@ -41,7 +41,9 @@ class CapellaModelExplorerBackend:
             allow_headers=["*"],
         )
         self.env = Environment()
-        self.grouped_templates, self.templates = index_templates(self.templates_path)
+        self.grouped_templates, self.templates = index_templates(
+            self.templates_path
+        )
         self.app.state.templates = templates = Jinja2Templates(
             directory=PATH_TO_FRONTEND
         )
@@ -59,7 +61,9 @@ class CapellaModelExplorerBackend:
         @self.app.get("/api/views")
         def read_templates():
             # list all templates in the templates folder from .yaml
-            self.grouped_templates, self.templates = index_templates(self.templates_path)
+            self.grouped_templates, self.templates = index_templates(
+                self.templates_path
+            )
             return self.grouped_templates
 
         @self.app.get("/api/objects/{uuid}")
@@ -100,12 +104,17 @@ class CapellaModelExplorerBackend:
                     encoding="utf8"
                 )
             except Exception as e:
-                error_message = f"<p style='color:red'>Template not found: {str(e)}</p>"
+                error_message = (
+                    f"<p style='color:red'>Template not found: {str(e)}</p>"
+                )
                 return HTMLResponse(content=error_message)
             try:
                 object = self.model.by_uuid(object_id)
             except Exception as e:
-                error_message = f"<p style='color:red'>Requested object not found: {str(e)}</p>"
+                error_message = (
+                    "<p style='color:red'>Requested object "
+                    f"not found: {str(e)}</p>"
+                )
                 return HTMLResponse(content=error_message)
             try:
                 # render the template with the object
@@ -113,7 +122,10 @@ class CapellaModelExplorerBackend:
                 rendered = template.render(object=object)
                 return HTMLResponse(content=rendered, status_code=200)
             except TemplateSyntaxError as e:
-                error_message = f"<p style='color:red'>Template syntax error: {e.message}, line {e.lineno}</p>"
+                error_message = (
+                    "<p style='color:red'>Template syntax error: "
+                    f"{e.message}, line {e.lineno}</p>"
+                )
                 return HTMLResponse(content=error_message)
             except Exception as e:
                 error_message = (
@@ -130,7 +142,7 @@ class CapellaModelExplorerBackend:
                 hash=info.rev_hash,
                 capella_version=info.capella_version,
                 branch=info.branch,
-                badge=self.model.description_badge
+                badge=self.model.description_badge,
             )
 
         @self.app.get("/{rest_of_path:path}")
@@ -140,7 +152,9 @@ class CapellaModelExplorerBackend:
             )
 
 
-def index_templates(path: pathlib.Path) -> dict[str, t.Any]:
+def index_templates(
+    path: pathlib.Path,
+) -> tuple[dict[str, t.Any], dict[str, t.Any]]:
     templates_grouped: dict[str, t.Any] = {"other": []}
     templates: dict[str, t.Any] = {}
     for template_file in path.glob("*.yaml"):
