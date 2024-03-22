@@ -44,9 +44,7 @@ class CapellaModelExplorerBackend:
         self.grouped_templates, self.templates = index_templates(
             self.templates_path
         )
-        self.app.state.templates = templates = Jinja2Templates(
-            directory=PATH_TO_FRONTEND
-        )
+        self.app.state.templates = Jinja2Templates(directory=PATH_TO_FRONTEND)
 
         self.configure_routes()
 
@@ -136,17 +134,18 @@ class CapellaModelExplorerBackend:
         @self.app.get("/api/model-info")
         def model_info():
             info = self.model.info
-            return dict(
-                title=info.title,
-                revision=info.revision,
-                hash=info.rev_hash,
-                capella_version=info.capella_version,
-                branch=info.branch,
-                badge=self.model.description_badge,
-            )
+            return {
+                "title": info.title,
+                "revision": info.revision,
+                "hash": info.rev_hash,
+                "capella_version": info.capella_version,
+                "branch": info.branch,
+                "badge": self.model.description_badge,
+            }
 
         @self.app.get("/{rest_of_path:path}")
         async def catch_all(request: Request, rest_of_path: str):
+            del rest_of_path
             return self.app.state.templates.TemplateResponse(
                 "index.html", {"request": request}
             )
