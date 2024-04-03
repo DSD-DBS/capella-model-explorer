@@ -75,12 +75,17 @@ class CapellaModelExplorerBackend:
             if not template_name in self.templates:
                 return {"error": f"Template {template_name} not found"}
             base = self.templates[urlparse.quote(template_name)]
+            filters = base.get("filters") or None
             variable = base["variable"]
             below = variable.get("below") or None
             attr = variable.get("attr") or None
             try:
                 objects = find_objects(
-                    self.model, variable["type"], below=below, attr=attr
+                    self.model,
+                    variable["type"],
+                    below=below,
+                    attr=attr,
+                    filters=filters,
                 )
                 base["objects"] = [
                     {"idx": obj.uuid, "name": obj.name} for obj in objects
@@ -175,11 +180,23 @@ def index_templates(
     return templates_grouped, templates
 
 
-def find_objects(model, obj_type, below=None, attr=None):
+def find_objects(model, obj_type, below=None, attr=None, filters=None):
     if attr:
         getter = operator.attrgetter(attr)
-        return getter(model)
-    if below:
+        objects = getter(model)
+    elif below:
         getter = operator.attrgetter(below)
-        return model.search(obj_type, below=getter(model))
-    return model.search(obj_type)
+        objects = model.search(obj_type, below=getter(model))
+    else:
+        objects = model.search(obj_type)
+
+    if filters:
+        objects = [
+            obj
+            for obj in objects
+            if all(
+                getattr(obj, key) == value for key, value in filters.items()
+            )
+        ]
+
+    return objects
