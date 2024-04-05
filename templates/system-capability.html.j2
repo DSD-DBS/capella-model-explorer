@@ -7,14 +7,14 @@
 
 <br><b>Pre-condition</b>: 
 {% if object.precondition %}
-{{ object.precondition.specification['capella:linkedText']|safe }}
+<p>{{ object.precondition.specification['capella:linkedText']|safe }}</p>
 {% else %}
 <p style="color:red">No pre-condition defined</p>
 {% endif %}
 
 <br><b>Post-condition</b>:
 {% if object.postcondition %}
-{{ object.postcondition.specification['capella:linkedText']|safe }}
+<p>{{ object.postcondition.specification['capella:linkedText']|safe }}</p>
 {% else %}
 <p style="color:red">No post-condition defined</p>
 {% endif %}
