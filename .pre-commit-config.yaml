@@ -96,9 +96,9 @@ repos:
           - --comment-style
           - "..|  |"
       - id: insert-license
-        name: Insert license headers (shell-style comments)
-        files: '(?:^|/)(?:.*\.(?:jsx)|Dockerfile|Makefile)$'
-        exclude: '(?:^|/)\..+|^docs/Makefile$'
+        name: Insert license headers (JSX files)
+        files: '\.jsx$'
+        exclude: '(?:^|/)\..+'
         args:
           - --detect-license-in-X-top-lines=15
           - --license-filepath
