@@ -8,7 +8,7 @@
 ![image](https://github.com/DSD-DBS/capella-model-explorer/actions/workflows/build-test-publish.yml/badge.svg)
 ![image](https://github.com/DSD-DBS/capella-model-explorer/actions/workflows/lint.yml/badge.svg)
 
-A webapp for exploring Capella models through simple "auto-generated" textual and graphical views. 
+A webapp for exploring Capella models through simple "auto-generated" textual and graphical views.
 
 **Longer story**:
 

@@ -1,3 +1,6 @@
+// Copyright DB InfraGO AG and contributors
+// SPDX-License-Identifier: Apache-2.0
+
 import React, { useState, useEffect } from 'react';
 import {WiredTemplatesList} from '../components/WiredTemplatesList';
 import { API_BASE_URL } from '../APIConfig';
@@ -12,7 +15,6 @@ export const HomeView = () => {
                 const response = await fetch(API_BASE_URL + '/model-info');
                 const data = await response.json();
                 setModelInfo(data);
-                console.log(data);
             } catch (err) {
                 setError('Failed to fetch model info: ' + err.message);
             }

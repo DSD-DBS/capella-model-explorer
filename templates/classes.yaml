@@ -1,6 +1,10 @@
+# Copyright DB InfraGO AG and contributors
+# SPDX-License-Identifier: Apache-2.0
+
 template: classes.html.j2
 name: Data Class
 description: Specifies structure of a data class. A class may be used to describe anything from a simple object relationship to a message on a bus.
-variable: 
+category: xc
+variable:
   name: object
   type: Class

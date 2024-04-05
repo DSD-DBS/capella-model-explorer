@@ -43,13 +43,15 @@ repos:
     rev: 6.3.0
     hooks:
       - id: pydocstyle
-        exclude: '^tests/'
+        exclude: "^tests/"
         additional_dependencies:
           - pydocstyle[toml]
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.8.0
     hooks:
       - id: mypy
+        additional_dependencies:
+          - types-pyyaml==6.0.11
   - repo: https://github.com/Lucas-C/pre-commit-hooks
     rev: v1.5.4
     hooks:
@@ -62,7 +64,7 @@ repos:
           - --license-filepath
           - LICENSES/.license_header.txt
           - --comment-style
-          - '#'
+          - "#"
       - id: insert-license
         name: Insert license headers (XML-style comments)
         files: '\.(?:html|md|xml)$'
@@ -72,7 +74,7 @@ repos:
           - --license-filepath
           - LICENSES/.license_header.txt
           - --comment-style
-          - '<!--| ~| -->'
+          - "<!--| ~| -->"
       - id: insert-license
         name: Insert license headers (C-style comments)
         files: '\.(?:css|js|ts)$'
@@ -82,7 +84,7 @@ repos:
           - --license-filepath
           - LICENSES/.license_header.txt
           - --comment-style
-          - '/*| *| */'
+          - "/*| *| */"
       - id: insert-license
         name: Insert license headers (reST comments)
         files: '\.rst$'
@@ -92,7 +94,17 @@ repos:
           - --license-filepath
           - LICENSES/.license_header.txt
           - --comment-style
-          - '..|  |'
+          - "..|  |"
+      - id: insert-license
+        name: Insert license headers (shell-style comments)
+        files: '(?:^|/)(?:.*\.(?:jsx)|Dockerfile|Makefile)$'
+        exclude: '(?:^|/)\..+|^docs/Makefile$'
+        args:
+          - --detect-license-in-X-top-lines=15
+          - --license-filepath
+          - LICENSES/.license_header.txt
+          - --comment-style
+          - "//"
   - repo: https://github.com/fsfe/reuse-tool
     rev: v3.0.1
     hooks:

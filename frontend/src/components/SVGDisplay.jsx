@@ -1,3 +1,6 @@
+// Copyright DB InfraGO AG and contributors
+// SPDX-License-Identifier: Apache-2.0
+
 import React, {useState} from "react";
 import {Lightbox} from "./Lightbox";
 
@@ -13,7 +16,7 @@ export const SVGDisplay = ({content}) => {
     return (
         <>
         <div className="relative group" style={{ maxWidth: '100%', height: 'auto' }} onClick={handleSvgClick}>
-            <div 
+            <div
                 className="absolute rounded inset-0 flex justify-center items-center bg-black bg-opacity-0 group-hover:bg-opacity-50 duration-200 cursor-pointer"
                 style={{ pointerEvents: 'none' }}
             >

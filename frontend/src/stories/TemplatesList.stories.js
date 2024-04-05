@@ -1,3 +1,8 @@
+/*
+ * Copyright DB InfraGO AG and contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import React from 'react';
 import { TemplatesList } from '../components/viewsList';
 
@@ -20,7 +25,7 @@ export const Demo = {
             {
                 name: "System Capability",
                 description: "Specifies what the system should be capable of and how it needs to interact with external actors.",
-                idx: 1  
+                idx: 1
             },
             {
                 name: "System Function",
@@ -31,4 +36,3 @@ export const Demo = {
         cardClickCallback: (idx) => alert(idx)
     },
 };
-

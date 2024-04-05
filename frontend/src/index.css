@@ -1,3 +1,8 @@
+/*
+ * Copyright DB InfraGO AG and contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -93,7 +98,7 @@ button:focus-visible {
 
 .html-content h2 {
   @apply text-3xl mb-3 mt-5;
-} 
+}
 
 .html-content h3 {
   @apply text-2xl mb-3 mt-5;

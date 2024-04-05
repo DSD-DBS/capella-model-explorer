@@ -1,3 +1,6 @@
+// Copyright DB InfraGO AG and contributors
+// SPDX-License-Identifier: Apache-2.0
+
 import React, { useEffect, useRef, useState } from "react";
 import { SVGDisplay } from "./SVGDisplay";
 import { Spinner } from "./Spinner";

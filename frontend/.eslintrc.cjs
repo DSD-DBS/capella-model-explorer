@@ -1,3 +1,6 @@
+// Copyright DB InfraGO AG and contributors
+// SPDX-License-Identifier: Apache-2.0
+
 module.exports = {
   root: true,
   env: { browser: true, es2020: true },

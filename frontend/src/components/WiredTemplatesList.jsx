@@ -1,3 +1,6 @@
+// Copyright DB InfraGO AG and contributors
+// SPDX-License-Identifier: Apache-2.0
+
 import React, {useState, useEffect} from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ViewsList } from './ViewsList';
@@ -32,11 +35,11 @@ export const WiredTemplatesList = () => {
     if (error) {
         return (
         <div className='bg-red-500 text-white p-4 rounded text-2xl'>
-            {error === 'Failed to fetch' ? 
-            "Can't connect to the server. Maybe your session was inactive for too long? if that's the case, request a new session / restart the app." 
-            : 
+            {error === 'Failed to fetch' ?
+            "Can't connect to the server. Maybe your session was inactive for too long? if that's the case, request a new session / restart the app."
+            :
             error
-            }   
+            }
         </div>);
     }
     return <ViewsList templates={templates} cardClickCallback={(idx) => navigate(`/${idx}`, {state: {idx: idx}})} />;}
