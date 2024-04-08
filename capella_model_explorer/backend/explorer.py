@@ -75,7 +75,8 @@ class CapellaModelExplorerBackend:
             if not template_name in self.templates:
                 return {"error": f"Template {template_name} not found"}
             base = self.templates[urlparse.quote(template_name)]
-            filters = base.get("filters") or None
+            base["single"] = base.get("single", False)
+            filters = base.get("filters")
             variable = base["variable"]
             below = variable.get("below") or None
             attr = variable.get("attr") or None
@@ -122,7 +123,7 @@ class CapellaModelExplorerBackend:
             try:
                 # render the template with the object
                 template = self.env.from_string(content)
-                rendered = template.render(object=object)
+                rendered = template.render(object=object, model=self.model)
                 return HTMLResponse(content=rendered, status_code=200)
             except TemplateSyntaxError as e:
                 error_message = (
@@ -180,15 +181,19 @@ def index_templates(
     return templates_grouped, templates
 
 
-def find_objects(model, obj_type, below=None, attr=None, filters=None):
+def find_objects(model, obj_type=None, below=None, attr=None, filters=None):
     if attr:
         getter = operator.attrgetter(attr)
         objects = getter(model)
-    elif below:
+        if objects and not isinstance(objects, list):
+            objects = [objects]
+    elif below and obj_type:
         getter = operator.attrgetter(below)
         objects = model.search(obj_type, below=getter(model))
-    else:
+    elif obj_type:
         objects = model.search(obj_type)
+    else:
+        raise ValueError("No search criteria provided")
 
     if filters:
         objects = [

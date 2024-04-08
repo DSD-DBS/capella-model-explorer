@@ -1,3 +1,8 @@
+{#
+    Copyright DB InfraGO AG and contributors
+    SPDX-License-Identifier: Apache-2.0
+#}
+{% set object = model.sa.root_component%}
 <h1>System Definition</h1>
 
 <h2>Introduction</h2>
@@ -28,7 +33,3 @@
 <h2>System boundary</h2>
 <p>The system boundary is defined by the following:</p>
 {{ object.context_diagram.as_svg | safe}}
-
-toolchain with low threshold, easier for european companies to use
-- something that is scalable for EU - low costs, low threshold
-allows proper serve

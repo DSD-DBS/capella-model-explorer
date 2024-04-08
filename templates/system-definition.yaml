@@ -1,8 +1,12 @@
+# Copyright DB InfraGO AG and contributors
+# SPDX-License-Identifier: Apache-2.0
+
 template: system-definition.html.j2
 name: System Definition
-description: Defines the system under consideration, its boundaries, capabilities, and its environment.
+description: hi
 category: sa
-variable: 
-  name: object
-  type: SystemComponent
-  below: sa
+single: true
+variable:
+    name: object
+    type: SystemComponent
+    below: sa
