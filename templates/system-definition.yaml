@@ -1,0 +1,14 @@
+# Copyright DB InfraGO AG and contributors
+# SPDX-License-Identifier: Apache-2.0
+
+template: system-definition.html.j2
+name: System Definition
+description: hi
+category: sa
+single: true
+variable:
+    name: object
+    type: SystemComponent
+    below: sa
+filters:
+    name: "System"
