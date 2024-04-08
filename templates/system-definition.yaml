@@ -1,0 +1,8 @@
+template: system-definition.html.j2
+name: System Definition
+description: Defines the system under consideration, its boundaries, capabilities, and its environment.
+category: sa
+variable: 
+  name: object
+  type: SystemComponent
+  below: sa
