@@ -11,4 +11,4 @@ variable:
     type: SystemComponent
     below: sa
 filters:
-    name: "System"
+    is_actor: false

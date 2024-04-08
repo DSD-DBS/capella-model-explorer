@@ -26,6 +26,7 @@
         <tr>
             <th>Property Name</th>
             <th>Type</th>
+            <th>Kind</th>
             <th>Multiplicity</th>
             <th>Description</th>
         </tr>
@@ -38,8 +39,10 @@
                 {% if property.type.__class__ == object.__class__ %}
                     <a href="/classes/{{ property.type.uuid }}">{{ property.type.name }}</a>
                 {% else %}
-                    {{ property.type.name }}</td>
+                    {{ property.type.name }}
                 {% endif %}
+            </td>
+            <td>{{ property.kind }}</td>
             <td>{{ property.min_card.value }} .. {{ property.max_card.value }}</td>
             <td>{% if property.description %}
             {{ property.description }}
