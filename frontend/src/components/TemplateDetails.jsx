@@ -23,7 +23,7 @@ export const TemplateDetails = ({ endpoint, onSingleInstance }) => {
                 const data = await response.json();
                 setDetails(data);
                 if (data.single) {
-                    onSingleInstance(data.objects[0].idx);
+                    onSingleInstance("render");
                 }
             } catch (error) {
                 setError(error.message);
@@ -59,15 +59,16 @@ export const TemplateDetails = ({ endpoint, onSingleInstance }) => {
                 </div>
             ) : (
                 <>
+                    {details.single === false ? (
                     <input
                         type="text"
                         value={filterText}
                         onChange={(e) => setFilterText(e.target.value)}
                         placeholder="Filter objects"
                         className="mb-3 p-2 border rounded"
-                    />
+                    />):( <></>)}
                     <div className="flex flex-wrap justify-center items-center overflow-auto">
-                        {details.objects && details.objects.length === 0 ? (
+                        {details.objects && details.single === false && details.objects.length === 0 ? (
                             <p>No objects found</p>
                         ) : (
                             details.objects &&

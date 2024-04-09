@@ -48,6 +48,24 @@ class CapellaModelExplorerBackend:
 
         self.configure_routes()
 
+    def render_instance_page(self, template_text, object=None):
+            try:
+                # render the template with the object
+                template = self.env.from_string(template_text)
+                rendered = template.render(object=object, model=self.model)
+                return HTMLResponse(content=rendered, status_code=200)
+            except TemplateSyntaxError as e:
+                error_message = (
+                    "<p style='color:red'>Template syntax error: "
+                    f"{e.message}, line {e.lineno}</p>"
+                )
+                return HTMLResponse(content=error_message)
+            except Exception as e:
+                error_message = (
+                    f"<p style='color:red'>Unexpected error: {str(e)}</p>"
+                )
+                return HTMLResponse(content=error_message)
+
     def configure_routes(self):
         self.app.mount(
             "/assets",
@@ -80,6 +98,9 @@ class CapellaModelExplorerBackend:
             variable = base["variable"]
             below = variable.get("below") or None
             attr = variable.get("attr") or None
+            if base["single"]:
+                base["objects"] = []
+                return base
             try:
                 objects = find_objects(
                     self.model,
@@ -112,30 +133,19 @@ class CapellaModelExplorerBackend:
                     f"<p style='color:red'>Template not found: {str(e)}</p>"
                 )
                 return HTMLResponse(content=error_message)
-            try:
-                object = self.model.by_uuid(object_id)
-            except Exception as e:
-                error_message = (
-                    "<p style='color:red'>Requested object "
-                    f"not found: {str(e)}</p>"
-                )
-                return HTMLResponse(content=error_message)
-            try:
-                # render the template with the object
-                template = self.env.from_string(content)
-                rendered = template.render(object=object, model=self.model)
-                return HTMLResponse(content=rendered, status_code=200)
-            except TemplateSyntaxError as e:
-                error_message = (
-                    "<p style='color:red'>Template syntax error: "
-                    f"{e.message}, line {e.lineno}</p>"
-                )
-                return HTMLResponse(content=error_message)
-            except Exception as e:
-                error_message = (
-                    f"<p style='color:red'>Unexpected error: {str(e)}</p>"
-                )
-                return HTMLResponse(content=error_message)
+            if object_id == "render":
+                object = None
+            else:
+                try:
+                    object = self.model.by_uuid(object_id)
+                except Exception as e:
+                    error_message = (
+                        "<p style='color:red'>Requested object "
+                        f"not found: {str(e)}</p>"
+                    )
+                    return HTMLResponse(content=error_message)
+            return self.render_instance_page(content, object)
+            
 
         @self.app.get("/api/model-info")
         def model_info():
