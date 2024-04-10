@@ -13,7 +13,7 @@
 
 <h2>Function owner</h2>
 {% if object.owner %}
-    <p>An Entity that is responsible for providing this function: <b>{{object.owner.name}}</b>.</p>
+    <p>An Entity that is responsible for providing this function: <b><a href="{{ object.owner | make_href }}">{{object.owner.name}}</a></b>.</p>
 {% else %}
     <p>This function is not allocated to any entity / no entity is responsible for it.</p>
 {% endif %}
@@ -23,7 +23,7 @@
 <p>The function is available in the following Entity states:</p>
 <ul>
     {% for state in object.available_in_states %}
-        <li>{{ state.name }}</li>
+        <li><a href="{{ state | make_href }}">{{ state.name }}</a></li>
     {% endfor %}
 </ul>
 {% else %}
