@@ -41,7 +41,7 @@ export const TemplateView = ({ endpoint }) => {
                 </aside>
                 {/* Main Content */}
                 <main className="flex-1 overflow-hidden p-4">
-                    <div className="w-full p-4 max-w-none lg:max-w-4xl min-w-0 lg:min-w-[850px] overflow-y-hidden h-full flex items-center justify-center">
+                    <div className="html-wrapper w-full p-4 max-w-none lg:max-w-4xl min-w-0 lg:min-w-[850px] overflow-y-hidden h-full flex items-center justify-center">
                         {" "}
                         {/* Ensure main content is scrollable and fills the height */}
                         {!!!objectID && !!!singleObjectID && (

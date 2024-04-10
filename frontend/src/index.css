@@ -107,3 +107,10 @@ button:focus-visible {
 ul {
   @apply list-disc pl-5;
 }
+
+@media print {
+  body, .html-wrapper, .flex-1, .html-content {
+    overflow: visible !important;
+  }
+  @page  { margin: 15mm; }   
+}
