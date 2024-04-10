@@ -3,6 +3,7 @@
 
 import dataclasses
 import operator
+import os
 import pathlib
 import typing as t
 import urllib.parse as urlparse
@@ -10,7 +11,7 @@ from pathlib import Path
 
 import capellambse
 import yaml
-from fastapi import FastAPI, Request
+from fastapi import APIRouter, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
@@ -18,6 +19,7 @@ from fastapi.templating import Jinja2Templates
 from jinja2 import Environment, TemplateSyntaxError
 
 PATH_TO_FRONTEND = Path("./frontend/dist")
+ROUTE_PREFIX = os.getenv("ROUTE_PREFIX", "")
 
 
 @dataclasses.dataclass
@@ -33,6 +35,7 @@ class CapellaModelExplorerBackend:
 
     def __post_init__(self):
         self.app = FastAPI()
+        self.router = APIRouter(prefix=ROUTE_PREFIX)
         self.app.add_middleware(
             CORSMiddleware,
             allow_origins=["*"],
@@ -45,36 +48,42 @@ class CapellaModelExplorerBackend:
             self.templates_path
         )
         self.app.state.templates = Jinja2Templates(directory=PATH_TO_FRONTEND)
-
         self.configure_routes()
+        self.app.include_router(self.router)
 
     def render_instance_page(self, template_text, object=None):
-            try:
-                # render the template with the object
-                template = self.env.from_string(template_text)
-                rendered = template.render(object=object, model=self.model)
-                return HTMLResponse(content=rendered, status_code=200)
-            except TemplateSyntaxError as e:
-                error_message = (
-                    "<p style='color:red'>Template syntax error: "
-                    f"{e.message}, line {e.lineno}</p>"
-                )
-                return HTMLResponse(content=error_message)
-            except Exception as e:
-                error_message = (
-                    f"<p style='color:red'>Unexpected error: {str(e)}</p>"
-                )
-                return HTMLResponse(content=error_message)
+        try:
+            # render the template with the object
+            template = self.env.from_string(template_text)
+            rendered = template.render(object=object, model=self.model)
+            return HTMLResponse(content=rendered, status_code=200)
+        except TemplateSyntaxError as e:
+            error_message = (
+                "<p style='color:red'>Template syntax error: "
+                f"{e.message}, line {e.lineno}</p>"
+            )
+            return HTMLResponse(content=error_message)
+        except Exception as e:
+            error_message = (
+                f"<p style='color:red'>Unexpected error: {str(e)}</p>"
+            )
+            return HTMLResponse(content=error_message)
 
     def configure_routes(self):
         self.app.mount(
-            "/assets",
+            f"{ROUTE_PREFIX}/assets",
             StaticFiles(
                 directory=PATH_TO_FRONTEND.joinpath("assets"), html=True
             ),
         )
+        self.app.mount(
+            f"{ROUTE_PREFIX}/static",
+            StaticFiles(
+                directory=PATH_TO_FRONTEND.joinpath("static"), html=True
+            ),
+        )
 
-        @self.app.get("/api/views")
+        @self.router.get("/api/views")
         def read_templates():
             # list all templates in the templates folder from .yaml
             self.grouped_templates, self.templates = index_templates(
@@ -82,12 +91,12 @@ class CapellaModelExplorerBackend:
             )
             return self.grouped_templates
 
-        @self.app.get("/api/objects/{uuid}")
+        @self.router.get("/api/objects/{uuid}")
         def read_object(uuid: str):
             obj = self.model.by_uuid(uuid)
             return {"idx": obj.uuid, "name": obj.name, "type": obj.xtype}
 
-        @self.app.get("/api/views/{template_name}")
+        @self.router.get("/api/views/{template_name}")
         def read_template(template_name: str):
             template_name = urlparse.unquote(template_name)
             if not template_name in self.templates:
@@ -117,7 +126,7 @@ class CapellaModelExplorerBackend:
                 base["error"] = str(e)
             return base
 
-        @self.app.get("/api/views/{template_name}/{object_id}")
+        @self.router.get("/api/views/{template_name}/{object_id}")
         def render_template(template_name: str, object_id: str):
             content = None
             object = None
@@ -145,9 +154,8 @@ class CapellaModelExplorerBackend:
                     )
                     return HTMLResponse(content=error_message)
             return self.render_instance_page(content, object)
-            
 
-        @self.app.get("/api/model-info")
+        @self.router.get("/api/model-info")
         def model_info():
             info = self.model.info
             return {
@@ -159,7 +167,7 @@ class CapellaModelExplorerBackend:
                 "badge": self.model.description_badge,
             }
 
-        @self.app.get("/{rest_of_path:path}")
+        @self.router.get("/{rest_of_path:path}")
         async def catch_all(request: Request, rest_of_path: str):
             del rest_of_path
             return self.app.state.templates.TemplateResponse(
