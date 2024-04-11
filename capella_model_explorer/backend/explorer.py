@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import dataclasses
+import logging
 import operator
 import os
 import pathlib
@@ -21,6 +22,7 @@ from jinja2 import Environment, TemplateSyntaxError
 
 PATH_TO_FRONTEND = Path("./frontend/dist")
 ROUTE_PREFIX = os.getenv("ROUTE_PREFIX", "")
+LOGGER = logging.getLogger(__name__)
 
 
 @dataclasses.dataclass
@@ -144,6 +146,9 @@ class CapellaModelExplorerBackend:
                     {"idx": obj.uuid, "name": obj.name} for obj in objects
                 ]
             except Exception as e:
+                LOGGER.exception(
+                    "Error finding objects for template %s", template_name
+                )
                 base["objects"] = []
                 base["error"] = str(e)
             return base
