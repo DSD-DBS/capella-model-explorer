@@ -113,8 +113,10 @@ class CapellaModelExplorerBackend:
                     {"idx": obj.uuid, "name": obj.name} for obj in objects
                 ]
             except Exception as e:
+                import traceback
                 base["objects"] = []
                 base["error"] = str(e)
+                base["traceback"] = traceback.format_exc()
             return base
 
         @self.app.get("/api/views/{template_name}/{object_id}")
