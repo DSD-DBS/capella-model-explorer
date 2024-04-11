@@ -44,9 +44,3 @@
 .read-the-docs {
   color: #888;
 }
-
-@media print {
-  .header {
-    display: none !important;
-  }
-}
