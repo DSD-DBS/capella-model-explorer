@@ -225,8 +225,13 @@ def find_objects(model, obj_type=None, below=None, attr=None, filters=None):
     if attr:
         getter = operator.attrgetter(attr)
         objects = getter(model)
-        if objects and not isinstance(objects, list):
+        if hasattr(objects, "_element"):
             objects = [objects]
+        elif not isinstance(objects, capellambse.model.ElementList):
+            raise ValueError(
+                f"Expected a list of model objects or a single model object"
+                f" for {attr!r} of the model, got {objects!r}"
+            )
     elif below and obj_type:
         getter = operator.attrgetter(below)
         objects = model.search(obj_type, below=getter(model))
