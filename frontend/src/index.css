@@ -112,5 +112,5 @@ ul {
   body, .html-wrapper, .flex-1, .html-content {
     overflow: visible !important;
   }
-  @page  { margin: 15mm; }   
+  @page  { margin: 15mm; }
 }
