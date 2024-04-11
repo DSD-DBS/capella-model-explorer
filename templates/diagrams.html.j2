@@ -4,7 +4,7 @@
 #}
 
 <h1>{{ object.name }}</h1>
-{{ object.as_svg }}
+{{ object.as_svg | safe }}
 
 <h2>Description</h2>
 {% if object.description %}
