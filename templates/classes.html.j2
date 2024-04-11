@@ -37,7 +37,7 @@
             <td>{{ property.name }}</td>
             <td>
                 {% if property.type.__class__ == object.__class__ %}
-                    <a href="/classes/{{ property.type.uuid }}">{{ property.type.name }}</a>
+                    <a href="{{ property.type | make_href }}">{{ property.type.name }}</a>
                 {% else %}
                     {{ property.type.name }}
                 {% endif %}

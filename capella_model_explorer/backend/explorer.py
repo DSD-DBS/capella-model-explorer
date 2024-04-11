@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import dataclasses
+import logging
 import operator
 import os
 import pathlib
@@ -10,6 +11,7 @@ import urllib.parse as urlparse
 from pathlib import Path
 
 import capellambse
+import markupsafe
 import yaml
 from fastapi import APIRouter, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -20,6 +22,7 @@ from jinja2 import Environment, TemplateSyntaxError
 
 PATH_TO_FRONTEND = Path("./frontend/dist")
 ROUTE_PREFIX = os.getenv("ROUTE_PREFIX", "")
+LOGGER = logging.getLogger(__name__)
 
 
 @dataclasses.dataclass
@@ -44,12 +47,33 @@ class CapellaModelExplorerBackend:
             allow_headers=["*"],
         )
         self.env = Environment()
+        self.env.finalize = self.__finalize
+        self.env.filters["make_href"] = self.__make_href
         self.grouped_templates, self.templates = index_templates(
             self.templates_path
         )
         self.app.state.templates = Jinja2Templates(directory=PATH_TO_FRONTEND)
         self.configure_routes()
         self.app.include_router(self.router)
+
+    def __finalize(self, markup: t.Any) -> object:
+        markup = markupsafe.escape(markup)
+        return capellambse.helpers.replace_hlinks(
+            markup, self.model, self.__make_href
+        )
+
+    def __make_href(self, obj: capellambse.model.GenericElement) -> str | None:
+        if isinstance(obj, capellambse.model.ElementList):
+            raise TypeError("Cannot make an href to a list of elements")
+        if not isinstance(obj, capellambse.model.GenericElement):
+            raise TypeError(f"Expected a model object, got {obj!r}")
+
+        for idx, template in self.templates.items():
+            clsname = template.get("variable", {}).get("type")
+            if obj.__class__.__name__ == clsname:
+                return f"/{idx}/{obj.uuid}"
+
+        return f"/__generic__/{obj.uuid}"
 
     def render_instance_page(self, template_text, object=None):
         try:
@@ -122,6 +146,9 @@ class CapellaModelExplorerBackend:
                     {"idx": obj.uuid, "name": obj.name} for obj in objects
                 ]
             except Exception as e:
+                LOGGER.exception(
+                    "Error finding objects for template %s", template_name
+                )
                 base["objects"] = []
                 base["error"] = str(e)
             return base
@@ -203,8 +230,13 @@ def find_objects(model, obj_type=None, below=None, attr=None, filters=None):
     if attr:
         getter = operator.attrgetter(attr)
         objects = getter(model)
-        if objects and not isinstance(objects, list):
+        if hasattr(objects, "_element"):
             objects = [objects]
+        elif not isinstance(objects, capellambse.model.ElementList):
+            raise ValueError(
+                f"Expected a list of model objects or a single model object"
+                f" for {attr!r} of the model, got {objects!r}"
+            )
     elif below and obj_type:
         getter = operator.attrgetter(below)
         objects = model.search(obj_type, below=getter(model))
