@@ -2,15 +2,18 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import dataclasses
+import logging
 import operator
+import os
 import pathlib
 import typing as t
 import urllib.parse as urlparse
 from pathlib import Path
 
 import capellambse
+import markupsafe
 import yaml
-from fastapi import FastAPI, Request
+from fastapi import APIRouter, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
@@ -18,6 +21,8 @@ from fastapi.templating import Jinja2Templates
 from jinja2 import Environment, TemplateSyntaxError
 
 PATH_TO_FRONTEND = Path("./frontend/dist")
+ROUTE_PREFIX = os.getenv("ROUTE_PREFIX", "")
+LOGGER = logging.getLogger(__name__)
 
 
 @dataclasses.dataclass
@@ -33,6 +38,7 @@ class CapellaModelExplorerBackend:
 
     def __post_init__(self):
         self.app = FastAPI()
+        self.router = APIRouter(prefix=ROUTE_PREFIX)
         self.app.add_middleware(
             CORSMiddleware,
             allow_origins=["*"],
@@ -41,40 +47,67 @@ class CapellaModelExplorerBackend:
             allow_headers=["*"],
         )
         self.env = Environment()
+        self.env.finalize = self.__finalize
+        self.env.filters["make_href"] = self.__make_href
         self.grouped_templates, self.templates = index_templates(
             self.templates_path
         )
         self.app.state.templates = Jinja2Templates(directory=PATH_TO_FRONTEND)
-
         self.configure_routes()
+        self.app.include_router(self.router)
+
+    def __finalize(self, markup: t.Any) -> object:
+        markup = markupsafe.escape(markup)
+        return capellambse.helpers.replace_hlinks(
+            markup, self.model, self.__make_href
+        )
+
+    def __make_href(self, obj: capellambse.model.GenericElement) -> str | None:
+        if isinstance(obj, capellambse.model.ElementList):
+            raise TypeError("Cannot make an href to a list of elements")
+        if not isinstance(obj, capellambse.model.GenericElement):
+            raise TypeError(f"Expected a model object, got {obj!r}")
+
+        for idx, template in self.templates.items():
+            clsname = template.get("variable", {}).get("type")
+            if obj.__class__.__name__ == clsname:
+                return f"/{idx}/{obj.uuid}"
+
+        return f"/__generic__/{obj.uuid}"
 
     def render_instance_page(self, template_text, object=None):
-            try:
-                # render the template with the object
-                template = self.env.from_string(template_text)
-                rendered = template.render(object=object, model=self.model)
-                return HTMLResponse(content=rendered, status_code=200)
-            except TemplateSyntaxError as e:
-                error_message = (
-                    "<p style='color:red'>Template syntax error: "
-                    f"{e.message}, line {e.lineno}</p>"
-                )
-                return HTMLResponse(content=error_message)
-            except Exception as e:
-                error_message = (
-                    f"<p style='color:red'>Unexpected error: {str(e)}</p>"
-                )
-                return HTMLResponse(content=error_message)
+        try:
+            # render the template with the object
+            template = self.env.from_string(template_text)
+            rendered = template.render(object=object, model=self.model)
+            return HTMLResponse(content=rendered, status_code=200)
+        except TemplateSyntaxError as e:
+            error_message = (
+                "<p style='color:red'>Template syntax error: "
+                f"{e.message}, line {e.lineno}</p>"
+            )
+            return HTMLResponse(content=error_message)
+        except Exception as e:
+            error_message = (
+                f"<p style='color:red'>Unexpected error: {str(e)}</p>"
+            )
+            return HTMLResponse(content=error_message)
 
     def configure_routes(self):
         self.app.mount(
-            "/assets",
+            f"{ROUTE_PREFIX}/assets",
             StaticFiles(
                 directory=PATH_TO_FRONTEND.joinpath("assets"), html=True
             ),
         )
+        self.app.mount(
+            f"{ROUTE_PREFIX}/static",
+            StaticFiles(
+                directory=PATH_TO_FRONTEND.joinpath("static"), html=True
+            ),
+        )
 
-        @self.app.get("/api/views")
+        @self.router.get("/api/views")
         def read_templates():
             # list all templates in the templates folder from .yaml
             self.grouped_templates, self.templates = index_templates(
@@ -82,12 +115,12 @@ class CapellaModelExplorerBackend:
             )
             return self.grouped_templates
 
-        @self.app.get("/api/objects/{uuid}")
+        @self.router.get("/api/objects/{uuid}")
         def read_object(uuid: str):
             obj = self.model.by_uuid(uuid)
             return {"idx": obj.uuid, "name": obj.name, "type": obj.xtype}
 
-        @self.app.get("/api/views/{template_name}")
+        @self.router.get("/api/views/{template_name}")
         def read_template(template_name: str):
             template_name = urlparse.unquote(template_name)
             if not template_name in self.templates:
@@ -114,12 +147,15 @@ class CapellaModelExplorerBackend:
                 ]
             except Exception as e:
                 import traceback
+                LOGGER.exception(
+                    "Error finding objects for template %s", template_name
+                )
                 base["objects"] = []
                 base["error"] = str(e)
                 base["traceback"] = traceback.format_exc()
             return base
 
-        @self.app.get("/api/views/{template_name}/{object_id}")
+        @self.router.get("/api/views/{template_name}/{object_id}")
         def render_template(template_name: str, object_id: str):
             content = None
             object = None
@@ -147,9 +183,8 @@ class CapellaModelExplorerBackend:
                     )
                     return HTMLResponse(content=error_message)
             return self.render_instance_page(content, object)
-            
 
-        @self.app.get("/api/model-info")
+        @self.router.get("/api/model-info")
         def model_info():
             info = self.model.info
             return {
@@ -161,7 +196,7 @@ class CapellaModelExplorerBackend:
                 "badge": self.model.description_badge,
             }
 
-        @self.app.get("/{rest_of_path:path}")
+        @self.router.get("/{rest_of_path:path}")
         async def catch_all(request: Request, rest_of_path: str):
             del rest_of_path
             return self.app.state.templates.TemplateResponse(
@@ -197,8 +232,13 @@ def find_objects(model, obj_type=None, below=None, attr=None, filters=None):
     if attr:
         getter = operator.attrgetter(attr)
         objects = getter(model)
-        if objects and not isinstance(objects, list):
+        if hasattr(objects, "_element"):
             objects = [objects]
+        elif not isinstance(objects, capellambse.model.ElementList):
+            raise ValueError(
+                f"Expected a list of model objects or a single model object"
+                f" for {attr!r} of the model, got {objects!r}"
+            )
     elif below and obj_type:
         getter = operator.attrgetter(below)
         objects = model.search(obj_type, below=getter(model))

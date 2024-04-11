@@ -4,7 +4,7 @@
 #}
 
 <h1>{{ object.name }}</h1>
-{{ object.as_svg }}
+{{ object.as_svg | safe }}
 
 <h2>Description</h2>
 {% if object.description %}
@@ -18,7 +18,7 @@
 <ul>
 {% for node in object.nodes %}
 {% if node.name %}
-<li><a href="#{{ node.uuid }}">{{ node.name }}</a></li>
+<li><a href="{{ node | make_href }}">{{ node.name }}</a></li>
 {% endif %}
 {% endfor %}
 </ul>

@@ -49,7 +49,7 @@
 <ul>
     {% for fnc in object.involved_functions %}
         {% if fnc.owner == entity %}
-            <li><a href="/system_function/{{ fnc.uuid }}">{{ fnc.name }}</a></li>
+            <li><a href="{{ fnc | make_href }}">{{ fnc.name }}</a></li>
         {% endif %}
     {% endfor %}
 </ul>
