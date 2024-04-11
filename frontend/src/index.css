@@ -82,6 +82,10 @@ button:focus-visible {
   }
 }
 
+.collapsed {
+  width: 50px; 
+}
+
 .html-content {
   text-align: left;
 }
@@ -112,5 +116,8 @@ ul {
   body, .html-wrapper, .flex-1, .html-content {
     overflow: visible !important;
   }
-  @page  { margin: 15mm; }
+  .print\\:hidden {
+    display: none !important;
+}
+  @page  { margin: 15mm; }   
 }
