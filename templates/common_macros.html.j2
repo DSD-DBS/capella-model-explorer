@@ -1,0 +1,30 @@
+{#
+    Copyright DB InfraGO AG and contributors
+    SPDX-License-Identifier: Apache-2.0
+#}
+
+{% macro show_other_attributes(object, excluded=[]) %}
+    {% set empty_attrs = [] %}
+
+    {%- for attr in object.__dir__()|sort if not attr.startswith("_") and attr not in ["from_model", "pvmt"]+excluded -%}
+    {%- set value = object[attr] -%}
+    {% if value %}
+        <h2 style="opacity: 0.8; border-top: 1px solid grey; margin-top: 1rem; padding-left: 1rem; font: 1rem monospace">{{ attr }}</h2>
+        {%- if value.as_svg -%}
+        {{ value.as_svg|safe }}
+        {% elif value._short_html_ -%}
+        <p>{{ value._short_html_() }}</p>
+        {% else -%}
+        <p>{{ value }}</p>
+        {% endif -%}
+    {% else %}
+        {% set _none = empty_attrs.append(attr) %}
+    {% endif %}
+    {% endfor -%}
+
+    {% if empty_attrs %}
+    <h3>Unset attributes</h3>
+    <p>The object has the following attributes in unset state (empty values): {{ ", ".join(empty_attrs) }}</p>
+    {% endif %}
+
+{% endmacro %}

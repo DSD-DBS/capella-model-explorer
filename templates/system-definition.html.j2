@@ -2,6 +2,9 @@
     Copyright DB InfraGO AG and contributors
     SPDX-License-Identifier: Apache-2.0
 #}
+
+{% from 'common_macros.html.j2' import show_other_attributes %}
+
 {% set object = model.sa.root_component%}
 <h1>System Definition</h1>
 
@@ -33,3 +36,54 @@
 <h2>System boundary</h2>
 <p>The system boundary is defined by the following:</p>
 {{ object.context_diagram.as_svg | safe}}
+
+<h2>System Functions</h2>
+{% if object.allocated_functions | length > 0 %}
+    <p>The system is expected to perform the following functions:</p>
+    <ul>
+        {% for fnc in object.allocated_functions %}
+            <li><a href="{{ fnc | make_href }}">{{ fnc.name }}</a></li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p style="color:red">No functions allocated to the system.</p>
+{% endif %}
+
+{% if object.diagrams %}
+    <h2>Diagrams</h2>
+    <p>The following diagrams provide additional details on the system</p>
+    {% for diagram in object.diagrams %}
+        <h3>{{diagram.name}}</h3>
+        {{ diagram.as_svg |safe }}
+    {% endfor %}
+{% endif %}
+
+<h2>State Machines</h2>
+<p>The following state machines describe system modes and states:</p>
+{% for stm in object.state_machines %}
+    <h3>{{ stm.name }}</h3>
+    {% if stm.regions | length > 1 %}
+        <p>The state machine has the following regions:</p>
+        <ul>
+        {% for region in stm.regions %}
+            <li><a href="{{ region | make_href }}">{{ region.name }}</a></li>
+        {% endfor %}
+        </ul>
+    {% elif stm.regions | length == 1 %}
+        {% set region = stm.regions | first %}
+        <ul>
+        {% for state in region.states %}
+            <li>{{ state._short_html_() }}"</li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p style="color:red">State machine {{ stm.name }} has no regions.</p>
+    {% endif %}
+{% endfor %}
+
+{# TODO: object.description may contain a malformed link, we need to handle that #}
+
+<h2>Other properties of the system</h2>
+{% set excluded = ["description", "context_diagram", "owner", "parent", "allocated_functions", "diagrams", "name", "parts", "realizing_components", "state_machines", "xtype"] %}
+
+{{ show_other_attributes(object, excluded) | safe}}

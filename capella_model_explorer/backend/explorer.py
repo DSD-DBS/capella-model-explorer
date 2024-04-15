@@ -18,7 +18,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from jinja2 import Environment, TemplateSyntaxError
+from jinja2 import Environment, TemplateSyntaxError, FileSystemLoader
 
 PATH_TO_FRONTEND = Path("./frontend/dist")
 ROUTE_PREFIX = os.getenv("ROUTE_PREFIX", "")
@@ -46,7 +46,7 @@ class CapellaModelExplorerBackend:
             allow_methods=["*"],
             allow_headers=["*"],
         )
-        self.env = Environment()
+        self.env = Environment(loader=FileSystemLoader(self.templates_path))
         self.env.finalize = self.__finalize
         self.env.filters["make_href"] = self.__make_href
         self.grouped_templates, self.templates = index_templates(

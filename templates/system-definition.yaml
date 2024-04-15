@@ -3,7 +3,7 @@
 
 template: system-definition.html.j2
 name: System Definition
-description: hi
+description: defines the need for the system, its boundary and interfaces
 category: sa
 single: true
 variable:

@@ -2,6 +2,7 @@
     Copyright DB InfraGO AG and contributors
     SPDX-License-Identifier: Apache-2.0
 #}
+{% from 'common_macros.html.j2' import show_other_attributes %}
 
 <h1>{{ object.name | capitalize }}</h1>
 
@@ -35,3 +36,7 @@
 <p>The diagram below provides an overview over the functional context: functions on the left provide functional inputs to the function of interest, functions on the right consume the outputs of the function of interest. The system is responsible for the functions with the green background. Functions with the blue background are allocated to external actors.</p>
 
 {{ object.context_diagram.as_svg | safe }}
+
+<h2>Other properties of "{{ object.name }}"</h2>
+{% set excluded = ["context_diagram", "description", "name", "owner", "xtype"] %}
+{{ show_other_attributes(object, excluded) | safe}}

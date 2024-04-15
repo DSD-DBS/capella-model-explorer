@@ -108,6 +108,8 @@ button:focus-visible {
   @apply text-2xl mb-3 mt-5;
 }
 
+.html-content table { @apply min-w-full divide-y divide-gray-200; }
+
 ul {
   @apply list-disc pl-5;
 }
