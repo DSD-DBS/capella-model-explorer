@@ -5,6 +5,14 @@
 
 <p style="margin-top:1.5em; "><b>Parent:</b> {{object.parent._short_html_()}}</p>
 
+{% if object.capabilities %}
+<p><b>{{ object.name }}</b> is involved in the following operational capabilities: 
+{%- for cap in object.capabilities -%}
+<a href="{{ cap | make_href }}">{{ cap.name }}</a>; 
+{%- endfor -%}
+</p>
+{% endif %}
+
 {% if object.state_machines %}
 <h2>State Machines</h2>
 <p>The following state machines describe the entity modes and states:</p>
@@ -21,12 +29,30 @@
         {% set region = stm.regions | first %}
         <ul>
         {% for state in region.states %}
-            <li>{{ state._short_html_() }}"</li>
+            <li>{{ state._short_html_() }}: {{ description(state) | safe }}</li>
         {% endfor %}
         </ul>
     {% else %}
         <p style="color:red">State machine {{ stm.name }} has no regions.</p>
     {% endif %}
+{% endfor %}
+{% endif %}
+
+{% if object.activities %}
+<h2>Operational Activities</h2>
+<p><b>{{object.name}}</b> is responsible for the following operational activities:</p>
+<ul>
+{% for activity in object.activities %}
+    <li>
+        <a href="{{ activity | make_href }}">{{activity.name}}</a>: {{ description(activity) | safe }}
+        <p><b>{{ activity.name }}</b> is involved in the following operational capabilities: 
+        {%- for cap in object.capabilities -%}
+        {%- if activity in cap.involved_activities -%}
+        <a href="{{ cap | make_href }}">{{ cap.name }}</a>; 
+        {%- endif -%}
+        {%- endfor -%}
+        </p>
+    </li>
 {% endfor %}
 {% endif %}
 
@@ -48,5 +74,5 @@
     </ul>
 {% endif %}
 
-{% set filtered = ["description", "xtype", "entities", "owner", "parent", "parts", "requirements", "state_machines"]%}
+{% set filtered = ["description", "xtype", "entities", "owner", "parent", "parts", "requirements", "state_machines", "activities", "capabilities", "name"]%}
 {{ show_other_attributes(object, filtered) | safe}}
