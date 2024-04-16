@@ -120,6 +120,10 @@ ul {
   }
   .print\\:hidden {
     display: none !important;
-}
+  }
+  .html-content {
+    border: none !important;
+    box-shadow: none !important;
+  }
   @page  { margin: 15mm; }   
 }
