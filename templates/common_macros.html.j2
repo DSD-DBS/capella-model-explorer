@@ -26,5 +26,40 @@
     <h3>Unset attributes</h3>
     <p>The object has the following attributes in unset state (empty values): {{ ", ".join(empty_attrs) }}</p>
     {% endif %}
+{% endmacro %}
 
+{% macro req_rels(rels) %}
+{% if rels %}
+<ul>
+{% for rel in rels %}
+    <li>
+        <a href="{{ rel.type | make_href if rel.type else '#' }}">{{rel.type.long_name }}</a> 
+        {{ rel.target.__class__.__name__ }} 
+        <a href="{{ rel.target | make_href  if rel.target else '#' }}">{{ rel.target.name }}</a>
+    </li>
+{% endfor %}
+</ul>
+{% else %}
+<p style="color: red;">Not linked to any model objects</p>
+{% endif%}
+{% endmacro %}
+
+{% macro render_requirements_table(reqs) %}
+    {% for req in reqs %}
+        <div style="margin-top: 1em; margin-bottom: 1em;">
+            <div><b>ID:</b> <a href="{{ req | make_href }}">{{ req.uuid }}</a></div>
+            <div>{{ req.text if req.text else req.long_name }}</div>
+            <div>{{req_rels(req.relations) | safe}}</div>
+        </div>
+        {% endfor %}
+{% endmacro %}
+
+{% macro render_reqs_by_type(reqs, types) %}
+    {% for req_type in types+[None] %}
+        {% set reqs = reqs.by_type(req_type)%}
+        {% if reqs %}
+            <h3>Of type "{{ req_type | string }}"</h3>
+            {{ render_requirements_table(reqs) | safe }}
+        {% endif %}
+    {% endfor %}
 {% endmacro %}
