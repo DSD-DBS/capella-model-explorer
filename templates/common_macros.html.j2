@@ -63,3 +63,11 @@
         {% endif %}
     {% endfor %}
 {% endmacro %}
+
+{% macro description(obj) %}
+    {% if obj.description %}
+    {{ obj.description | safe }}
+    {% else %}
+    <p style="color:red">No description available.</p>
+    {% endif %}
+{% endmacro %}
