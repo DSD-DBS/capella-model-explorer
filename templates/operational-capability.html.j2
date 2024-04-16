@@ -1,0 +1,7 @@
+{% from 'common_macros.html.j2' import show_other_attributes, description, render_reqs_by_type %}
+
+<h1>{{ object.name }}</h1>
+{{ description(object) | safe }}
+
+{% set filtered = ["description", "xtype"]%}
+{{ show_other_attributes(object, filtered) | safe}}
