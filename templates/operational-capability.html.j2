@@ -3,5 +3,41 @@
 <h1>{{ object.name }}</h1>
 {{ description(object) | safe }}
 
-{% set filtered = ["description", "xtype"]%}
+<br><b>Pre-condition</b>:
+{% if object.precondition %}
+<p>{{ object.precondition.specification['capella:linkedText']|safe }}</p>
+{% else %}
+<p style="color:red">No pre-condition defined</p>
+{% endif %}
+
+<br><b>Post-condition</b>:
+{% if object.postcondition %}
+<p>{{ object.postcondition.specification['capella:linkedText']|safe }}</p>
+{% else %}
+<p style="color:red">No post-condition defined</p>
+{% endif %}
+
+<h2>Context Diagram</h2>
+<p>The diagram below provides an overview over the entities immediately involved in the Capability and related Capabilities.</p>
+
+{{ object.context_diagram.as_svg|safe}}
+
+<h2>Data Flow Diagram</h2>
+
+<p>The diagram below provides an overview of the operational activities that are required to realize the Capability.</p>
+
+{{ object.data_flow_view.as_svg | safe }}
+
+{% if object.diagrams %}
+<h2>Other related diagrams</h2>
+<ul>
+{% for diagram in object.diagrams %}
+    <h3>{{ diagram.name }}</h3>
+    {{ diagram.as_svg |safe }}
+{% endfor %}
+</ul>
+{% endif %}
+
+{% set filtered = ["description", "xtype", "postcondition", "precondition", "context_diagram", "data_flow_view", "diagrams"]%}
 {{ show_other_attributes(object, filtered) | safe}}
+
