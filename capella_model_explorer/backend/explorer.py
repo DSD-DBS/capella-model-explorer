@@ -50,7 +50,7 @@ class CapellaModelExplorerBackend:
         )
         self.env = Environment(loader=FileSystemLoader(self.templates_path))
         self.env.finalize = self.__finalize
-        self.env.filters["make_href"] = self.__make_href
+        self.env.filters["make_href"] = self.__make_href_filter
         self.grouped_templates, self.templates = index_templates(
             self.templates_path
         )
@@ -64,12 +64,32 @@ class CapellaModelExplorerBackend:
             markup, self.model, self.__make_href
         )
 
-    def __make_href(self, obj: capellambse.model.GenericElement) -> str | None:
+    def __make_href_filter(self, obj: object) -> str | None:
         if isinstance(obj, capellambse.model.ElementList):
             raise TypeError("Cannot make an href to a list of elements")
-        if not isinstance(obj, capellambse.model.GenericElement):
+        if not isinstance(
+            obj,
+            (
+                capellambse.model.GenericElement,
+                capellambse.model.diagram.AbstractDiagram,
+            ),
+        ):
             raise TypeError(f"Expected a model object, got {obj!r}")
 
+        try:
+            self.model.by_uuid(obj.uuid)
+        except KeyError:
+            return "#"
+
+        return self.__make_href(obj)
+
+    def __make_href(
+        self,
+        obj: (
+            capellambse.model.GenericElement
+            | capellambse.model.diagram.AbstractDiagram
+        ),
+    ) -> str | None:
         for idx, template in self.templates.items():
             clsname = template.get("variable", {}).get("type")
             if obj.__class__.__name__ == clsname:
