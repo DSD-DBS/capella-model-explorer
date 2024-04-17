@@ -8,7 +8,6 @@ import os
 import pathlib
 import typing as t
 import urllib.parse as urlparse
-from html import escape
 from pathlib import Path
 
 import capellambse
@@ -20,6 +19,8 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from jinja2 import Environment, TemplateSyntaxError, FileSystemLoader
+
+esc = markupsafe.escape
 
 PATH_TO_FRONTEND = Path("./frontend/dist")
 ROUTE_PREFIX = os.getenv("ROUTE_PREFIX", "")
@@ -83,19 +84,22 @@ class CapellaModelExplorerBackend:
             rendered = template.render(object=object, model=self.model)
             return HTMLResponse(content=rendered, status_code=200)
         except TemplateSyntaxError as e:
-            error_message = (
-                "<p style='color:red'>Template syntax error: "
-                f"{e.message}, line {e.lineno}</p>"
-            )
+            error_message = markupsafe.Markup(
+                "<p style='color:red'>Template syntax error: {}, line {}</p>"
+            ).format(e.message, e.lineno)
             return HTMLResponse(content=error_message)
         except Exception as e:
-            error_message = (
+            error_message = markupsafe.Markup(
                 '<p style="color:red">'
-                f"Unexpected error: {type(e).__name__}: {str(e)}"
+                "Unexpected error: {etype}: {emsg}"
                 '</p><pre style="font-size:80%;overflow:scroll">'
-                f"object={escape(repr(object))}\n"
-                f"model={escape(repr(self.model))}"
-                "</pre></p>"
+                "object={obj}\nmodel={model}"
+                "</pre>"
+            ).format(
+                etype=type(e).__name__,
+                emsg=str(e),
+                obj=repr(object),
+                model=repr(self.model),
             )
             return HTMLResponse(content=error_message)
 
@@ -177,9 +181,9 @@ class CapellaModelExplorerBackend:
                     encoding="utf8"
                 )
             except Exception as e:
-                error_message = (
-                    f"<p style='color:red'>Template not found: {str(e)}</p>"
-                )
+                error_message = markupsafe.Markup(
+                    "<p style='color:red'>Template not found: {}</p>"
+                ).format(str(e))
                 return HTMLResponse(content=error_message)
             if object_id == "render":
                 object = None
@@ -187,10 +191,10 @@ class CapellaModelExplorerBackend:
                 try:
                     object = self.model.by_uuid(object_id)
                 except Exception as e:
-                    error_message = (
-                        "<p style='color:red'>Requested object "
-                        f"not found: {str(e)}</p>"
-                    )
+                    error_message = markupsafe.Markup(
+                        "<p style='color:red'>"
+                        "Requested object not found: {}</p>"
+                    ).format(str(e))
                     return HTMLResponse(content=error_message)
             return self.render_instance_page(content, object)
 
