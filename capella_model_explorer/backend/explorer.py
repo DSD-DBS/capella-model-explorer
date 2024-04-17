@@ -18,7 +18,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from jinja2 import Environment, TemplateSyntaxError, FileSystemLoader
+from jinja2 import (
+    Environment,
+    FileSystemLoader,
+    TemplateSyntaxError,
+    is_undefined,
+)
 
 esc = markupsafe.escape
 
@@ -65,6 +70,9 @@ class CapellaModelExplorerBackend:
         )
 
     def __make_href_filter(self, obj: object) -> str | None:
+        if is_undefined(obj) or obj is None:
+            return "#"
+
         if isinstance(obj, capellambse.model.ElementList):
             raise TypeError("Cannot make an href to a list of elements")
         if not isinstance(

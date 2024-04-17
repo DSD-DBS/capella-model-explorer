@@ -33,9 +33,9 @@
 <ul>
 {% for rel in rels %}
     <li>
-        <a href="{{ rel.type | make_href if rel.type else '#' }}">{{rel.type.long_name }}</a> 
-        {{ rel.target.__class__.__name__ }} 
-        <a href="{{ rel.target | make_href  if rel.target else '#' }}">{{ rel.target.name }}</a>
+        <a href="{{ rel.type | make_href }}">{{rel.type.long_name }}</a>
+        {{ rel.target.__class__.__name__ }}
+        <a href="{{ rel.target | make_href }}">{{ rel.target.name }}</a>
     </li>
 {% endfor %}
 </ul>
