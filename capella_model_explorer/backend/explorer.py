@@ -8,6 +8,7 @@ import os
 import pathlib
 import typing as t
 import urllib.parse as urlparse
+from html import escape
 from pathlib import Path
 
 import capellambse
@@ -89,7 +90,12 @@ class CapellaModelExplorerBackend:
             return HTMLResponse(content=error_message)
         except Exception as e:
             error_message = (
-                f"<p style='color:red'>Unexpected error: {str(e)}</p>"
+                '<p style="color:red">'
+                f"Unexpected error: {type(e).__name__}: {str(e)}"
+                '</p><pre style="font-size:80%;overflow:scroll">'
+                f"object={escape(repr(object))}\n"
+                f"model={escape(repr(self.model))}"
+                "</pre></p>"
             )
             return HTMLResponse(content=error_message)
 
