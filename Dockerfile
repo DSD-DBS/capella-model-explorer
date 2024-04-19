@@ -36,9 +36,11 @@ COPY --from=build-frontend /app/dist/ ./frontend/dist/
 # Expose the port the app runs in
 EXPOSE 8000
 
+COPY ./templates /views
+
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
-ENTRYPOINT ["/entrypoint.sh"]
+ENV MODEL_ENTRYPOINT=/model
+RUN chmod -R 777 ./frontend/dist/
 
-# Start the application
-CMD ["python", "-m", "capella_model_explorer.backend", "/model", "/views"]
+ENTRYPOINT ["/entrypoint.sh"]
