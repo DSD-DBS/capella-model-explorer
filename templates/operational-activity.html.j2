@@ -2,7 +2,7 @@
     Copyright DB InfraGO AG and contributors
     SPDX-License-Identifier: Apache-2.0
 #}
-{% from 'common_macros.html.j2' import show_other_attributes, description %}
+{% from 'common_macros.html.j2' import show_other_attributes, description, typed_name, linked_name %}
 
 <h1>{{ object.name }}</h1>
 {{ description(object) | safe }}
@@ -12,11 +12,61 @@
         <b>{{ object.owner.__class__.__name__}}</b> 
         <a href="{{ object.owner | make_href }}">{{ object.owner.name }}</a>.
     </p>
-    {%%}
+    {% if object.available_in_states %}
+    <p><a href="{{ object.owner | make_href}}">{{ object.owner.name }}</a> may {{ object.name }} while in one of the following modes or states:&nbsp; 
+    {%- for state in object.available_in_states -%}
+        <a href="{{ state | make_href }}">{{ state.name }}</a>{%- if not loop.last -%}, {% endif -%}
+    {%- endfor -%}
+    </p>
+    {% endif %}
+
+    <h2>Interface partners</h2>
+    <p>While performing this activity <a href="{{ object.owner | make_href}}">{{ object.owner.name }}</a> may interact with the following entities:&nbsp; 
+    {% set ins = object.inputs | map(attribute="source") | selectattr("owner") | map(attribute="owner") | list %}
+    {% set outs = object.outputs | map(attribute="target") | selectattr("owner") | map(attribute="owner") | list %}
+    {% set partners = ins + outs | rejectattr("uuid", "equalto", object.owner.uuid) | list %}
+    {%- for partner in partners | unique -%} {{ linked_name(partner) | safe }},&nbsp;{%- endfor -%}</p>
+
 {% else %}
     <p style="color: red;">No entity is responsible for performing this activity at the moment.</p>
 {% endif %}
 
+{%- if object.inputs -%}
+    <h2>Inputs</h2>
+    <p>To <i>{{ object.name }}</i> the {{ linked_name(object.owner) | safe if object.owner else "<span style='color: red'>Unassigned Entity</span>" | safe }} may need:</p>
+    <ul>
+        {% for input in object.inputs %}
+            <li>
+                    {%- set act = input.source -%}
+                    {{ linked_name(input) | safe }} produced by "{{ linked_name(act) | safe }}" activity of&nbsp; 
+                    {%- if act.owner -%}
+                        {{ linked_name(act.owner) | safe }} 
+                    {%- else -%}
+                        <span style="color: red;">Unassigned entity</span> 
+                    {%- endif -%} 
+            </li>
+        {% endfor %}
+    </ul>
+{%- endif -%}
+
+{% if object.outputs %}
+<h2>Outputs</h2>
+<p>The outputs of <i>{{ object.name }}</i> may be used for the following purposes:</p>
+<ul>
+{% for output in object.outputs %}
+<li>
+    {%- set act = output.target -%}
+    {%- if act.owner -%}
+        {{ linked_name(act.owner) | safe }} 
+    {%- else -%}
+        <span style="color: red;">Unassigned entity</span> 
+    {%- endif -%}&nbsp;
+    may require {{ linked_name(output) | safe }} to perform "{{ linked_name(act) | safe }}" activity.
+    
+</li>
+{% endfor %}
+</ul>
+{% endif %}
 
 <h2>Operational Activity Context</h2>
 
@@ -27,5 +77,5 @@ The figure below provides an overview of the interactions between the activity o
 {{ object.context_diagram.as_svg|safe }}
 
 <h2>Other properties of "{{ object.name }}"</h2>
-{% set excluded = ["name", "context_diagram", "xtype", "parent"] %}
+{% set excluded = ["name", "available_in_states", "related_exchanges", "inputs", "outputs", "context_diagram", "xtype", "parent", "owner", "owning_entity"] %}
 {{ show_other_attributes(object, excluded) | safe  }}

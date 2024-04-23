@@ -72,6 +72,6 @@
     {% endif %}
 {% endmacro %}
 
-{% macro typed_name(object) %}
-<b>{{ object.__class__.__name__ }}</b> <a href="{{ object | make_href }}">{{ object.name }}</a>
-{% endmacro %}
+{%- macro typed_name(object) -%}<b>{{ object.__class__.__name__ }}</b> <a href="{{ object | make_href }}">{{ object.name  | trim }}</a>{%- endmacro -%}
+
+{%- macro linked_name(object) -%}<a href="{{ object | make_href }}">{{ object.name  | trim }}</a>{%- endmacro -%}

@@ -58,8 +58,8 @@
                 <a href="{{ cap | make_href }}">{{ cap.name }}</a>; 
                 {%- endif -%}
             {%- endfor -%}
+            </p>
         {%- endif -%}
-        </p>
     </li>
 {% endfor %}
 {% endif %}
@@ -84,10 +84,10 @@
 
 {% if object.realizing_system_components %}
 <h2>Realizations of {{ object.name }}</h2>
-<p><i>{{object.name}}</i> is realized by the following system components:</p>
+<p><i>{{object.name}}</i> is realized by the following model objects:</p>
 <ul>
 {% for comp in object.realizing_system_components %}
-    <li><a href="{{ comp | make_href }}">{{comp.name}}</a></li>
+    <li>{{ typed_name(comp) | safe }}</li>
 {% endfor %}
 {% endif%}
 

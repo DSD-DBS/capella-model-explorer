@@ -88,6 +88,7 @@ button:focus-visible {
 
 .html-content {
   text-align: left;
+
 }
 
 .html-content svg {
@@ -109,6 +110,8 @@ button:focus-visible {
 }
 
 .html-content table { @apply min-w-full divide-y divide-gray-200; }
+.html-content p { margin-top: 0.75em; margin-bottom: 0.75em; line-height: 1.5em; }
+.html-content p a, .html-content li a { @apply text-gray-500 italic hover:underline; }
 
 ul {
   @apply list-disc pl-5;
