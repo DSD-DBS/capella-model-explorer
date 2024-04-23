@@ -1,3 +1,7 @@
+{#
+    Copyright DB InfraGO AG and contributors
+    SPDX-License-Identifier: Apache-2.0
+#}
 {% from 'common_macros.html.j2' import show_other_attributes, description, render_reqs_by_type, typed_name %}
 
 <h1>{{ object.name }}</h1>
@@ -6,9 +10,9 @@
 <p style="margin-top:1.5em; "><b>Parent:</b> {{ typed_name(object.parent) | safe }}</p>
 
 {% if object.capabilities %}
-<p><i>{{ object.name }} {% if object.is_human %}(human){% endif %}</i> is involved in the following operational capabilities: 
+<p><i>{{ object.name }} {% if object.is_human %}(human){% endif %}</i> is involved in the following operational capabilities:
 {%- for cap in object.capabilities -%}
-<a href="{{ cap | make_href }}">{{ cap.name }}</a>; 
+<a href="{{ cap | make_href }}">{{ cap.name }}</a>;
 {%- endfor -%}
 </p>
 {% endif %}
@@ -52,10 +56,10 @@
             {%- endif -%}
         {%- endfor -%}
         {%- if involving_caps -%}
-            <p>involving operational capabilities: 
+            <p>involving operational capabilities:
             {%- for cap in object.capabilities -%}
                 {%- if activity in cap.involved_activities -%}
-                <a href="{{ cap | make_href }}">{{ cap.name }}</a>; 
+                <a href="{{ cap | make_href }}">{{ cap.name }}</a>;
                 {%- endif -%}
             {%- endfor -%}
             </p>

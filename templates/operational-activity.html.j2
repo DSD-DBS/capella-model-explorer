@@ -8,12 +8,12 @@
 {{ description(object) | safe }}
 
 {% if object.owner %}
-    <p>This activity is performed by 
-        <b>{{ object.owner.__class__.__name__}}</b> 
+    <p>This activity is performed by
+        <b>{{ object.owner.__class__.__name__}}</b>
         <a href="{{ object.owner | make_href }}">{{ object.owner.name }}</a>.
     </p>
     {% if object.available_in_states %}
-    <p><a href="{{ object.owner | make_href}}">{{ object.owner.name }}</a> may {{ object.name }} while in one of the following modes or states:&nbsp; 
+    <p><a href="{{ object.owner | make_href}}">{{ object.owner.name }}</a> may {{ object.name }} while in one of the following modes or states:&nbsp;
     {%- for state in object.available_in_states -%}
         <a href="{{ state | make_href }}">{{ state.name }}</a>{%- if not loop.last -%}, {% endif -%}
     {%- endfor -%}
@@ -21,7 +21,7 @@
     {% endif %}
 
     <h2>Interface partners</h2>
-    <p>While performing this activity <a href="{{ object.owner | make_href}}">{{ object.owner.name }}</a> may interact with the following entities:&nbsp; 
+    <p>While performing this activity <a href="{{ object.owner | make_href}}">{{ object.owner.name }}</a> may interact with the following entities:&nbsp;
     {% set ins = object.inputs | map(attribute="source") | selectattr("owner") | map(attribute="owner") | list %}
     {% set outs = object.outputs | map(attribute="target") | selectattr("owner") | map(attribute="owner") | list %}
     {% set partners = ins + outs | rejectattr("uuid", "equalto", object.owner.uuid) | list %}
@@ -38,12 +38,12 @@
         {% for input in object.inputs %}
             <li>
                     {%- set act = input.source -%}
-                    {{ linked_name(input) | safe }} produced by "{{ linked_name(act) | safe }}" activity of&nbsp; 
+                    {{ linked_name(input) | safe }} produced by "{{ linked_name(act) | safe }}" activity of&nbsp;
                     {%- if act.owner -%}
-                        {{ linked_name(act.owner) | safe }} 
+                        {{ linked_name(act.owner) | safe }}
                     {%- else -%}
-                        <span style="color: red;">Unassigned entity</span> 
-                    {%- endif -%} 
+                        <span style="color: red;">Unassigned entity</span>
+                    {%- endif -%}
             </li>
         {% endfor %}
     </ul>
@@ -57,12 +57,12 @@
 <li>
     {%- set act = output.target -%}
     {%- if act.owner -%}
-        {{ linked_name(act.owner) | safe }} 
+        {{ linked_name(act.owner) | safe }}
     {%- else -%}
-        <span style="color: red;">Unassigned entity</span> 
+        <span style="color: red;">Unassigned entity</span>
     {%- endif -%}&nbsp;
     may require {{ linked_name(output) | safe }} to perform "{{ linked_name(act) | safe }}" activity.
-    
+
 </li>
 {% endfor %}
 </ul>

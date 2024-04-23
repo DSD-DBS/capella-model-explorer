@@ -16,8 +16,8 @@ We see a larger non-MBSE crowd struggling with the things hidden in the model. W
 
 **Use cases**:
 
--   Provide insights into / "spell-out" the model for non-MBSE stakeholders via document-a-like dynamic views that describe model elements in a human-readable form.
--   Provide meaningful default views (that can be further customized) for the key elements to kickstart the model exploration.
+- Provide insights into / "spell-out" the model for non-MBSE stakeholders via document-a-like dynamic views that describe model elements in a human-readable form.
+- Provide meaningful default views (that can be further customized) for the key elements to kickstart the model exploration.
 
 There are a few more use cases but we will reveal them a bit later.
 

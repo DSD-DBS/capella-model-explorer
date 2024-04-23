@@ -76,8 +76,7 @@ The key differences are:
 
 - **Docstrings**: The [Numpy style guide] applies here.
 
-  [numpy style guide]:
-    https://numpydoc.readthedocs.io/en/latest/format.html#docstring-standard
+  [numpy style guide]: https://numpydoc.readthedocs.io/en/latest/format.html#docstring-standard
 
   When writing docstrings for functions, use the imperative style, as per
   [PEP-257]). For example, write "Do X and Y" instead of "Does X and Y".
@@ -124,7 +123,6 @@ The key differences are:
   typing related classes like `t.TypedDict`.
 
   <!-- prettier-ignore -->
-
   Use the new syntax and classes for typing introduced with Python 3.10.
 
   - Instead of `t.Tuple`, `t.List` etc. use the builtin classes `tuple`, `list`
@@ -142,8 +140,7 @@ The key differences are:
   If you have set up black correctly, you don't need to worry about this though
   :)
 
-  [black code style]:
-    https://black.readthedocs.io/en/stable/the_black_code_style/current_style.html
+  [black code style]: https://black.readthedocs.io/en/stable/the_black_code_style/current_style.html
 
 - When working with `dict`s, consider using `t.TypedDict` instead of a more
   generic `dict[str, float|int|str]`-like annotation where possible, as the

@@ -181,14 +181,23 @@ class CapellaModelExplorerBackend:
                     filters=filters,
                 )
                 base["objects"] = [
-                    {"idx": obj.uuid, 
-                     "name": str(
-                         obj.name if obj.name else (
-                             obj.long_name if hasattr(obj, "long_name") else "undefined")
-                    )} for obj in objects
+                    {
+                        "idx": obj.uuid,
+                        "name": str(
+                            obj.name
+                            if obj.name
+                            else (
+                                obj.long_name
+                                if hasattr(obj, "long_name")
+                                else "undefined"
+                            )
+                        ),
+                    }
+                    for obj in objects
                 ]
             except Exception as e:
                 import traceback
+
                 LOGGER.exception(
                     "Error finding objects for template %s", template_name
                 )

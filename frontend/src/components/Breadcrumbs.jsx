@@ -1,14 +1,14 @@
 // Copyright DB InfraGO AG and contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import React, { useEffect, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { API_BASE_URL } from '../APIConfig';
+import React, { useEffect, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
+import { API_BASE_URL } from "../APIConfig";
 
 export const Breadcrumbs = () => {
   const location = useLocation();
   const [breadcrumbLabels, setBreadcrumbLabels] = useState({});
-  const pathnames = location.pathname.split('/').filter(x => x);
+  const pathnames = location.pathname.split("/").filter((x) => x);
   const [error, setError] = useState(null);
 
   const fetchModelInfo = async () => {
@@ -23,9 +23,9 @@ export const Breadcrumbs = () => {
 
     const viewsDict = await response.json();
     const allViews = Object.values(viewsDict).flat();
-    const view = allViews.find(v => v.idx.toString() === idx);
+    const view = allViews.find((v) => v.idx.toString() === idx);
     return view ? view.name : idx;
-};
+  };
 
   // Function to fetch object names
   const fetchObjectName = async (uuid) => {
@@ -37,10 +37,10 @@ export const Breadcrumbs = () => {
   useEffect(() => {
     const updateLabels = async () => {
       const title = await fetchModelInfo();
-      const labels = { '/': title };
+      const labels = { "/": title };
 
       for (let i = 0; i < pathnames.length; i++) {
-        const to = `/${pathnames.slice(0, i + 1).join('/')}`;
+        const to = `/${pathnames.slice(0, i + 1).join("/")}`;
 
         if (i === 0) {
           labels[to] = await fetchViewName(pathnames[i]);
@@ -58,24 +58,30 @@ export const Breadcrumbs = () => {
     updateLabels();
   }, [location]);
 
-  const visible_pathnames = [breadcrumbLabels['/'], ...location.pathname.split('/').filter(x => x)];
+  const visible_pathnames = [
+    breadcrumbLabels["/"],
+    ...location.pathname.split("/").filter((x) => x),
+  ];
 
   return (
-    <nav aria-label="breadcrumb" className="flex items-center">
+    <nav
+      aria-label="breadcrumb"
+      className="flex items-center text-black dark:text-gray-200 font-medium"
+    >
       <ol className="flex items-center">
-        <li className="flex items-center dark:text-gray-200">
-          <Link to={"/"}>{breadcrumbLabels['/']}</Link>
+        <li className="flex items-center">
+          <Link to={"/"}>{breadcrumbLabels["/"]}</Link>
           <span className="mx-2">/</span>
         </li>
         {visible_pathnames.slice(1).map((value, index) => {
           const last = index === visible_pathnames.length - 2;
-          const to = `/${visible_pathnames.slice(1, index + 2).join('/')}`;
+          const to = `/${visible_pathnames.slice(1, index + 2).join("/")}`;
           const label = breadcrumbLabels[to] || value;
 
           return (
             <li className="flex items-center" key={to}>
               {!last && <Link to={to}>{label}</Link>}
-              {last && <span className='dark:text-gray-200' >{label}</span>}
+              {last && <span className=" text-custom-blue">{label}</span>}
               {!last && <span className="mx-2">/</span>}
             </li>
           );

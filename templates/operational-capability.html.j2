@@ -1,3 +1,7 @@
+{#
+    Copyright DB InfraGO AG and contributors
+    SPDX-License-Identifier: Apache-2.0
+#}
 {% from 'common_macros.html.j2' import show_other_attributes, description, render_reqs_by_type %}
 
 <h1>{{ object.name }}</h1>
@@ -40,4 +44,3 @@
 
 {% set filtered = ["description", "xtype", "postcondition", "precondition", "context_diagram", "data_flow_view", "diagrams"]%}
 {{ show_other_attributes(object, filtered) | safe}}
-
