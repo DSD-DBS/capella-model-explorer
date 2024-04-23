@@ -1,0 +1,31 @@
+{#
+    Copyright DB InfraGO AG and contributors
+    SPDX-License-Identifier: Apache-2.0
+#}
+{% from 'common_macros.html.j2' import show_other_attributes, description %}
+
+<h1>{{ object.name }}</h1>
+{{ description(object) | safe }}
+
+{% if object.owner %}
+    <p>This activity is performed by 
+        <b>{{ object.owner.__class__.__name__}}</b> 
+        <a href="{{ object.owner | make_href }}">{{ object.owner.name }}</a>.
+    </p>
+    {%%}
+{% else %}
+    <p style="color: red;">No entity is responsible for performing this activity at the moment.</p>
+{% endif %}
+
+
+<h2>Operational Activity Context</h2>
+
+<p>
+The figure below provides an overview of the interactions between the activity of interest and other activities.
+</p>
+
+{{ object.context_diagram.as_svg|safe }}
+
+<h2>Other properties of "{{ object.name }}"</h2>
+{% set excluded = ["name", "context_diagram", "xtype", "parent"] %}
+{{ show_other_attributes(object, excluded) | safe  }}

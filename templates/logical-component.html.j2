@@ -2,18 +2,10 @@
     Copyright DB InfraGO AG and contributors
     SPDX-License-Identifier: Apache-2.0
 #}
-{% from 'common_macros.html.j2' import show_other_attributes %}
-
-{% macro description(obj) %}
-    {% if obj.description %}
-    <p>{{ obj.description }}</p>
-    {% else %}
-    <p style="color:red">No description available.</p>
-    {% endif %}
-{% endmacro %}
+{% from 'common_macros.html.j2' import show_other_attributes, description %}
 
 <h1>{{ object.name }}</h1>
-{{ description(object) }}
+{{ description(object) | safe }}
 
 <h2>Logical Component Context</h2>
 

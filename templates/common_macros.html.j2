@@ -66,8 +66,12 @@
 
 {% macro description(obj) %}
     {% if obj.description %}
-    {{ obj.description | safe }}
+        <p>{{ obj.description | safe }}</p>
     {% else %}
     <p style="color:red">No description available.</p>
     {% endif %}
+{% endmacro %}
+
+{% macro typed_name(object) %}
+<b>{{ object.__class__.__name__ }}</b> <a href="{{ object | make_href }}">{{ object.name }}</a>
 {% endmacro %}

@@ -1,12 +1,12 @@
-{% from 'common_macros.html.j2' import show_other_attributes, description, render_reqs_by_type %}
+{% from 'common_macros.html.j2' import show_other_attributes, description, render_reqs_by_type, typed_name %}
 
 <h1>{{ object.name }}</h1>
 {{ description(object) | safe }}
 
-<p style="margin-top:1.5em; "><b>Parent:</b> {{object.parent._short_html_()}}</p>
+<p style="margin-top:1.5em; "><b>Parent:</b> {{ typed_name(object.parent) | safe }}</p>
 
 {% if object.capabilities %}
-<p><b>{{ object.name }}</b> is involved in the following operational capabilities: 
+<p><i>{{ object.name }} {% if object.is_human %}(human){% endif %}</i> is involved in the following operational capabilities: 
 {%- for cap in object.capabilities -%}
 <a href="{{ cap | make_href }}">{{ cap.name }}</a>; 
 {%- endfor -%}
@@ -14,8 +14,8 @@
 {% endif %}
 
 {% if object.state_machines %}
-<h2>State Machines</h2>
-<p>The following state machines describe the entity modes and states:</p>
+<h2>States and Modes</h2>
+<p>The following state machines describe modes and states of <i>{{ object.name }}</i>:</p>
 {% for stm in object.state_machines %}
     <h3>{{ stm.name }}</h3>
     {% if stm.regions | length > 1 %}
@@ -28,8 +28,8 @@
     {% elif stm.regions | length == 1 %}
         {% set region = stm.regions | first %}
         <ul>
-        {% for state in region.states %}
-            <li>{{ state._short_html_() }}: {{ description(state) | safe }}</li>
+        {% for state in region.states if state.__class__.__name__ in ["State", "Mode"] %}
+            <li><b>{{ state.__class__.__name__ }}</b> <a href="{{ state | make_href }}">{{ state.name }}</a>{{ ": " + state.description | safe if state.description else ""}}
         {% endfor %}
         </ul>
     {% else %}
@@ -39,18 +39,26 @@
 {% endif %}
 
 {% if object.activities %}
-<h2>Operational Activities</h2>
-<p><b>{{object.name}}</b> is responsible for the following operational activities:</p>
+<h2>Activities</h2>
+<p><i>{{object.name}}</i> is responsible for the following operational activities:</p>
 <ul>
 {% for activity in object.activities %}
     <li>
-        <a href="{{ activity | make_href }}">{{activity.name}}</a>: {{ description(activity) | safe }}
-        <p><b>{{ activity.name }}</b> is involved in the following operational capabilities: 
+        <a href="{{ activity | make_href }}">{{activity.name}}</a>{{ ": " + activity.description | safe if activity.description else ""}}
+        {%- set involving_caps = [] -%}
         {%- for cap in object.capabilities -%}
-        {%- if activity in cap.involved_activities -%}
-        <a href="{{ cap | make_href }}">{{ cap.name }}</a>; 
-        {%- endif -%}
+            {%- if activity in cap.involved_activities -%}
+                {%- set _ = involving_caps.append(cap) -%}
+            {%- endif -%}
         {%- endfor -%}
+        {%- if involving_caps -%}
+            <p>involving operational capabilities: 
+            {%- for cap in object.capabilities -%}
+                {%- if activity in cap.involved_activities -%}
+                <a href="{{ cap | make_href }}">{{ cap.name }}</a>; 
+                {%- endif -%}
+            {%- endfor -%}
+        {%- endif -%}
         </p>
     </li>
 {% endfor %}
@@ -74,5 +82,16 @@
     </ul>
 {% endif %}
 
-{% set filtered = ["description", "xtype", "entities", "owner", "parent", "parts", "requirements", "state_machines", "activities", "capabilities", "name"]%}
+{% if object.realizing_system_components %}
+<h2>Realizations of {{ object.name }}</h2>
+<p><i>{{object.name}}</i> is realized by the following system components:</p>
+<ul>
+{% for comp in object.realizing_system_components %}
+    <li><a href="{{ comp | make_href }}">{{comp.name}}</a></li>
+{% endfor %}
+{% endif%}
+
+<h2>Other attributes</h2>
+
+{% set filtered = ["description", "realizing_system_components", "realizing_components", "xtype", "is_actor", "is_human", "entities", "owner", "parent", "parts", "requirements", "state_machines", "activities", "capabilities", "name"]%}
 {{ show_other_attributes(object, filtered) | safe}}
