@@ -30,8 +30,12 @@ export const TemplateView = ({ endpoint }) => {
 
   return (
     <div>
-      <div className="fixed h-screen w-auto flex-col left-0 top-0">
-      <Header />
+      <div className="fixed flex-col left-0 top-0 z-20 w-full">
+       <Header />
+      </div>
+
+      <div className="fixed flex-col left-0 top-0 z-10 m-12">
+      
       {isSmallScreen && (
         <div className="mt-8 flex justify-center">
           <Button
@@ -42,35 +46,34 @@ export const TemplateView = ({ endpoint }) => {
           </Button>
         </div>
       )}
-      <div className="flex-32 flex">
-        <aside
+      <aside
           className={`mb-8 mt-8 flex max-h-[75vh] flex-col overflow-y-auto rounded-lg shadow-lg dark:shadow-dark lg:block lg:w-96 print:hidden ${
             isSidebarCollapsed ? "hidden" : "h-screen w-64"
           }`}
         >
           <TemplateDetails endpoint={endpoint} onSingleInstance={setObjectID} />
         </aside>
-        
-      </div>
     </div>
-      <main className="flex-1 ">
-          <div className="html-wrapper ml-8 mt-8 flex h-[80vh] min-w-0 max-w-none items-start justify-center  lg:min-w-[650px] lg:max-w-4xl">
-            {!!!objectID && !!!singleObjectID && (
-              <p className="text-xl text-gray-700 dark:text-gray-300">
-                Select an Instance
-              </p>
-            )}
-            {(objectID || singleObjectID) && (
-              <div className=" mx-auto box-border mb-4">
-                <InstanceView
-                  endpoint={endpoint}
-                  objectID={objectID || singleObjectID}
-                  templateName={templateName}
-                />
-              </div>
-            )}
-          </div>
-        </main>
+
+      <main className="flex-1 z-50">
+        <div className="html-wrapper ml-8 mt-8 flex h-[80vh] min-w-0 max-w-none items-start justify-center  lg:min-w-[650px] lg:max-w-4xl">
+          {!!!objectID && !!!singleObjectID && (
+            <p className="text-xl text-gray-700 dark:text-gray-300">
+              Select an Instance
+            </p>
+          )}
+          {(objectID || singleObjectID) && (
+            <div className=" mx-auto box-border mb-4 mt-20">
+              <InstanceView
+                endpoint={endpoint}
+                objectID={objectID || singleObjectID}
+                templateName={templateName}
+              />
+            </div>
+          )}
+        </div>
+      </main>
+
     </div>
   );
 };

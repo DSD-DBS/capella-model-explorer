@@ -55,7 +55,7 @@ export const InstanceView = ({ templateName, objectID, endpoint }) => {
     document.body.style.minHeight = '100vh';
     if (!contentRef.current) return;
     const currentHeight = contentRef.current.scrollHeight;
-    document.body.style.height = `${currentHeight + 100}px`;
+    document.body.style.height = `${currentHeight + 150}px`;
   }, [details]);
   
   if (loading)
