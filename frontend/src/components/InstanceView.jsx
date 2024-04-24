@@ -43,13 +43,21 @@ export const InstanceView = ({ templateName, objectID, endpoint }) => {
         });
         setDetails(contentItems);
         setLoading(false);
-        if (contentRef.current) contentRef.current.scrollIntoView();
       })
       .catch((error) => {
         setLoading(false);
         setDetails("Error fetching data ", error);
       });
   }, [endpoint, objectID, templateName]);
+
+  useEffect(() => {
+    document.body.style.height = 'auto';
+    document.body.style.minHeight = '100vh';
+    if (!contentRef.current) return;
+    const currentHeight = contentRef.current.scrollHeight;
+    document.body.style.height = `${currentHeight + 100}px`;
+  }, [details]);
+  
   if (loading)
     return (
       <div className="mx-auto md:w-[210mm]">

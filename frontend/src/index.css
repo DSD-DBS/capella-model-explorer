@@ -21,12 +21,17 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+html, body, #root {
+  min-height: 100%;
+  height: auto;
+}
+
 body {
   margin: 0;
   display: flex;
   place-items: center;
   min-width: 320px;
-  @apply bg-custom-light dark:bg-custom-dark-1;
+  @apply bg-gray-200 dark:bg-custom-dark-1 bg-auto;
 }
 
 .react-transform-wrapper {

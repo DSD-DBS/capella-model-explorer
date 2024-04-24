@@ -19,6 +19,7 @@ export const HomeView = () => {
       } catch (err) {
         setError("Failed to fetch model info: " + err.message);
       }
+      document.body.style.height = 'auto';
     };
 
     fetchModelInfo();
@@ -33,7 +34,7 @@ export const HomeView = () => {
   }
 
   return (
-    <div className="mb-8 flex h-full flex-col justify-center">
+    <div className="mb-8 flex-col justify-center">
       <div className="flex w-full items-start justify-between px-4 ">
         <div className="mx-auto mb-8 text-center ">
           {modelInfo && (
