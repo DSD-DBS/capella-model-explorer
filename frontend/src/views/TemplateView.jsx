@@ -29,7 +29,8 @@ export const TemplateView = ({ endpoint }) => {
   }, [isSmallScreen]);
 
   return (
-    <div className="flex h-screen w-auto flex-col">
+    <div>
+      <div className="fixed h-screen w-auto flex-col left-0 top-0">
       <Header />
       {isSmallScreen && (
         <div className="mt-8 flex justify-center">
@@ -49,7 +50,10 @@ export const TemplateView = ({ endpoint }) => {
         >
           <TemplateDetails endpoint={endpoint} onSingleInstance={setObjectID} />
         </aside>
-        <main className="flex-1 ">
+        
+      </div>
+    </div>
+      <main className="flex-1 ">
           <div className="html-wrapper ml-8 mt-8 flex h-[80vh] min-w-0 max-w-none items-start justify-center  lg:min-w-[650px] lg:max-w-4xl">
             {!!!objectID && !!!singleObjectID && (
               <p className="text-xl text-gray-700 dark:text-gray-300">
@@ -57,15 +61,16 @@ export const TemplateView = ({ endpoint }) => {
               </p>
             )}
             {(objectID || singleObjectID) && (
-              <InstanceView
-                endpoint={endpoint}
-                objectID={objectID || singleObjectID}
-                templateName={templateName}
-              />
+              <div className=" mx-auto box-border mb-4">
+                <InstanceView
+                  endpoint={endpoint}
+                  objectID={objectID || singleObjectID}
+                  templateName={templateName}
+                />
+              </div>
             )}
           </div>
         </main>
-      </div>
     </div>
   );
 };
