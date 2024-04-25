@@ -3,17 +3,21 @@
     SPDX-License-Identifier: Apache-2.0
 #}
 
-{% from 'common_macros.html.j2' import show_other_attributes, linked_name %}
+{% from 'common_macros.html.j2' import show_other_attributes, linked_name, display_traceability %}
 
 {% macro describe_exchange_direction(source, target, interface, exchanges) %}
     <p>
-        {{ linked_name(source) | safe }} should provide 
-        {% for fex in exchanges %}
-        <a href="{{ fex.source.owner | make_href }}">{{ fex.name }}</a>{% if not loop.last %}, {% else %} and {% endif %}
+        {%- set unique_exchange_names = [] -%}
+        {{ linked_name(source) | safe }} should provide&nbsp; 
+        {%- for fex in exchanges  -%}
+            {%- if fex.name not in unique_exchange_names -%}
+                <a href="{{ fex.source.owner | make_href }}">{{ fex.name }}</a>{% if not loop.last %}, {% else %} {% endif %}
+                {%- set _none = unique_exchange_names.append(fex.name) -%}
+            {%- endif -%}
         {% endfor %}
-        via <i>{{ interface.name }}</i> interface (component exchange) so that {{ linked_name(target) | safe }} could 
+        via <i>{{ interface.name }}</i> interface (component exchange) so that {{ linked_name(target) | safe }} could&nbsp; 
         {%- for fnc in exchanges | map(attribute='target.owner') | unique -%}
-        {{ linked_name(fnc) | safe }}{% if not loop.last %}, {% else %} and {% endif %}
+        {{ linked_name(fnc) | safe }}{% if not loop.last %}, {% else %} {% endif %}
         {%- endfor -%}
     </p>
 {% endmacro %}
@@ -46,5 +50,9 @@
 <p>The functional interactions between interface partners via {{ object.name }} are summarized by the diagram below:</p>
 {{ object.context_diagram.as_svg | safe }}
 
-{% set filtered = ["name", "description", "xtype", "allocated_functional_exchanges", "context_diagram"]%}
+{{ display_traceability(object, complain=False) | safe }}
+
+<h2>Other object attributes</h2>
+
+{% set filtered = ["name", "description", "xtype", "allocated_functional_exchanges", "context_diagram", "parent", "realizing_component_exchanges", "realized_component_exchanges"]%}
 {{show_other_attributes(object, filtered) | safe}}

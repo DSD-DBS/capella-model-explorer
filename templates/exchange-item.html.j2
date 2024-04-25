@@ -1,0 +1,27 @@
+{#
+    Copyright DB InfraGO AG and contributors
+    SPDX-License-Identifier: Apache-2.0
+#}
+
+{% from 'common_macros.html.j2' import show_other_attributes, description, typed_name %}
+
+<h1>Exchange Item <b>{{ object.name if object.name else "Unnamed"}}</b></h1>
+{{ description(object) | safe }}
+
+<h2>Usage</h2>
+<p>The exchange item "{{ object.name }}" is produced and used across the model in the following cases:</p>
+<ul>
+{%- for exchange in object.exchanges -%}
+    {%- set src = exchange.source.owner.owner if exchange.source.owner.owner else None -%}
+    {%- set tgt = exchange.target.owner.owner if exchange.target.owner.owner else None -%}
+    <li>
+        {{ typed_name(exchange) | safe }}
+        , produced by {{ typed_name(exchange.source.owner) | safe }} of {{ typed_name(src) | safe if src else "Unassigned" }}
+        &nbsp;and consumed by {{ typed_name(exchange.target.owner) | safe }} of {{ typed_name(tgt) | safe if tgt else "Unassigned" }}</li>
+{%- endfor -%}
+</ul>
+
+<h2>Other attributes</h2>
+
+{%- set excluded = ["name", "xtype", "description", "exchanges"] -%}
+{{show_other_attributes(object, excluded) | safe}}

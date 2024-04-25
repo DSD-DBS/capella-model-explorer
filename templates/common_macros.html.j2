@@ -75,3 +75,35 @@
 {%- macro typed_name(object) -%}<b>{{ object.__class__.__name__ }}</b> <a href="{{ object | make_href }}">{{ object.name  | trim }}</a>{%- endmacro -%}
 
 {%- macro linked_name(object) -%}<a href="{{ object | make_href }}">{{ object.name  | trim }}</a>{%- endmacro -%}
+
+{%- macro display_traceability(object, complain=False) -%}
+    {%- set realized_attrs = [] -%}
+    {%- set realizing_attrs = [] -%}
+    {%- for attr in object.__dir__() -%}
+        {%- if attr.startswith("realized_") -%}
+            {% set _none = realized_attrs.append(attr) %}
+        {%- elif attr.startswith("realizing_") -%}
+            {% set _none = realizing_attrs.append(attr) %}
+        {%- endif-%}
+    {%- endfor -%}
+    {%- set realized_objects = object[realized_attrs | first] if realized_attrs else None -%}
+    {%- set realizing_objects = object[realizing_attrs | first] if realizing_attrs else None -%}
+    
+    <h2>Traceability</h2>
+    {% if realized_objects %}
+    <p>{{ object.name }} realizes the following objects:<p>
+    <ul>
+    {%- for obj in realized_objects -%}<li>{{ typed_name(obj) | safe}}</li>{%- endfor -%}
+    </ul>
+    {%- elif complain -%}
+        <p style="color: red;">{{ object.name }} doesn't seem to realize any object</p>
+    {%- endif -%}
+    {% if realizing_objects %}
+    <p>{{ object.name }} is realized by the following objects:</p>
+    <ul>
+    {%- for obj in realizing_objects -%}<li>{{ typed_name(obj) | safe}}</li>{%- endfor -%}
+    </ul>
+    {%- elif complain -%}
+        <p style="color: red;">{{ object.name }} doesn't seem to be realized by any object</p>
+    {% endif %}
+{%- endmacro -%}

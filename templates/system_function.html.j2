@@ -2,9 +2,15 @@
     Copyright DB InfraGO AG and contributors
     SPDX-License-Identifier: Apache-2.0
 #}
-{% from 'common_macros.html.j2' import show_other_attributes %}
+{% from 'common_macros.html.j2' import show_other_attributes, linked_name %}
 
 <h1>{{ object.name | capitalize }}</h1>
+
+{% if object.owner %}
+    <p>A function of {{ linked_name(object.owner) | safe }}</p>
+{% else %}
+    <p style="color: red;">This function is not allocated to any entity / no entity is responsible for it.</p>
+{% endif %}
 
 {% if object.description %}
 <p>{{ object.description }}</p>
@@ -12,16 +18,9 @@
 <p style="color:red">No description available.</p>
 {% endif %}
 
-<h2>Function owner</h2>
-{% if object.owner %}
-    <p>An Entity that is responsible for providing this function: <b><a href="{{ object.owner | make_href }}">{{object.owner.name}}</a></b>.</p>
-{% else %}
-    <p>This function is not allocated to any entity / no entity is responsible for it.</p>
-{% endif %}
-
 <h2>Conditional availability</h2>
 {% if object.available_in_states %}
-<p>The function is available in the following Entity states:</p>
+<p>The function is available in the following states of the {{ linked_name(object.owner) | safe }}:</p>
 <ul>
     {% for state in object.available_in_states %}
         <li><a href="{{ state | make_href }}">{{ state.name }}</a></li>
