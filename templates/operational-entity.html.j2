@@ -2,7 +2,7 @@
     Copyright DB InfraGO AG and contributors
     SPDX-License-Identifier: Apache-2.0
 #}
-{% from 'common_macros.html.j2' import show_other_attributes, description, render_reqs_by_type, typed_name %}
+{% from 'common_macros.html.j2' import show_other_attributes, description, render_reqs_by_type, typed_name, display_traceability %}
 
 <h1>{{ object.name }}</h1>
 {{ description(object) | safe }}
@@ -86,14 +86,7 @@
     </ul>
 {% endif %}
 
-{% if object.realizing_system_components %}
-<h2>Realizations of {{ object.name }}</h2>
-<p><i>{{object.name}}</i> is realized by the following model objects:</p>
-<ul>
-{% for comp in object.realizing_system_components %}
-    <li>{{ typed_name(comp) | safe }}</li>
-{% endfor %}
-{% endif%}
+{{ display_traceability(object)| safe }}
 
 <h2>Other attributes</h2>
 
