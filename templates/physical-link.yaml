@@ -1,7 +1,7 @@
 # Copyright DB InfraGO AG and contributors
 # SPDX-License-Identifier: Apache-2.0
 
-template: __generic__.html.j2
+template: physical-link.html.j2
 name: Physical Interface
 description: Defines a Physical Interface between 2 components
 category: pa

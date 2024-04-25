@@ -107,3 +107,29 @@
         <p style="color: red;">{{ object.name }} doesn't seem to be realized by any object</p>
     {% endif %}
 {%- endmacro -%}
+
+{% macro display_property_values(object) %}
+{% if object.property_value_groups  %}
+<h2>Other properties</h2>
+    <p>The following properties were additionally assigned to {{ object.name }}</p>
+    {% for group in object.property_value_groups %}
+        <p><b>{{ group.name | safe}}</b></p>
+        <table>
+            <thead>
+                <tr>
+                    <td>Property</td>
+                    <td>Value</td>
+                </tr>
+            </thead>
+            <tbody>
+            {% for prop in group.property_values %}
+            <tr>
+                <td>{{ prop.name }}</td>
+                <td>{{ prop.value.name | safe if prop.value.name else prop.value }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endfor %}
+{% endif %}
+{% endmacro %}
