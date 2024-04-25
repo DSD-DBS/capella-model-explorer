@@ -38,10 +38,6 @@ While the thing is running you can edit the templates in the `templates` folder 
 
 To run the app in dev mode you'll need to first run `npm run build` - this is needed by the backend to have some statics to serve. Then run `npm run dev` in a terminal and `python -m capella_model_explorer.backend path_to_model path_to_templates` in another terminal. The backend and statically built frontend will be served at `http://localhost:8000`. The live frontend will be served by vite at `http://localhost:5173`(or similar, it will be printed in the terminal where you ran `npm run dev`).
 
-# Documentation
-
-Read the [full documentation on Github pages](https://dsd-dbs.github.io/capella-model-explorer).
-
 # Installation
 
 You can install the latest released version directly from PyPI.
