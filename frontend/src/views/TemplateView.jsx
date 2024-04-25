@@ -55,7 +55,8 @@ export const TemplateView = ({ endpoint }) => {
         </aside>
     </div>
 
-      <main className="flex-1 z-50">
+      <main className="flex-1 z-50 flex">
+        <div className="w-400"></div>
         <div className="html-wrapper ml-8 mt-8 flex h-[80vh] min-w-0 max-w-none items-start justify-center  lg:min-w-[650px] lg:max-w-4xl">
           {!!!objectID && !!!singleObjectID && (
             <p className="text-xl text-gray-700 dark:text-gray-300">

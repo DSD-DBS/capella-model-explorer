@@ -1,0 +1,12 @@
+# Copyright DB InfraGO AG and contributors
+# SPDX-License-Identifier: Apache-2.0
+
+template: system-interface.html.j2
+name: System Interfaces
+description: defines interactions between system and actors at a high level
+category: sa
+variable:
+    name: object
+    type: ComponentExchange
+    below: sa
+
