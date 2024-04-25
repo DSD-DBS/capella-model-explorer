@@ -1,0 +1,56 @@
+# Copyright DB InfraGO AG and contributors
+# SPDX-License-Identifier: Apache-2.0
+
+templates: 
+- template: system-analysis/system_function.html.j2
+  idx: system-function
+  name: System Function
+  description: Specifies what the system should do and how it needs to interact with external actors.
+  category: sa
+  variable:
+    name: object
+    type: SystemFunction
+    below: sa
+
+- template: system-analysis/system-actor.html.j2
+  idx: system-actors
+  name: System Actors
+  description: define who the system in interacts with and why
+  category: sa
+  variable:
+      name: object
+      type: SystemComponent
+      below: sa
+  filters:
+    is_actor: true
+
+- template: system-analysis/system-capability.html.j2
+  idx: system-capability
+  name: System Capability
+  description: Specifies what the system should be capable of and how it needs to interact with external actors.
+  category: sa
+  variable:
+    name: object
+    type: Capability
+    below: sa
+
+- template: system-analysis/system-definition.html.j2
+  idx: system-definition
+  name: System Definition
+  description: defines the need for the system, its boundary and interfaces
+  category: sa
+  single: true
+  variable:
+      name: object
+      type: SystemComponent
+      below: sa
+
+- template: system-analysis/system-interface.html.j2
+  idx: system-interfaces
+  name: System Interfaces
+  description: defines interactions between system and actors at a high level
+  category: sa
+  variable:
+      name: object
+      type: ComponentExchange
+      below: sa

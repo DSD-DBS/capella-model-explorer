@@ -254,28 +254,32 @@ class CapellaModelExplorerBackend:
                 "index.html", {"request": request}
             )
 
+def index_template(template, templates, templates_grouped, filename=None):
+    idx = filename if filename else template["idx"]
+    record = {"idx": idx, **template}
+    if "category" in template:
+        category = template["category"]
+        if category not in templates_grouped:
+            templates_grouped[category] = []
+        templates_grouped[category].append(record)
+    else:
+        templates_grouped["other"].append(record)
+    templates[idx] = template
+
 
 def index_templates(
     path: pathlib.Path,
 ) -> tuple[dict[str, t.Any], dict[str, t.Any]]:
     templates_grouped: dict[str, t.Any] = {"other": []}
     templates: dict[str, t.Any] = {}
-    for template_file in path.glob("*.yaml"):
+    for template_file in path.glob("**/*.yaml"):
         template = yaml.safe_load(template_file.read_text(encoding="utf8"))
-        idx = urlparse.quote(template_file.name.replace(".yaml", ""))
-        record = {"idx": idx, **template}
-        if "category" in template:
-            category = template["category"]
-            if category not in templates_grouped:
-                templates_grouped[category] = []
-            templates_grouped[category].append(record)
+        if "templates" in template:
+            for template_def in template["templates"]:
+                index_template(template_def, templates, templates_grouped)
         else:
-            templates_grouped["other"].append(record)
-        templates[idx] = template
-        name = template_file.name.replace(".yaml", "")
-        templates[urlparse.quote(name)] = template
-        # later we could add here count of objects that can be rendered
-        # with this template
+            idx = urlparse.quote(template_file.name.replace(".yaml", ""))
+            index_template(template, templates, templates_grouped, filename=idx)
     return templates_grouped, templates
 
 
