@@ -5,6 +5,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { SVGDisplay } from "./SVGDisplay";
 import { Spinner } from "./Spinner";
 import { Button } from "./Button";
+import { Printer } from "lucide-react";
 
 export const InstanceView = ({ templateName, objectID, endpoint }) => {
   const [details, setDetails] = useState([]);
@@ -74,18 +75,13 @@ export const InstanceView = ({ templateName, objectID, endpoint }) => {
       onMouseLeave={() => setIsHovering(false)}
     >
       {isHovering && (
-        <Button
-          style={{
-            position: "absolute",
-            top: 0,
-            right: 0,
-            margin: "1rem",
-            padding: "0.5rem",
-          }}
-          onClick={() => window.print()}
-        >
-          Print Content
-        </Button>
+        <div className="fixed -ml-14 -mt-6">
+          <div
+            onClick={() => window.print()}
+            className="flex cursor-pointer items-center justify-center rounded-full bg-custom-blue text-white dark:bg-custom-blue dark:text-gray-100 p-2 transition-colors duration-700 ease-in-out hover:bg-custom-dark-4 dark:hover:bg-custom-light">
+            <Printer></Printer>
+          </div>
+        </div>
       )}
       {details.map((item, idx) => {
         if (item.type === "SVGDisplay") {
