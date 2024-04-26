@@ -6,12 +6,14 @@ import logging
 import operator
 import os
 import pathlib
+import time
 import typing as t
 import urllib.parse as urlparse
 from pathlib import Path
 
 import capellambse
 import markupsafe
+import prometheus_client
 import yaml
 from fastapi import APIRouter, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -62,6 +64,17 @@ class CapellaModelExplorerBackend:
         self.app.state.templates = Jinja2Templates(directory=PATH_TO_FRONTEND)
         self.configure_routes()
         self.app.include_router(self.router)
+        self.idle_time_gauge = prometheus_client.Gauge(
+            "idletime_minutes",
+            "Time in minutes since the last user interaction",
+        )
+        self.last_interaction = time.time()
+
+        @self.app.middleware("http")
+        async def update_last_interaction_time(request: Request, call_next):
+            response = await call_next(request)
+            self.last_interaction = time.time()
+            return response
 
     def __finalize(self, markup: t.Any) -> object:
         markup = markupsafe.escape(markup)
@@ -247,6 +260,12 @@ class CapellaModelExplorerBackend:
                 "branch": info.branch,
                 "badge": self.model.description_badge,
             }
+
+        @self.router.get("/metrics")
+        def metrics():
+            idle_time_minutes = (time.time() - self.last_interaction) / 60
+            self.idle_time_gauge.set(idle_time_minutes)
+            return prometheus_client.generate_latest()
 
         @self.router.get("/{rest_of_path:path}")
         async def catch_all(request: Request, rest_of_path: str):
