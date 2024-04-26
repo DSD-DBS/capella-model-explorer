@@ -149,7 +149,7 @@ config:
   is_deprecated: false
   sessions:
     persistent:
-      image: https://ghcr.io/dsd-dbs/capella-model-explorer/model-explorer:latest
+      image: ghcr.io/dsd-dbs/capella-model-explorer/model-explorer:latest
   backups:
     image: null
   compatible_versions: [1, 2, 3, 4]
