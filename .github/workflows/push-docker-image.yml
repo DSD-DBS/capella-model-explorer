@@ -1,0 +1,41 @@
+name: Create and publish Docker image
+
+on:
+  push:
+    branches: ['**']
+    tags: ['v*.*.*']
+
+# Defines two custom environment variables for the workflow. These are used for the Container registry domain, and a name for the Docker image that this workflow builds.
+env:
+  IMAGE_NAME: ${{ github.repository }}
+
+# There is a single job in this workflow. It's configured to run on the latest available version of Ubuntu.
+jobs:
+  build-and-push-image:
+    runs-on: ubuntu-latest
+    # Sets the permissions granted to the `GITHUB_TOKEN` for the actions in this job.
+    permissions:
+      contents: read
+      packages: write
+      #
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}/model-explorer
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
