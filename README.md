@@ -123,7 +123,7 @@ config:
         type: http
         name: default
         ports:
-          metrics: 9118
+          metrics: 8000
           http: 8000
         redirect_url: '{CAPELLACOLLAB_SESSIONS_SCHEME}://{CAPELLACOLLAB_SESSIONS_HOST}:{CAPELLACOLLAB_SESSIONS_PORT}{CAPELLACOLLAB_SESSIONS_BASE_PATH}/'
   monitoring:
