@@ -103,7 +103,7 @@ class CapellaModelExplorerBackend:
             if obj.__class__.__name__ == clsname:
                 return f"/{idx}/{obj.uuid}"
 
-        return f"/__generic__/{obj.uuid}"
+        return f"{ROUTE_PREFIX}/__generic__/{obj.uuid}"
 
     def render_instance_page(self, template_text, object=None):
         try:
@@ -167,15 +167,16 @@ class CapellaModelExplorerBackend:
             base["single"] = base.get("single", False)
             filters = base.get("filters")
             variable = base["variable"]
-            below = variable.get("below") or None
-            attr = variable.get("attr") or None
+            below = variable.get("below")
+            attr = variable.get("attr")
+            obj_type = variable.get("type")
             if base["single"]:
                 base["objects"] = []
                 return base
             try:
                 objects = find_objects(
                     self.model,
-                    variable["type"],
+                    obj_type,
                     below=below,
                     attr=attr,
                     filters=filters,
@@ -254,6 +255,7 @@ class CapellaModelExplorerBackend:
                 "index.html", {"request": request}
             )
 
+
 def index_template(template, templates, templates_grouped, filename=None):
     idx = filename if filename else template["idx"]
     record = {"idx": idx, **template}
@@ -279,7 +281,9 @@ def index_templates(
                 index_template(template_def, templates, templates_grouped)
         else:
             idx = urlparse.quote(template_file.name.replace(".yaml", ""))
-            index_template(template, templates, templates_grouped, filename=idx)
+            index_template(
+                template, templates, templates_grouped, filename=idx
+            )
     return templates_grouped, templates
 
 

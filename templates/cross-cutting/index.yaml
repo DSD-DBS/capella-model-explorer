@@ -2,30 +2,30 @@
 # SPDX-License-Identifier: Apache-2.0
 
 templates:
-- template: xc/classes.html.j2
-  idx: class
-  name: Data Class
-  description: Specifies structure of a data class. A class may be used to describe anything from a simple object relationship to a message on a bus.
-  category: xc
-  variable:
-    name: object
-    type: Class
+    - template: cross-cutting/classes.html.j2
+      idx: class
+      name: Data Class
+      description: Specifies structure of a data class. A class may be used to describe anything from a simple object relationship to a message on a bus.
+      category: xc
+      variable:
+          name: object
+          type: Class
 
-- template: xc/diagrams.html.j2
-  name: Diagrams
-  idx: diagram
-  description: Provides access to all human-made diagrams inside the model
-  category: xc
-  variable:
-    name: object
-    type: AbstractDiagram
-    attr: diagrams
+    - template: cross-cutting/diagrams.html.j2
+      name: Diagrams
+      idx: diagram
+      description: Provides access to all human-made diagrams inside the model
+      category: xc
+      variable:
+          name: object
+          type: AbstractDiagram
+          attr: diagrams
 
-- template: xc/exchange-item.html.j2
-  name: Exchange Item
-  idx: exchange-item
-  description: Specifies an exchange item, i.e. energy / material / information.
-  category: xc
-  variable:
-    name: object
-    type: ExchangeItem
+    - template: cross-cutting/exchange-item.html.j2
+      name: Exchange Item
+      idx: exchange-item
+      description: Specifies an exchange item, i.e. energy / material / information.
+      category: xc
+      variable:
+          name: object
+          type: ExchangeItem

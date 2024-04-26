@@ -13,7 +13,7 @@ from . import explorer
 HOST = os.getenv("CAPELLA_MODEL_EXPLORER_HOST_IP", "0.0.0.0")
 PORT = os.getenv("CAPELLA_MODEL_EXPLORER_PORT", "8000")
 
-PATH_TO_TEMPLATES = Path(__file__).parent.parent.parent / "templates"
+PATH_TO_TEMPLATES = Path("./templates")
 
 
 @click.command()
