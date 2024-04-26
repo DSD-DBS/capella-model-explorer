@@ -8,73 +8,82 @@ In this component we show list of template instances, and when we click on a tem
 */
 
 import React, { useEffect, useState } from "react";
-import { useLocation, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useMediaQuery } from "react-responsive";
 import { Header } from "../components/Header";
 import { InstanceView } from "../components/InstanceView";
 import { TemplateDetails } from "../components/TemplateDetails";
-import { Button } from "../components/Button";
+import { ChevronUp } from "lucide-react";
 
 export const TemplateView = ({ endpoint }) => {
   let { templateName, objectID } = useParams();
   const [singleObjectID, setObjectID] = useState(null);
-  const location = useLocation();
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  const isSmallScreen = useMediaQuery({ query: "(max-width: 1024px)" });
+  const isSmallScreen = useMediaQuery({ query: "(max-width: 1800px)" });
+  const [isSidebarVisible, setIsSidebarVisible] = useState(!isSmallScreen);
+
+  const [isButtonClicked, setIsButtonClicked] = useState(false);
 
   useEffect(() => {
-    if (isSmallScreen) {
-      setIsSidebarCollapsed(true);
-    }
+    setIsSidebarVisible(!isSmallScreen);
   }, [isSmallScreen]);
 
+  const toggleSidebar = () => {
+    setIsSidebarVisible(!isSidebarVisible);
+    if (!isSidebarVisible) {
+      setIsButtonClicked(true);
+    }
+  };
   return (
     <div>
-      <div className="fixed flex-col left-0 top-0 z-20 w-full">
-       <Header />
-      </div>
+      <Header />
 
-      <div className="fixed flex-col left-0 top-0 z-10 m-12">
-      
-      {isSmallScreen && (
-        <div className="mt-8 flex justify-center">
-          <Button
-            className="px-4 py-2"
-            onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-          >
-            {isSidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
-          </Button>
-        </div>
-      )}
-      <aside
-          className={`mb-8 mt-8 flex max-h-[75vh] flex-col overflow-y-auto rounded-lg shadow-lg dark:shadow-dark lg:block lg:w-96 print:hidden ${
-            isSidebarCollapsed ? "hidden" : "h-screen w-64"
-          }`}
-        >
+      <div
+        className={`fixed left-16 z-20 mt-20 flex w-96 transform flex-col items-center transition-all duration-700 ease-in-out ${
+          isSidebarVisible ? "translate-y-0 " : "-translate-y-full"
+        }`}
+      >
+        <aside className="m-h-50[vh] h-full w-full flex-col overflow-y-auto rounded-lg shadow-lg dark:shadow-dark print:hidden">
           <TemplateDetails endpoint={endpoint} onSingleInstance={setObjectID} />
         </aside>
-    </div>
+        <button
+          onClick={toggleSidebar}
+          className={` flex h-8 w-16 cursor-pointer items-center justify-center rounded-full rounded-t-none bg-blue-500 p-2 transition-transform duration-500 ease-in-out hover:bg-blue-700 focus:outline-none ${
+            isSidebarVisible ? "translate-y-0" : "translate-y-[2rem] "
+          }`}
+        >
+          <ChevronUp
+            className={`h-6 w-6 transform text-white  transition-all duration-700 ease-in-out ${
+              isSidebarVisible ? "" : " rotate-180"
+            }`}
+          />
+        </button>
+      </div>
 
-      <main className="flex-1 z-50 flex">
-        <div className="w-400"></div>
-        <div className="html-wrapper ml-8 mt-8 flex h-[80vh] min-w-0 max-w-none items-start justify-center  lg:min-w-[650px] lg:max-w-4xl">
-          {!!!objectID && !!!singleObjectID && (
-            <p className="text-xl text-gray-700 dark:text-gray-300">
-              Select an Instance
-            </p>
+      <main>
+        <div className="flex">
+          {isSidebarVisible && isSmallScreen && (
+            <div className="fixed left-0 top-0 z-10 h-screen w-screen bg-black opacity-50 dark:bg-gray-700"></div>
           )}
-          {(objectID || singleObjectID) && (
-            <div className=" mx-auto box-border mb-4 mt-20">
-              <InstanceView
-                endpoint={endpoint}
-                objectID={objectID || singleObjectID}
-                templateName={templateName}
-              />
-            </div>
-          )}
+          <div
+            className={`html-wrapper relative flex h-screen flex-1 items-center justify-center pb-12 pt-28`}
+          >
+            {!!!objectID && !!!singleObjectID && (
+              <p className="text-xl text-gray-700 dark:text-gray-300">
+                Select an Instance
+              </p>
+            )}
+            {(objectID || singleObjectID) && (
+              <div className="m-auto mx-auto box-border">
+                <InstanceView
+                  endpoint={endpoint}
+                  objectID={objectID || singleObjectID}
+                  templateName={templateName}
+                />
+              </div>
+            )}
+          </div>
         </div>
       </main>
-
     </div>
   );
 };

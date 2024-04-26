@@ -66,10 +66,10 @@ export const Breadcrumbs = () => {
   return (
     <nav
       aria-label="breadcrumb"
-      className="flex items-center text-black dark:text-gray-200 font-medium"
+      className="flex items-center font-medium text-black dark:text-gray-200"
     >
       <ol className="flex items-center">
-        <li className="flex items-center">
+        <li className="flex  items-center truncate">
           <Link to={"/"}>{breadcrumbLabels["/"]}</Link>
           <span className="mx-2">/</span>
         </li>
@@ -79,9 +79,9 @@ export const Breadcrumbs = () => {
           const label = breadcrumbLabels[to] || value;
 
           return (
-            <li className="flex items-center" key={to}>
+            <li className="flex  items-center truncate" key={to}>
               {!last && <Link to={to}>{label}</Link>}
-              {last && <span className=" text-custom-blue">{label}</span>}
+              {last && <span className="  text-custom-blue">{label}</span>}
               {!last && <span className="mx-2">/</span>}
             </li>
           );

@@ -34,7 +34,7 @@ export const TemplateDetails = ({ endpoint, onSingleInstance }) => {
   }, [endpoint, templateName, objectID, onSingleInstance]);
   if (error) {
     return (
-      <div className="dark:bg-custom-dark-error rounded bg-red-500 p-4 text-2xl text-white">
+      <div className="rounded bg-red-500 p-4 text-2xl text-white dark:bg-custom-dark-error">
         {error}
       </div>
     );
@@ -53,7 +53,7 @@ export const TemplateDetails = ({ endpoint, onSingleInstance }) => {
             We failed to find matching template instances due to the following
             error:{" "}
           </p>
-          <div className="dark:bg-custom-dark-error rounded bg-red-500 px-2 py-2 text-white">
+          <div className="rounded bg-red-500 px-2 py-2 text-white dark:bg-custom-dark-error">
             {details.error}
           </div>
         </div>
@@ -65,7 +65,7 @@ export const TemplateDetails = ({ endpoint, onSingleInstance }) => {
               value={filterText}
               onChange={(e) => setFilterText(e.target.value)}
               placeholder="Filter objects"
-              className="mx-auto mb-3 mr-6 w-80 rounded border-2 border-gray-300 p-2 shadow-sm dark:border-gray-500 dark:bg-custom-dark-3"
+              className="mx-auto mb-3 mr-6 w-full rounded border-2 border-gray-300 p-2 shadow-sm dark:border-gray-500 dark:bg-custom-dark-3"
             />
           ) : (
             <></>

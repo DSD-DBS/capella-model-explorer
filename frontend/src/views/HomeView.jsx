@@ -19,7 +19,7 @@ export const HomeView = () => {
       } catch (err) {
         setError("Failed to fetch model info: " + err.message);
       }
-      document.body.style.height = 'auto';
+      document.body.style.height = "auto";
     };
 
     fetchModelInfo();
@@ -27,14 +27,14 @@ export const HomeView = () => {
 
   if (error) {
     return (
-      <div className="dark:bg-custom-dark-error rounded bg-red-500 p-2 text-xl text-white">
+      <div className="rounded bg-red-500 p-2 text-xl text-white dark:bg-custom-dark-error">
         {error}
       </div>
     );
   }
 
   return (
-    <div className="mb-8 flex-col justify-center">
+    <div className="mb-8 flex-col justify-center overflow-auto">
       <div className="flex w-full items-start justify-between px-4 ">
         <div className="mx-auto mb-8 text-center ">
           {modelInfo && (
