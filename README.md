@@ -140,7 +140,7 @@ You can tune the resources according to your needs.
 
 After saving the configuration, you have to add a version for the new tool.
 Since the Capella Model Explorer can load different Capella versions, we can
-one generic version:
+use one generic version:
 
 ```yaml
 name: 'Generic'
