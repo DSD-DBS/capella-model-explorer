@@ -38,9 +38,17 @@ EXPOSE 8000
 
 COPY ./templates /views
 
+# Cache directory has to be writable
+RUN chmod -R 777 /home
+ENV HOME=/home
+
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 ENV MODEL_ENTRYPOINT=/model
 RUN chmod -R 777 ./frontend/dist/
+
+# Run as non-root user per default
+USER 1001
+
 
 ENTRYPOINT ["/entrypoint.sh"]
