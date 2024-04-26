@@ -12,6 +12,7 @@ import urllib.parse as urlparse
 from pathlib import Path
 
 import capellambse
+import fastapi
 import markupsafe
 import prometheus_client
 import yaml
@@ -72,9 +73,13 @@ class CapellaModelExplorerBackend:
 
         @self.app.middleware("http")
         async def update_last_interaction_time(request: Request, call_next):
-            response = await call_next(request)
-            self.last_interaction = time.time()
-            return response
+            if (
+                not request.url.path == "/metrics"
+                and not request.url.path == "/favicon.ico"
+            ):
+                print(request.url.path)
+                self.last_interaction = time.time()
+            return await call_next(request)
 
     def __finalize(self, markup: t.Any) -> object:
         markup = markupsafe.escape(markup)
@@ -114,7 +119,7 @@ class CapellaModelExplorerBackend:
         for idx, template in self.templates.items():
             clsname = template.get("variable", {}).get("type")
             if obj.__class__.__name__ == clsname:
-                return f"/{idx}/{obj.uuid}"
+                return f"{ROUTE_PREFIX}/{idx}/{obj.uuid}"
 
         return f"{ROUTE_PREFIX}/__generic__/{obj.uuid}"
 
@@ -261,11 +266,14 @@ class CapellaModelExplorerBackend:
                 "badge": self.model.description_badge,
             }
 
-        @self.router.get("/metrics")
+        @self.app.get("/metrics")
         def metrics():
             idle_time_minutes = (time.time() - self.last_interaction) / 60
             self.idle_time_gauge.set(idle_time_minutes)
-            return prometheus_client.generate_latest()
+            return fastapi.Response(
+                content=prometheus_client.generate_latest(),
+                media_type="text/plain",
+            )
 
         @self.router.get("/{rest_of_path:path}")
         async def catch_all(request: Request, rest_of_path: str):
