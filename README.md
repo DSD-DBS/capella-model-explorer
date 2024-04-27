@@ -115,7 +115,9 @@ config:
       requests: 1.6Gi
       limits: 6Gi
   environment:
-    MODEL_ENTRYPOINT: '{CAPELLACOLLAB_SESSION_PROVISIONING[0][path]}'
+    MODEL_ENTRYPOINT:
+      stage: before
+      value: '{CAPELLACOLLAB_SESSION_PROVISIONING[0][path]}'
     ROUTE_PREFIX: '{CAPELLACOLLAB_SESSIONS_BASE_PATH}'
   connection:
     methods:
