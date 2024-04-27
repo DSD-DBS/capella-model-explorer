@@ -50,5 +50,7 @@ RUN chmod -R 777 ./frontend/dist/
 # Run as non-root user per default
 USER 1001
 
+# Pre-install npm dependencies for context diagrams
+RUN python -c "from capellambse_context_diagrams import _elkjs; _elkjs._install_required_npm_pkg_versions()"
 
 ENTRYPOINT ["/entrypoint.sh"]

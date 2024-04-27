@@ -77,7 +77,6 @@ class CapellaModelExplorerBackend:
                 not request.url.path == "/metrics"
                 and not request.url.path == "/favicon.ico"
             ):
-                print(request.url.path)
                 self.last_interaction = time.time()
             return await call_next(request)
 
