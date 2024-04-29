@@ -65,7 +65,7 @@ export const TemplateDetails = ({ endpoint, onSingleInstance }) => {
               value={filterText}
               onChange={(e) => setFilterText(e.target.value)}
               placeholder="Filter objects"
-              className="mx-auto mb-3 mr-6 w-full rounded border-2 border-gray-300 p-2 shadow-sm dark:border-gray-500 dark:bg-custom-dark-3"
+              className="mx-auto mb-3 mr-6 w-full rounded  bg-custom-light p-2 shadow-sm dark:border-gray-500 dark:bg-custom-dark-3"
             />
           ) : (
             <></>
