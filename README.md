@@ -134,8 +134,8 @@ config:
   provisioning:
     directory: /models
     max_number_of_models: 1
-  workspaces:
-    enabled: false
+  persistent_workspaces:
+    mounting_enabled: false
 ```
 
 You can tune the resources according to your needs.
