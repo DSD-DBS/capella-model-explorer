@@ -1,0 +1,23 @@
+# Copyright DB InfraGO AG and contributors
+# SPDX-License-Identifier: Apache-2.0
+
+templates:
+- template: physical-architecture/physical-link.html.j2
+  idx: physical-link
+  name: Physical Interface
+  description: Defines a Physical Interface between 2 components
+  category: pa
+  variable:
+    name: object
+    type: PhysicalLink
+    below: pa
+
+- template: __generic__.html.j2
+  idx: physical-component
+  name: Physical Component
+  description: Defines a Physical Component
+  category: pa
+  variable:
+    name: object
+    type: PhysicalComponent
+    below: pa

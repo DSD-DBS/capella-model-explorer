@@ -1,0 +1,30 @@
+{#
+    Copyright DB InfraGO AG and contributors
+    SPDX-License-Identifier: Apache-2.0
+#}
+
+{% from 'common_macros.html.j2' import show_other_attributes, render_reqs_by_type %}
+{% set types = model.search("RequirementType") | map(attribute="long_name") | unique | list %}
+
+<h1>Module {{object.name or object.long_name}}</h1>
+<p>{{ object.text if object.text else object.long_name | safe}}</p>
+<hr style="margin-top:1em">
+
+{% if object.requirements %}
+    <h2>Root level objects</h2>
+    {{ render_reqs_by_type(object.requirements, types) | safe }}
+{% endif %}
+
+{% if object.folders%}
+    {% for folder in object.folders%}
+        <h2>Folder {{ folder.long_name }}</h2>
+        <p>{{ folder.requirements | length }} requirements in folder</p>
+        {{ render_reqs_by_type(folder.requirements, types) | safe }}
+    {% endfor %}
+{% endif %}
+
+
+{% from 'common_macros.html.j2' import show_other_attributes %}
+
+{% set filtered = ["parent", "owner", "requirements", "long_name", "to_reqif"]%}
+{{show_other_attributes(object, filtered) | safe}}

@@ -1,0 +1,11 @@
+# Copyright DB InfraGO AG and contributors
+# SPDX-License-Identifier: Apache-2.0
+
+idx: req
+template: req.html.j2
+name: Requirement Modules
+description: Basic template to visualize requirement objects
+category: other
+variable:
+  name: object
+  type: CapellaModule

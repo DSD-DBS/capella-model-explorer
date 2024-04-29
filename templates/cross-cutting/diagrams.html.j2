@@ -1,0 +1,27 @@
+{#
+    Copyright DB InfraGO AG and contributors
+    SPDX-License-Identifier: Apache-2.0
+#}
+
+<h1>{{ object.name }}</h1>
+{{ object.as_svg | safe }}
+
+<h2>Description</h2>
+{% if object.description %}
+<p>{{ object.description }}</p>
+{% else %}
+<p style="color:red">No description available.</p>
+{% endif %}
+
+<h2>Referenced Objects</h2>
+{% if object.nodes %}
+<ul>
+{% for node in object.nodes %}
+{% if node.name %}
+<li><a href="{{ node | make_href }}">{{ node.name }}</a></li>
+{% endif %}
+{% endfor %}
+</ul>
+{% else %}
+<p style="color:red">No referenced objects available.</p>
+{% endif %}

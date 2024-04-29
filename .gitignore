@@ -156,3 +156,8 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
+node_modules/
+
+# Mac stuff
+.DS_Store

@@ -1,0 +1,33 @@
+# Copyright DB InfraGO AG and contributors
+# SPDX-License-Identifier: Apache-2.0
+
+templates:
+- template: logical-architecture/logical-component.html.j2
+  name: Logical Components
+  idx: logical-component
+  description: Specifies a logical component. This is a ported template from a prototype project.
+  category: la
+  variable:
+    name: object
+    type: LogicalComponent
+    below: la
+
+- template: __generic__.html.j2
+  idx: logical-interface
+  name: Logical Component Interfaces
+  description: Defines interfaces between actors and logical system components
+  category: la
+  variable:
+    name: object
+    type: ComponentExchange
+    below: la
+
+- template: __generic__.html.j2
+  idx: logical-function
+  name: Logical Functions
+  description: Defines function of a system component or an actor
+  category: la
+  variable:
+    name: object
+    type: LogicalFunction
+    below: la

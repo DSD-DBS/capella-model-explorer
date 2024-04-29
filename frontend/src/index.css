@@ -1,0 +1,173 @@
+/*
+ * Copyright DB InfraGO AG and contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  @apply bg-gray-200 bg-auto dark:bg-custom-dark-1;
+}
+
+.react-transform-wrapper {
+  overflow: visible !important;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  a:hover {
+    color: #747bff;
+  }
+}
+
+.collapsed {
+  width: 50px;
+}
+
+.html-content {
+  text-align: left;
+}
+
+.html-content svg {
+  display: block;
+  @apply h-auto max-w-full;
+  text-align: center;
+}
+
+.html-content h1 {
+  @apply mb-4 mt-5 text-4xl;
+}
+
+.html-content h2 {
+  @apply mb-3 mt-5 text-3xl;
+}
+
+.html-content h3 {
+  @apply mb-3 mt-5 text-2xl;
+}
+
+.html-content table {
+  @apply min-w-full divide-y divide-gray-200;
+}
+.html-content p {
+  margin-top: 0.75em;
+  margin-bottom: 0.75em;
+  line-height: 1.5em;
+}
+.html-content p a,
+.html-content li a {
+  @apply italic text-gray-500 hover:underline;
+}
+
+ul {
+  @apply list-disc pl-5;
+}
+
+@media print {
+  body,
+  .html-wrapper,
+  .flex-1,
+  .html-content {
+    overflow: visible !important;
+  }
+  .print\\:hidden {
+    display: none !important;
+  }
+  .html-content {
+    border: none !important;
+    box-shadow: none !important;
+  }
+  @page {
+    margin: 15mm;
+  }
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: 0.4s;
+}
+
+input:checked + .slider {
+  background-color: #2196f3;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196f3;
+}
+
+input:checked + .slider:before {
+  transform: translateX(26px);
+}
+
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}

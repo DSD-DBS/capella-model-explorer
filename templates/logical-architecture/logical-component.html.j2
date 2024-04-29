@@ -1,0 +1,38 @@
+{#
+    Copyright DB InfraGO AG and contributors
+    SPDX-License-Identifier: Apache-2.0
+#}
+{% from 'common_macros.html.j2' import show_other_attributes, description %}
+
+<h1>{{ object.name }}</h1>
+{{ description(object) | safe }}
+
+<h2>Logical Component Context</h2>
+
+<p>
+The figure below provides an overview of the logical subsystem and external entities that either require the functionality of <b>{{ object.name }}</b> (expect outputs) or enable it (provide inputs). The figure also identifies the interfaces between the subsystem and its environment.
+</p>
+
+{{ object.context_diagram.as_svg|safe }}
+
+<h3>Logical interface partners of {{object.name}}</h2>
+
+{% set lexcs = [] %}{% for port in object.ports %}{% for lexc in port.exchanges %}
+{% set _ = lexcs.append([lexc, lexc.source.owner if lexc.source.owner != subsystem else lexc.target.owner]) %}
+{% endfor %}{% endfor %}
+
+{% for partner_cmp_name in lexcs | map(attribute=1) | map(attribute="name") | unique %}
+    {% set partner = lexcs | map(attribute=1) | selectattr("name", "equalto", partner_cmp_name) | first %}
+    <h3>{{ partner.name }}</h3>
+    <p>{{ description(partner) | safe }}</p>
+    {% set spp = lexcs | map(attribute=0) | selectattr("source.owner", "equalto", partner) | list %}
+    {% set tpp = lexcs | map(attribute=0) | selectattr("target.owner", "equalto", partner) | list %}
+    {% for lexc in (spp + tpp) %}
+        <h4>Logical interface {{ lexc.name }}</h4>
+        {{ lexc.context_diagram.as_svg|safe  }}
+    {% endfor %}
+{% endfor %}
+
+<h2>Other properties of "{{ object.name }}"</h2>
+{% set excluded = ["name", "context_diagram", "xtype", "parent"] %}
+{{ show_other_attributes(object, excluded) | safe  }}

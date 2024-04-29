@@ -13,9 +13,7 @@ description = "A webapp for exploring Capella models"
 readme = "README.md"
 requires-python = ">=3.10, <3.13"
 license = { text = "Apache-2.0" }
-authors = [
-  { name = "DB InfraGO AG" },
-]
+authors = [{ name = "DB InfraGO AG" }]
 keywords = []
 classifiers = [
   "Development Status :: 1 - Planning",
@@ -31,8 +29,9 @@ dependencies = [
   "capellambse",
   "capellambse-context-diagrams",
   "jinja2",
-  "pandas",
-  "streamlit",
+  "fastapi",
+  "uvicorn",
+  "prometheus-client",
 ]
 
 [project.urls]
@@ -40,17 +39,9 @@ Homepage = "https://github.com/DSD-DBS/capella-model-explorer"
 Documentation = "https://dsd-dbs.github.io/capella-model-explorer"
 
 [project.optional-dependencies]
-docs = [
-  "furo",
-  "sphinx",
-  "sphinx-copybutton",
-  "tomli; python_version<'3.11'",
-]
+docs = ["furo", "sphinx", "sphinx-copybutton", "tomli; python_version<'3.11'"]
 
-test = [
-  "pytest",
-  "pytest-cov",
-]
+test = ["pytest", "pytest-cov"]
 
 [tool.black]
 line-length = 79
@@ -101,17 +92,18 @@ ignore_missing_imports = true
 [tool.pydocstyle]
 convention = "numpy"
 add-select = [
-  "D212",  # Multi-line docstring summary should start at the first line
-  "D402",  # First line should not be the function’s “signature”
-  "D417",  # Missing argument descriptions in the docstring
+  "D212", # Multi-line docstring summary should start at the first line
+  "D402", # First line should not be the function’s “signature”
+  "D417", # Missing argument descriptions in the docstring
 ]
 add-ignore = [
-  "D201",  # No blank lines allowed before function docstring  # auto-formatting
-  "D202",  # No blank lines allowed after function docstring  # auto-formatting
-  "D203",  # 1 blank line required before class docstring  # auto-formatting
-  "D204",  # 1 blank line required after class docstring  # auto-formatting
-  "D211",  # No blank lines allowed before class docstring  # auto-formatting
-  "D213",  # Multi-line docstring summary should start at the second line
+  "D1",   # Missing docstring in [...]
+  "D201", # No blank lines allowed before function docstring  # auto-formatting
+  "D202", # No blank lines allowed after function docstring  # auto-formatting
+  "D203", # 1 blank line required before class docstring  # auto-formatting
+  "D204", # 1 blank line required after class docstring  # auto-formatting
+  "D211", # No blank lines allowed before class docstring  # auto-formatting
+  "D213", # Multi-line docstring summary should start at the second line
 ]
 
 [tool.pylint.format]
