@@ -36,6 +36,44 @@
 
 {{ object.context_diagram.as_svg | safe }}
 
+<h2>Inputs and Outputs</h2>
+<p>{% set cache = namespace(currentLevel='1', hnr=1, h1=0, h2=0, h3=0, h4=0, h5=0, h6=0, temp0=[], primaryId='', found=false) %}</p>
+<p>
+  <strong>Inputs</strong>
+</p>
+<p>{% set cache.InfoIsPrinted = False %}</p>
+<p>{% if object.inputs|length == 0 %}No exchanges consumed by function <strong>{{object.name}}</strong>.{% endif %}</p>
+<p>{% for inp in object.inputs %}{% for iExch in inp.exchanges|sort(attribute='name', reverse=False) %}{# FOR 1, 2 ##}</p>
+<p>{% if not cache.InfoIsPrinted %}</p>
+<p>{% set cache.InfoIsPrinted = True %}</p>
+<p>The following exchanges are consumed by the function <strong>{{object.name}}</strong>:</p>
+<p>{% endif%}</p>
+<ul>
+  <li>
+    <strong>{{ iExch.name }}</strong> provided by function <strong>{{ iExch.source.owner.name }}</strong>: {{ iExch.description }}. <br/>{% if iExch.exchange_items|length > 0 %}The exchange item {% else %} No exchange items {% endif %} {%for eItem in iExch.exchange_items%}<em>{{eItem.name}}</em>{% if loop.last == False%}, {% endif %}{% endfor %} is conveyed by this functional exchange.</li>
+</ul>
+<p>{% endfor %}{% endfor %}{# FOR 1, 2 ##}</p>
+<p>
+  <strong>Outputs</strong>
+</p>
+<p>{% set cache.InfoIsPrinted = False %}</p>
+<p>{% if object.outputs|length == 0 %}No exchanges are provided by function <strong>{{object.name}}</strong>.{% endif %}</p>
+<p>{% for outp in object.outputs %}{% for iExch in outp.exchanges %}{# FOR 1, 2 ##}</p>
+<p>{% if not cache.InfoIsPrinted %}</p>
+<p>{% set cache.InfoIsPrinted = True %}</p>
+<p>The following exchanges are provided by the function <strong>{{object.name}}</strong>:</p>
+<p>{% endif%}</p>
+<ul>
+  <li>
+    <strong>{{ iExch.name }}</strong> provided to function <strong>{{ iExch.target.owner.name }}</strong>: {{ iExch.description }}. <br/>{% if iExch.exchange_items|length > 0 %}The exchange item {% else %} No exchange items {% endif %} {%for eItem in iExch.exchange_items%}<em>{{eItem.name}}</em>{% if loop.last == False%}, {% endif %}{% endfor %} is conveyed by this functional exchange.</li>
+</ul>
+<p>{% endfor %}{% endfor %}{# FOR 1, 2 ##}</p>
+
+
+
+
+
+
 <h2>Other properties of "{{ object.name }}"</h2>
-{% set excluded = ["context_diagram", "description", "name", "owner", "xtype"] %}
+{% set excluded = ["context_diagram", "description", "name", "owner", "xtype","inputs","outputs"] %}
 {{ show_other_attributes(object, excluded) | safe}}
