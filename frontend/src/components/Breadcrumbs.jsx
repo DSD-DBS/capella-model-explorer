@@ -69,9 +69,9 @@ export const Breadcrumbs = () => {
       className="flex items-center font-medium text-black dark:text-gray-200"
     >
       <ol className="flex items-center">
-        <li className="flex  items-center truncate">
+        <li className="hidden items-center truncate lg:block ">
           <Link to={"/"}>{breadcrumbLabels["/"]}</Link>
-          <span className="mx-2">/</span>
+          <span className="mx-0 md:mx-2">/</span>
         </li>
         {visible_pathnames.slice(1).map((value, index) => {
           const last = index === visible_pathnames.length - 2;
@@ -79,10 +79,24 @@ export const Breadcrumbs = () => {
           const label = breadcrumbLabels[to] || value;
 
           return (
-            <li className="flex  items-center truncate" key={to}>
-              {!last && <Link to={to}>{label}</Link>}
-              {last && <span className="  text-custom-blue">{label}</span>}
-              {!last && <span className="mx-2">/</span>}
+            <li className="flex items-center truncate md:items-start " key={to}>
+              {!last && (
+                <Link
+                  to={to}
+                  className="hidden max-w-64 truncate whitespace-nowrap md:block"
+                >
+                  {label}
+                </Link>
+              )}
+              {last && (
+                <span
+                  className="custom-phone-width:block custom-phone-width:max-w-60 hidden w-full truncate whitespace-nowrap text-custom-blue md:max-w-full"
+                  title={label}
+                >
+                  {label}
+                </span>
+              )}
+              {!last && <span className="mx-2 hidden md:block">/</span>}
             </li>
           );
         })}

@@ -4,7 +4,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { SVGDisplay } from "./SVGDisplay";
 import { Spinner } from "./Spinner";
-import { Button } from "./Button";
 import { Printer } from "lucide-react";
 
 export const InstanceView = ({ templateName, objectID, endpoint }) => {
@@ -75,7 +74,7 @@ export const InstanceView = ({ templateName, objectID, endpoint }) => {
       ) : (
         <>
           {isHovering && (
-            <div className="fixed -ml-14 -mt-6">
+            <div className="fixed hidden md:-ml-14 md:-mt-6 md:block">
               <div
                 onClick={() => window.print()}
                 className="flex cursor-pointer items-center justify-center rounded-full bg-custom-blue p-2 text-white transition-colors duration-700 ease-in-out hover:bg-custom-dark-4 dark:bg-custom-blue dark:text-gray-100 dark:hover:bg-custom-light"

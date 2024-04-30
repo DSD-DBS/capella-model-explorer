@@ -20,12 +20,12 @@ export const ViewsList = ({ templates, cardClickCallback }) => {
         if (cat in templates && templates[cat].length > 0) {
           return (
             <div key={cat} className="mb-8 p-4  ">
-              <h2 className="border-b border-gray-900 pb-2 text-2xl font-bold dark:border-gray-300">
+              <h2 className="border-b border-gray-900 pb-2 text-2xl  font-bold dark:border-gray-300">
                 <span className=" px-4 py-2 text-gray-900 dark:text-gray-100">
                   {categories[cat]}
                 </span>
               </h2>
-              <div className="mt-2 flex flex-wrap justify-center gap-y-2">
+              <div className="mt-2 grid grid-cols-1 gap-4 md:flex md:flex-wrap md:justify-center ">
                 {templates[cat].map((template) => (
                   <TemplateCard
                     key={template.idx}

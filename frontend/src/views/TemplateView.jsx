@@ -13,6 +13,7 @@ import { useMediaQuery } from "react-responsive";
 import { Header } from "../components/Header";
 import { InstanceView } from "../components/InstanceView";
 import { TemplateDetails } from "../components/TemplateDetails";
+import { Printer } from "lucide-react";
 
 export const TemplateView = ({ endpoint }) => {
   let { templateName, objectID } = useParams();
@@ -39,22 +40,23 @@ export const TemplateView = ({ endpoint }) => {
       setIsButtonClicked(true);
     }
   };
+
+  useEffect(() => {
+    if (!objectID && !singleObjectID) {
+      setIsSidebarVisible(true);
+    }
+  }, [objectID, singleObjectID]);
   return (
     <div>
-      <Header />
-      {isSmallScreen && (
-        <button
-          onClick={toggleSidebar}
-          className={`fixed left-1/2 top-16 z-20 m-4 flex h-10 w-auto -translate-x-1/2 transform cursor-pointer items-center justify-center rounded-full bg-blue-500 p-2 px-4 text-sm text-white transition-transform duration-500 ease-in-out hover:bg-blue-700 focus:outline-none`}
-        >
-          {isSidebarVisible ? "Collapse Sidebar" : "Expand Sidebar"}
-        </button>
-      )}
-
+      <Header
+        isSmallScreen={isSmallScreen}
+        toggleSidebar={toggleSidebar}
+        isSidebarVisible={isSidebarVisible}
+      />
       <div className="flex">
         <div
-          className={`z-19 mt-20 flex w-96 transform flex-col items-center transition-all duration-700 ease-in-out ${
-            isSidebarVisible ? "translate-y-0 " : "hidden"
+          className={`z-19 mr-8 mt-32 flex w-auto transform flex-col items-center transition-all duration-700 ease-in-out md:mt-20 ${
+            isSidebarVisible ? "translate-y-0" : "hidden"
           }`}
         >
           <aside className="h-auto min-w-80 flex-col overflow-y-auto rounded-lg shadow-lg dark:shadow-dark print:hidden">
@@ -67,12 +69,10 @@ export const TemplateView = ({ endpoint }) => {
 
         <main>
           <div className="w-[100vw] overflow-y-auto">
-            <div className="relative ml-12 mr-12 flex flex-1 ">
-              <div className="html-wrapper relative flex h-screen items-center justify-center pt-28">
+            <div className="relative flex flex-1 md:ml-12 md:mr-12 ">
+              <div className="html-wrapper relative flex h-screen items-center justify-center pt-32">
                 {!!!objectID && !!!singleObjectID && (
-                  <p
-                    className={`${isSmallScreen ? "ml-32" : "ml-80"} text-xl text-gray-700 dark:text-gray-300 `}
-                  >
+                  <p className="translate-x-full text-xl text-gray-700 dark:text-gray-300">
                     Select an Instance
                   </p>
                 )}

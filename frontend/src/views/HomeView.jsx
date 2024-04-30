@@ -34,23 +34,24 @@ export const HomeView = () => {
   }
 
   return (
-    <div className="mb-8 flex-col justify-center overflow-auto">
-      <div className="flex w-full items-start justify-between px-4 ">
-        <div className="mx-auto mb-8 text-center ">
-          {modelInfo && (
-            <div className="rounded-b-lg bg-gray-100 p-4 text-gray-700 shadow-lg dark:bg-custom-dark-3 dark:text-gray-100 ">
-              <h2 className="text-xl">{modelInfo.title}</h2>
-              {modelInfo.capella_version && (
-                <p>Capella Version: {modelInfo.capella_version}</p>
-              )}
-              {modelInfo.revision && <p>Revision: {modelInfo.revision}</p>}
-              {modelInfo.branch && <p>Branch: {modelInfo.branch}</p>}
-              {modelInfo.hash && <p>Commit Hash: {modelInfo.hash}</p>}
-              <div dangerouslySetInnerHTML={{ __html: modelInfo.badge }}></div>
-            </div>
-          )}
-        </div>
-        <div className="flex items-start justify-end rounded-b-lg bg-gray-100 p-6 shadow-lg dark:bg-custom-dark-2">
+    <div className="mb-8 flex-col justify-center overflow-auto p-4">
+      <div className="flex w-full items-start justify-between px-4">
+        {modelInfo && (
+          <div className="rounded-lg bg-gray-100 p-4 text-gray-700 shadow-lg dark:bg-custom-dark-3 dark:text-gray-100 md:mx-auto">
+            <h2 className="text-xl">{modelInfo.title}</h2>
+            {modelInfo.capella_version && (
+              <p>Capella Version: {modelInfo.capella_version}</p>
+            )}
+            {modelInfo.revision && <p>Revision: {modelInfo.revision}</p>}
+            {modelInfo.branch && <p>Branch: {modelInfo.branch}</p>}
+            {modelInfo.hash && <p>Commit Hash: {modelInfo.hash}</p>}
+            <div
+              className="hidden md:block"
+              dangerouslySetInnerHTML={{ __html: modelInfo.badge }}
+            ></div>
+          </div>
+        )}
+        <div className="mb-4 mt-auto flex h-full w-auto justify-center rounded-md bg-gray-100 p-2 shadow-lg dark:bg-custom-dark-3 md:justify-end">
           <ThemeSwitcher />
         </div>
       </div>
