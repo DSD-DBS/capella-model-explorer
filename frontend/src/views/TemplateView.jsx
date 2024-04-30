@@ -36,14 +36,14 @@ export const TemplateView = ({ endpoint }) => {
 
   const toggleSidebar = () => {
     setIsSidebarVisible(!isSidebarVisible);
-    if (!isSidebarVisible) {
-      setIsButtonClicked(true);
-    }
   };
 
   useEffect(() => {
     if (!objectID && !singleObjectID) {
       setIsSidebarVisible(true);
+    }
+    if (isSmallScreen && objectID) {
+      setIsSidebarVisible(false);
     }
   }, [objectID, singleObjectID]);
   return (
