@@ -6,9 +6,8 @@ import { Breadcrumbs } from "./Breadcrumbs";
 import { ThemeSwitcher } from "./ThemeSwitcher";
 import { SettingsMenu } from "./SettingsMenu";
 import { HomeIcon } from "./HomeIcon";
-import { SidebarIcon } from "./SidebarIcon";
 
-export const Header = ({ isSmallScreen, toggleSidebar }) => {
+export const Header = () => {
   return (
     <header className="fixed left-0 top-0 z-50 w-screen items-center justify-between rounded-b-lg bg-gray-100 p-6 text-lg text-white shadow-lg dark:bg-custom-dark-2 dark:shadow-dark print:hidden">
       <div className="flex w-full items-center justify-between">
@@ -16,11 +15,6 @@ export const Header = ({ isSmallScreen, toggleSidebar }) => {
           <Breadcrumbs className="truncate" />
         </div>
         <div className="flex flex-shrink-0 space-x-4">
-          {isSmallScreen && (
-            <div onClick={toggleSidebar} className="cursor-pointer">
-              <SidebarIcon />
-            </div>
-          )}
           <HomeIcon />
           <SettingsMenu />
           <ThemeSwitcher />

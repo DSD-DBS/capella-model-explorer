@@ -48,15 +48,19 @@ export const TemplateView = ({ endpoint }) => {
   }, [objectID, singleObjectID]);
   return (
     <div>
-      <Header
-        isSmallScreen={isSmallScreen}
-        toggleSidebar={toggleSidebar}
-        isSidebarVisible={isSidebarVisible}
-      />
+      <Header />
+      {isSmallScreen && (
+        <button
+          onClick={toggleSidebar}
+          className={`text-md fixed left-1/2 top-16 z-20 m-4 flex h-10 w-auto -translate-x-1/2 cursor-pointer items-center justify-center rounded-b-md border-2 border-gray-900 bg-custom-blue p-2 px-4 text-white transition-transform duration-500 ease-in-out hover:bg-custom-blue-hover focus:outline-none dark:border-white`}
+        >
+          {isSidebarVisible ? "Collapse Sidebar" : "Expand Sidebar"}
+        </button>
+      )}
       <div className="flex">
         <div
-          className={`z-19 mr-8 mt-32 flex w-auto transform flex-col items-center transition-all duration-700 ease-in-out md:mt-20 ${
-            isSidebarVisible ? "translate-y-0" : "hidden"
+          className={`z-19 mt-32 flex w-auto transform flex-col items-center transition-all duration-700 ease-in-out md:mr-8 md:mt-20 ${
+            isSidebarVisible ? "mr-8 translate-y-0" : "hidden"
           }`}
         >
           <aside className="h-auto min-w-80 flex-col overflow-y-auto rounded-lg shadow-lg dark:shadow-dark print:hidden">
