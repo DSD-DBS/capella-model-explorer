@@ -21,6 +21,7 @@ export const HomeView = () => {
         const response = await fetch(API_BASE_URL + '/model-info');
         const data = await response.json();
         setModelInfo(data);
+        document.title = `${data.title} - Model Explorer`;
       } catch (err) {
         setError('Failed to fetch model info: ' + err.message);
       }
