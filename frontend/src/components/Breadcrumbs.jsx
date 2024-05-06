@@ -10,6 +10,13 @@ export const Breadcrumbs = () => {
   const [breadcrumbLabels, setBreadcrumbLabels] = useState({});
   const pathnames = location.pathname.split("/").filter((x) => x);
   const [error, setError] = useState(null);
+  const [initialTitle, setInitialTitle] = useState("");
+
+  useEffect(() => {
+    if (!initialTitle) {
+      setInitialTitle(document.title);
+    }
+  }, [initialTitle]);
 
   const fetchModelInfo = async () => {
     const response = await fetch(API_BASE_URL + `/model-info`);
@@ -53,10 +60,12 @@ export const Breadcrumbs = () => {
       console.log(labels);
 
       setBreadcrumbLabels(labels);
+      const lastBreadcrumb = Object.values(labels).pop();
+      document.title = `${lastBreadcrumb} | ${initialTitle} Model Explorer`;
     };
 
     updateLabels();
-  }, [location]);
+  }, [location, initialTitle]);
 
   const visible_pathnames = [
     breadcrumbLabels["/"],
