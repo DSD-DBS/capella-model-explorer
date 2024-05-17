@@ -72,7 +72,7 @@ export const TemplateView = ({ endpoint }) => {
         </div>
 
         <main>
-          <div className="w-[100vw] overflow-y-auto">
+          <div className="overflow-y-auto md:w-[100vw]">
             <div className="relative flex flex-1 md:ml-12 md:mr-12 ">
               <div className="html-wrapper relative flex h-screen items-center justify-center pt-32">
                 {!!!objectID && !!!singleObjectID && (

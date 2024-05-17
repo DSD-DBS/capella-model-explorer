@@ -58,6 +58,13 @@ export const InstanceView = ({ templateName, objectID, endpoint }) => {
     document.body.style.height = `${currentHeight + 150}px`;
   }, [details]);
 
+  if (loading)
+    return (
+      <div className="mx-auto md:w-[210mm]">
+        <Spinner />
+      </div>
+    );
+
   return (
     <div
       ref={contentRef}
@@ -67,38 +74,30 @@ export const InstanceView = ({ templateName, objectID, endpoint }) => {
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
     >
-      {loading ? (
-        <div className="flex h-screen -translate-y-48 transform items-center justify-center">
-          <Spinner />
+      {isHovering && (
+        <div className="fixed hidden md:-ml-14 md:-mt-6 md:block">
+          <div
+            onClick={() => window.print()}
+            className="flex cursor-pointer items-center justify-center rounded-full bg-custom-blue p-2 text-white transition-colors duration-700 ease-in-out hover:bg-custom-dark-4 dark:bg-custom-blue dark:text-gray-100 dark:hover:bg-custom-light"
+          >
+            <Printer></Printer>
+          </div>
         </div>
-      ) : (
-        <>
-          {isHovering && (
-            <div className="fixed hidden md:-ml-14 md:-mt-6 md:block">
-              <div
-                onClick={() => window.print()}
-                className="flex cursor-pointer items-center justify-center rounded-full bg-custom-blue p-2 text-white transition-colors duration-700 ease-in-out hover:bg-custom-dark-4 dark:bg-custom-blue dark:text-gray-100 dark:hover:bg-custom-light"
-              >
-                <Printer></Printer>
-              </div>
-            </div>
-          )}
-          {details.map((item, idx) => {
-            if (item.type === "SVGDisplay") {
-              return <SVGDisplay key={idx} content={item.content} />;
-            } else {
-              return (
-                <div
-                  key={idx}
-                  dangerouslySetInnerHTML={{
-                    __html: item.content,
-                  }}
-                />
-              );
-            }
-          })}
-        </>
       )}
+      {details.map((item, idx) => {
+        if (item.type === "SVGDisplay") {
+          return <SVGDisplay key={idx} content={item.content} />;
+        } else {
+          return (
+            <div
+              key={idx}
+              dangerouslySetInnerHTML={{
+                __html: item.content,
+              }}
+            />
+          );
+        }
+      })}
     </div>
   );
 };
