@@ -101,7 +101,7 @@ Navigate to `Menu` > `Settings` > `Tools` > `Add a new tool` and fill in the
 following configuration:
 
 ```yaml
-name: 'Capella model explorer'
+name: "Capella model explorer"
 integrations:
   t4c: false
   pure_variants: false
@@ -117,8 +117,8 @@ config:
   environment:
     MODEL_ENTRYPOINT:
       stage: before
-      value: '{CAPELLACOLLAB_SESSION_PROVISIONING[0][path]}'
-    ROUTE_PREFIX: '{CAPELLACOLLAB_SESSIONS_BASE_PATH}'
+      value: "{CAPELLACOLLAB_SESSION_PROVISIONING[0][path]}"
+    ROUTE_PREFIX: "{CAPELLACOLLAB_SESSIONS_BASE_PATH}"
   connection:
     methods:
       - id: f51872a8-1a4f-4a4d-b4f4-b39cbd31a75b
@@ -127,7 +127,7 @@ config:
         ports:
           metrics: 8000
           http: 8000
-        redirect_url: '{CAPELLACOLLAB_SESSIONS_SCHEME}://{CAPELLACOLLAB_SESSIONS_HOST}:{CAPELLACOLLAB_SESSIONS_PORT}{CAPELLACOLLAB_SESSIONS_BASE_PATH}/'
+        redirect_url: "{CAPELLACOLLAB_SESSIONS_SCHEME}://{CAPELLACOLLAB_SESSIONS_HOST}:{CAPELLACOLLAB_SESSIONS_PORT}{CAPELLACOLLAB_SESSIONS_BASE_PATH}/"
   monitoring:
     prometheus:
       path: /metrics
@@ -145,7 +145,7 @@ Since the Capella Model Explorer can load different Capella versions, we can
 use one generic version:
 
 ```yaml
-name: 'Generic'
+name: "Generic"
 config:
   is_recommended: true
   is_deprecated: false

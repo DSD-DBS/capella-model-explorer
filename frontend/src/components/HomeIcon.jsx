@@ -1,3 +1,6 @@
+// Copyright DB InfraGO AG and contributors
+// SPDX-License-Identifier: Apache-2.0
+
 import React from "react";
 import { Home } from "lucide-react";
 import { Link } from "react-router-dom";

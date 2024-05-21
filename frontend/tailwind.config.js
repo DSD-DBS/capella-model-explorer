@@ -11,6 +11,7 @@ export default {
     extend: {
       screens: {
         "custom-phone-width": "431px",
+        "3xl": "1800px",
       },
       boxShadow: {
         white: "0 0 15px rgba(255, 255, 255, 0.1)",

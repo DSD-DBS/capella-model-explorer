@@ -28,6 +28,8 @@ from jinja2 import (
     is_undefined,
 )
 
+from . import __version__
+
 esc = markupsafe.escape
 
 PATH_TO_FRONTEND = Path("./frontend/dist")
@@ -47,7 +49,7 @@ class CapellaModelExplorerBackend:
     model: capellambse.MelodyModel
 
     def __post_init__(self):
-        self.app = FastAPI()
+        self.app = FastAPI(version=__version__)
         self.router = APIRouter(prefix=ROUTE_PREFIX)
         self.app.add_middleware(
             CORSMiddleware,
@@ -280,6 +282,10 @@ class CapellaModelExplorerBackend:
             return self.app.state.templates.TemplateResponse(
                 "index.html", {"request": request}
             )
+
+        @self.app.get(f"{ROUTE_PREFIX}/api/version")
+        async def version():
+            return {"version": self.app.version}
 
 
 def index_template(template, templates, templates_grouped, filename=None):

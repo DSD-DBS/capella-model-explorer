@@ -1,7 +1,7 @@
 # Copyright DB InfraGO AG and contributors
 # SPDX-License-Identifier: Apache-2.0
 
-templates: 
+templates:
 - template: system-analysis/system_function.html.j2
   idx: system-function
   name: System Function

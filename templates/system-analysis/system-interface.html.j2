@@ -8,14 +8,14 @@
 {% macro describe_exchange_direction(source, target, interface, exchanges) %}
     <p>
         {%- set unique_exchange_names = [] -%}
-        {{ linked_name(source) | safe }} should provide&nbsp; 
+        {{ linked_name(source) | safe }} should provide&nbsp;
         {%- for fex in exchanges  -%}
             {%- if fex.name not in unique_exchange_names -%}
                 <a href="{{ fex.source.owner | make_href }}">{{ fex.name }}</a>{% if not loop.last %}, {% else %} {% endif %}
                 {%- set _none = unique_exchange_names.append(fex.name) -%}
             {%- endif -%}
         {% endfor %}
-        via <i>{{ interface.name }}</i> interface (component exchange) so that {{ linked_name(target) | safe }} could&nbsp; 
+        via <i>{{ interface.name }}</i> interface (component exchange) so that {{ linked_name(target) | safe }} could&nbsp;
         {%- for fnc in exchanges | map(attribute='target.owner') | unique -%}
         {{ linked_name(fnc) | safe }}{% if not loop.last %}, {% else %} {% endif %}
         {%- endfor -%}

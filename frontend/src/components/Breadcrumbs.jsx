@@ -90,7 +90,7 @@ export const Breadcrumbs = () => {
               )}
               {last && (
                 <span
-                  className="custom-phone-width:block custom-phone-width:max-w-60 hidden w-full truncate whitespace-nowrap text-custom-blue md:max-w-full"
+                  className="hidden w-full truncate whitespace-nowrap text-custom-blue custom-phone-width:block custom-phone-width:max-w-60 md:max-w-full"
                   title={label}
                 >
                   {label}

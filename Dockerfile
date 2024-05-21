@@ -47,6 +47,10 @@ RUN chmod +x /entrypoint.sh
 ENV MODEL_ENTRYPOINT=/model
 RUN chmod -R 777 ./frontend/dist/
 
+# Run script to get software version
+COPY frontend/fetch-version.py ./frontend/
+RUN python frontend/fetch-version.py
+
 # Run as non-root user per default
 USER 1001
 
