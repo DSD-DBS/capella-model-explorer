@@ -30,7 +30,7 @@ export const SoftwareVersion = () => {
   }, []);
 
   return (
-    <div className="text-gray-500">
+    <div className="text-gray-500 dark:text-gray-300">
       {frontendVersion && (
         <div className="version-info">
           Frontend Version: {frontendVersion.version}
