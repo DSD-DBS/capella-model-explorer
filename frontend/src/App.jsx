@@ -1,7 +1,6 @@
 // Copyright DB InfraGO AG and contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { useEffect, useState } from "react";
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import { API_BASE_URL, ROUTE_PREFIX } from "./APIConfig";
 import "./App.css";

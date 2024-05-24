@@ -53,7 +53,9 @@ a terminal and
 another terminal. The backend and statically built frontend will be served at
 `http://localhost:8000`. The live frontend will be served by vite at
 `http://localhost:5173`(or similar, it will be printed in the terminal where
-you ran `npm run dev`).
+you ran `npm run dev`). If you wish to display the Frontend Software Version,
+it will initially show 'Fetch Failed'. To successfully fetch and display the
+version, you need to run the command `python frontend/fetch_version.py`.
 
 # Installation
 

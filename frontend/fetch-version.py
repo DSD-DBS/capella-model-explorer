@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import json
+import os
 import pathlib
 import subprocess
 
@@ -15,9 +16,12 @@ def run_git_command(cmd: list[str]):
     ).stdout.decode()
 
 
-(
-    pathlib.Path(__file__).parent / "dist" / "static" / "version.json"
-).write_text(
+if os.getenv("MODE") == "production":
+    path = pathlib.Path(__file__).parent / "dist" / "static" / "version.json"
+else:
+    path = pathlib.Path(__file__).parent / "public" / "static" / "version.json"
+
+path.write_text(
     json.dumps(
         {
             "git": {

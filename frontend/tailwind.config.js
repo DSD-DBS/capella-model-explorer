@@ -10,7 +10,7 @@ export default {
   theme: {
     extend: {
       screens: {
-        "custom-phone-width": "431px",
+        "custom-phone-width": "512px",
         "3xl": "1800px",
       },
       boxShadow: {

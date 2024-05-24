@@ -283,7 +283,7 @@ class CapellaModelExplorerBackend:
                 "index.html", {"request": request}
             )
 
-        @self.app.get(f"{ROUTE_PREFIX}/api/version")
+        @self.app.get(f"{ROUTE_PREFIX}/api/metadata")
         async def version():
             return {"version": self.app.version}
 
