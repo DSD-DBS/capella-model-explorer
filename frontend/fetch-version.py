@@ -8,12 +8,15 @@ import subprocess
 
 
 def run_git_command(cmd: list[str]):
-    return subprocess.run(
-        ["git", *cmd],
-        check=True,
-        capture_output=True,
-        cwd=pathlib.Path(__file__).parent,
-    ).stdout.decode()
+    try:
+        return subprocess.run(
+            ["git", *cmd],
+            check=True,
+            capture_output=True,
+            cwd=pathlib.Path(__file__).parent,
+        ).stdout.decode()
+    except subprocess.CalledProcessError:
+        return "No tags found"
 
 
 if os.getenv("MODE") == "production":
