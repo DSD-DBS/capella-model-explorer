@@ -1,15 +1,14 @@
 // Copyright DB InfraGO AG and contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import React, { useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { API_BASE_URL } from "../APIConfig";
+import { useEffect, useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { API_BASE_URL } from '../APIConfig';
 
 export const Breadcrumbs = () => {
   const location = useLocation();
   const [breadcrumbLabels, setBreadcrumbLabels] = useState({});
-  const pathnames = location.pathname.split("/").filter((x) => x);
-  const [error, setError] = useState(null);
+  const pathnames = location.pathname.split('/').filter((x) => x);
 
   const fetchModelInfo = async () => {
     const response = await fetch(API_BASE_URL + `/model-info`);
@@ -37,10 +36,10 @@ export const Breadcrumbs = () => {
   useEffect(() => {
     const updateLabels = async () => {
       const title = await fetchModelInfo();
-      const labels = { "/": title };
+      const labels = { '/': title };
 
       for (let i = 0; i < pathnames.length; i++) {
-        const to = `/${pathnames.slice(0, i + 1).join("/")}`;
+        const to = `/${pathnames.slice(0, i + 1).join('/')}`;
 
         if (i === 0) {
           labels[to] = await fetchViewName(pathnames[i]);
@@ -59,30 +58,53 @@ export const Breadcrumbs = () => {
   }, [location]);
 
   const visible_pathnames = [
-    breadcrumbLabels["/"],
-    ...location.pathname.split("/").filter((x) => x),
+    breadcrumbLabels['/'],
+    ...location.pathname.split('/').filter((x) => x)
   ];
+  const slicedPathnames = visible_pathnames.slice(1);
 
   return (
     <nav
       aria-label="breadcrumb"
-      className="flex items-center font-medium text-black dark:text-gray-200"
-    >
+      className={
+        'flex items-center font-medium text-black dark:text-gray-200'
+      }>
       <ol className="flex items-center">
-        <li className="flex  items-center truncate">
-          <Link to={"/"}>{breadcrumbLabels["/"]}</Link>
-          <span className="mx-2">/</span>
+        <li className="hidden items-center truncate lg:block">
+          <Link to={'/'}>{breadcrumbLabels['/']}</Link>
+          <span className="mx-0 md:mx-2">/</span>
         </li>
-        {visible_pathnames.slice(1).map((value, index) => {
-          const last = index === visible_pathnames.length - 2;
-          const to = `/${visible_pathnames.slice(1, index + 2).join("/")}`;
+
+        {slicedPathnames.map((value, index) => {
+          const last = index === slicedPathnames.length - 1;
+          const to = `/${slicedPathnames.slice(0, index + 1).join('/')}`;
           const label = breadcrumbLabels[to] || value;
 
           return (
-            <li className="flex  items-center truncate" key={to}>
-              {!last && <Link to={to}>{label}</Link>}
-              {last && <span className="  text-custom-blue">{label}</span>}
-              {!last && <span className="mx-2">/</span>}
+            <li
+              className="flex items-center truncate md:items-start"
+              key={to}>
+              {!last && (
+                <Link
+                  to={to}
+                  className={
+                    'hidden max-w-64 truncate whitespace-nowrap md:block'
+                  }>
+                  {label}
+                </Link>
+              )}
+              {last && (
+                <span
+                  className={
+                    'hidden w-full truncate whitespace-nowrap ' +
+                    'text-custom-blue custom-phone-width:block ' +
+                    'custom-phone-width:max-w-60 md:max-w-full'
+                  }
+                  title={label}>
+                  {label}
+                </span>
+              )}
+              {!last && <span className="mx-2 hidden md:block">/</span>}
             </li>
           );
         })}

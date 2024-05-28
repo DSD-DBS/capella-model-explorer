@@ -9,6 +9,10 @@ export default {
   content: ["./src/**/*.{html,js,jsx}"],
   theme: {
     extend: {
+      screens: {
+        "custom-phone-width": "512px",
+        "3xl": "1800px",
+      },
       boxShadow: {
         white: "0 0 15px rgba(255, 255, 255, 0.1)",
         dark: "0 4px 6px 0 rgba(0, 0, 0, 0.2)",
