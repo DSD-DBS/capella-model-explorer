@@ -41,13 +41,3 @@ templates:
     name: object
     type: Mode
     below: la
-
-- template: logical-architecture/logical-state-machine.html.j2
-  idx: logical-state-machine
-  name: State Machines of Logical Actors and Components
-  description: Defines state machines of a logical components or an actor
-  category: la
-  variable:
-    name: object
-    type: StateMachine
-    below: la

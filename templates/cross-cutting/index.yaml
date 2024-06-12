@@ -29,3 +29,12 @@ templates:
       variable:
           name: object
           type: ExchangeItem
+
+    - template: cross-cutting/region.html.j2
+      idx: logical-state-machine
+      name: State Machine Regions
+      description: Defines a state machine region of a component or an actor
+      category: xc
+      variable:
+        name: object
+        type: Region
