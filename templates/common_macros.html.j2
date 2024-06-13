@@ -88,7 +88,7 @@
     {%- endfor -%}
     {%- set realized_objects = object[realized_attrs | first] if realized_attrs else None -%}
     {%- set realizing_objects = object[realizing_attrs | first] if realizing_attrs else None -%}
-    
+
     <h2>Traceability</h2>
     {% if realized_objects %}
     <p>{{ object.name }} realizes the following objects:<p>

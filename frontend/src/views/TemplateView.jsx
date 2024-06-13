@@ -3,7 +3,9 @@
 
 /*
 
-In this component we show list of template instances, and when we click on a template, we show the rendered instance next to the list. If no imnstance is selected we show a hint to select one.
+In this component we show list of template instances, and when we click on a
+template, we show the rendered instance next to the list. If no imnstance is
+selected we show a hint to select one.
 
 */
 
@@ -13,6 +15,7 @@ import { useMediaQuery } from "react-responsive";
 import { Header } from "../components/Header";
 import { InstanceView } from "../components/InstanceView";
 import { TemplateDetails } from "../components/TemplateDetails";
+import { SoftwareVersion } from "../components/SoftwareVersion";
 
 export const TemplateView = ({ endpoint }) => {
   let { templateName, objectID } = useParams();
@@ -35,29 +38,41 @@ export const TemplateView = ({ endpoint }) => {
 
   const toggleSidebar = () => {
     setIsSidebarVisible(!isSidebarVisible);
-    if (!isSidebarVisible) {
-      setIsButtonClicked(true);
-    }
   };
+
+  useEffect(() => {
+    if (!objectID && !singleObjectID) {
+      setIsSidebarVisible(true);
+    }
+    if (isSmallScreen && objectID) {
+      setIsSidebarVisible(false);
+    }
+  }, [objectID, singleObjectID]);
   return (
     <div>
       <Header />
       {isSmallScreen && (
         <button
           onClick={toggleSidebar}
-          className={`fixed left-1/2 top-16 z-20 m-4 flex h-10 w-auto -translate-x-1/2 transform cursor-pointer items-center justify-center rounded-full bg-blue-500 p-2 px-4 text-sm text-white transition-transform duration-500 ease-in-out hover:bg-blue-700 focus:outline-none`}
+          className={`
+          text-md fixed left-1/2 top-16 z-20 m-4 flex h-10 w-auto
+          -translate-x-1/2 cursor-pointer items-center justify-center
+          rounded-b-md border-2 border-gray-900 bg-custom-blue p-2 px-4
+          text-white transition-transform duration-500 ease-in-out
+          hover:bg-custom-blue-hover focus:outline-none
+          dark:border-white print:hidden
+        `}
         >
           {isSidebarVisible ? "Collapse Sidebar" : "Expand Sidebar"}
         </button>
       )}
-
       <div className="flex">
         <div
-          className={`z-19 mt-20 flex w-96 transform flex-col items-center transition-all duration-700 ease-in-out ${
-            isSidebarVisible ? "translate-y-0 " : "hidden"
+          className={`z-19 mt-32 flex min-w-80 transform flex-col items-center md:mr-8 md:mt-20 print:hidden ${
+            isSidebarVisible ? "mr-8 translate-y-0" : "hidden"
           }`}
         >
-          <aside className="h-auto min-w-80 flex-col overflow-y-auto rounded-lg shadow-lg dark:shadow-dark print:hidden">
+          <aside className="h-auto flex-col overflow-y-auto rounded-lg shadow-lg dark:shadow-dark print:hidden">
             <TemplateDetails
               endpoint={endpoint}
               onSingleInstance={setObjectID}
@@ -66,16 +81,18 @@ export const TemplateView = ({ endpoint }) => {
         </div>
 
         <main>
-          <div className="w-[100vw] overflow-y-auto">
-            <div className="relative ml-12 mr-12 flex flex-1 ">
-              <div className="html-wrapper relative flex h-screen items-center justify-center pt-28">
-                {!!!objectID && !!!singleObjectID && (
-                  <p
-                    className={`${isSmallScreen ? "ml-32" : "ml-80"} text-xl text-gray-700 dark:text-gray-300 `}
-                  >
-                    Select an Instance
-                  </p>
-                )}
+          <div className="overflow-y-auto md:w-screen">
+            {!objectID && !singleObjectID && (
+              <p
+                className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform text-xl text-gray-700 dark:text-gray-300 ${
+                  isSidebarVisible && isSmallScreen ? "hidden" : ""
+                }`}
+              >
+                Select an Instance
+              </p>
+            )}
+            <div className="relative flex flex-1 md:ml-12 md:mr-12">
+              <div className="html-wrapper relative flex h-screen items-center justify-center pt-32 print:pt-0">
                 {(objectID || singleObjectID) && (
                   <div className="m-auto mx-auto box-border">
                     <InstanceView
@@ -89,6 +106,9 @@ export const TemplateView = ({ endpoint }) => {
             </div>
           </div>
         </main>
+      </div>
+      <div className="hidden text-center 3xl:fixed 3xl:bottom-4 3xl:left-4 3xl:mb-0 3xl:mt-0 3xl:block 3xl:text-left">
+        <SoftwareVersion />
       </div>
     </div>
   );

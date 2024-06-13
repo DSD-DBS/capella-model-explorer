@@ -4,5 +4,11 @@
  */
 
 module.exports = {
-  plugins: [require.resolve("prettier-plugin-tailwindcss")],
+  plugins: [require.resolve('prettier-plugin-tailwindcss')],
+  semi: true,
+  tabWidth: 2,
+  printWidth: 79,
+  singleQuote: true,
+  trailingComma: 'none',
+  bracketSameLine: true
 };
