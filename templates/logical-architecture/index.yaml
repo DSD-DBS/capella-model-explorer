@@ -12,9 +12,9 @@ templates:
     type: LogicalComponent
     below: la
 
-- template: __generic__.html.j2
+- template: logical-architecture/logical-interface.html.j2
   idx: logical-interface
-  name: Logical Component Interfaces
+  name: Logical Interfaces
   description: Defines interfaces between actors and logical system components
   category: la
   variable:

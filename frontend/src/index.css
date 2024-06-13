@@ -91,7 +91,16 @@ h1 {
 }
 
 .html-content table {
-  @apply min-w-full divide-y divide-gray-200;
+  @apply min-w-full divide-y divide-gray-400;
+}
+.html-content table tr {
+  border-bottom: 1px solid #ddd
+}
+.html-content table tr:last-of-type {
+  border-bottom: none
+}
+.html-content table tr td {
+  vertical-align: top;
 }
 .html-content p {
   margin-top: 0.75em;
