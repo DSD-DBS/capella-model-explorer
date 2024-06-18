@@ -3,28 +3,73 @@
     SPDX-License-Identifier: Apache-2.0
 #}
 
-{% macro show_other_attributes(object, excluded=[]) %}
+{% macro show_compliance_to_modeling_rules(object) %}
+{% if "validation" in object.__dir__() %}
+    <h2>Compliance to modeling rules</h2>
+    {% set results = object.validate() %}
+    {% if results %}
+        <table>
+            <tbody>
+            {% for result in results %}
+                <tr style="{% if not result.passed %}border-bottom: none;{% endif %}">
+                    <td style="{% if not result.passed %}padding-top: 0.4em;{% endif %}">
+                        <b style="white-space: nowrap;">{{ result.rule.id }}</b>
+                    </td>
+                    <td style="{% if not result.passed %}padding-top: 0.4em;{% endif %}"> 
+                        <b>{{ result.rule.name }}</b>
+                    </td>
+                    <td style="{% if not result.passed %}padding-top: 0.4em;{% endif %}">
+                        <b style="color: {{ 'green' if result.passed else 'red'}}">
+                            {{ "PASSED" if result.passed else "FAILED"}}
+                        </b>
+                    </td>
+                    
+                </tr>
+                {% if not result.passed %}
+                <tr>
+                    <td colspan="3" style="padding-left: 2.5em;">
+                        <p>{{ result.rule.rationale }}</p>
+                        <p><b>Next action:</b> {{ result.rule.action }}</p>
+                    </td>
+                </tr>
+                {% endif %}
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Could not evaluate compliance of the object to the current modeling rules set.</p>
+    {% endif %}
+{% endif %}
+{% endmacro %}
+
+{% macro show_other_attributes(object, excluded=[], hide_rules_check=False) %}
     {% set empty_attrs = [] %}
 
     {%- for attr in object.__dir__()|sort if not attr.startswith("_") and attr not in ["from_model", "pvmt"]+excluded -%}
-    {%- set value = object[attr] -%}
-    {% if value %}
-        <h2 style="opacity: 0.8; border-top: 1px solid grey; margin-top: 1rem; padding-left: 1rem; font: 1rem monospace">{{ attr }}</h2>
-        {%- if value.as_svg -%}
-        {{ value.as_svg|safe }}
-        {% elif value._short_html_ -%}
-        <p>{{ value._short_html_() }}</p>
-        {% else -%}
-        <p>{{ value }}</p>
-        {% endif -%}
+    {% if attr == "validation" %}
     {% else %}
-        {% set _none = empty_attrs.append(attr) %}
+        {%- set value = object[attr] -%}
+        {% if value %}
+            <h2 style="opacity: 0.8; border-top: 1px solid grey; margin-top: 1rem; padding-left: 1rem; font: 1rem monospace">{{ attr }}</h2>
+            {%- if value.as_svg -%}
+            {{ value.as_svg|safe }}
+            {% elif value._short_html_ -%}
+            <p>{{ value._short_html_() }}</p>
+            {% else -%}
+            <p>{{ value }}</p>
+            {% endif -%}
+        {% else %}
+            {% set _none = empty_attrs.append(attr) %}
+        {% endif %}
     {% endif %}
     {% endfor -%}
 
     {% if empty_attrs %}
     <h3>Unset attributes</h3>
     <p>The object has the following attributes in unset state (empty values): {{ ", ".join(empty_attrs) }}</p>
+    {% endif %}
+    {% if not hide_rules_check %}
+    {{ show_compliance_to_modeling_rules(object) | safe }}
     {% endif %}
 {% endmacro %}
 
