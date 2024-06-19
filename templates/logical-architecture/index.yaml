@@ -25,7 +25,7 @@ templates:
 - template: logical-architecture/logical-function.html.j2
   idx: logical-function
   name: Logical Functions
-  description: Defines function of a system component or an actor
+  description: Defines function of a logical system component or an actor
   category: la
   variable:
     name: object

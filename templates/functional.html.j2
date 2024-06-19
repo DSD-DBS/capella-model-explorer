@@ -1,14 +1,29 @@
+{#
+    Copyright DB InfraGO AG and contributors
+    SPDX-License-Identifier: Apache-2.0
+#}
+
 {% from "common_macros.html.j2" import linked_name, linked_name_with_icon, display_property_values, display_traceability, render_requirements_table, draw_icon, first_upper %}
 
 {% macro list_unused_ports(ports_list) %}
 {% set unused_ports = ports_list | rejectattr("exchanges") | list %}
 {% if unused_ports %}
-<p>The following ports are not connected to any exchange:</p>
+<p style="color: red;">The following ports are not connected to any exchange:</p>
 <ul>
 {% for port in unused_ports %}
-    <li><span style="color:red">{{ linked_name_with_icon(port) | safe }}</span></li>
+    <li>{{ linked_name_with_icon(port) | safe }}</li>
 {% endfor %}
 </ul>
+{% endif %}
+{% endmacro %}
+
+{% macro list_related_exchange_items(exchange) %}
+{% if exchange.exchange_items %}
+<p>This interaction is further specified via the following Exchange Items:</p>
+<ul>
+    {% for item in exchange.exchange_items %}
+    <li>{{ linked_name_with_icon(item) | safe }}</li>
+    {% endfor %}
 {% endif %}
 {% endmacro %}
 
@@ -34,7 +49,8 @@
             <tr>
             <td>FEX-{{ exchange.uuid[-5:] | upper}}</td>
             <td>
-                While performing {{ linked_name_with_icon(exchange.source.owner) | safe }} activity {{ source_owner | safe }} may provide {{ linked_name_with_icon(exchange) | safe }} to {{ owner | safe }} so that {{ owner_name }} could {{ object.name }}.
+                While performing {{ linked_name_with_icon(exchange.source.owner) | safe }} activity {{ source_owner | safe }} may provide {{ linked_name_with_icon(exchange) | safe }} to {{ owner | safe }} so that {{ owner_name | safe }} could {{ object.name }}.
+                {{ list_related_exchange_items(exchange) | safe }}
             </td>
             </tr>
         {% endfor %}
@@ -68,7 +84,8 @@
                     {% set target_owner_name = exchange.target.owner.owner.name %}
                     {% set target_owner = linked_name_with_icon(exchange.target.owner.owner) %}
                 {% endif %}
-                While performing {{ object.name }} activity {{ owner | safe }} may provide {{ linked_name_with_icon(exchange) | safe }} to {{ target_owner | safe }} so that {{ target_owner_name }} could {{ linked_name_with_icon(exchange.target.owner) | safe }}.
+                While performing {{ object.name }} activity {{ owner_name | safe }} may provide {{ linked_name_with_icon(exchange) | safe }} to {{ target_owner | safe }} so that {{ target_owner_name | safe }} could {{ linked_name_with_icon(exchange.target.owner) | safe }}.
+                {{ list_related_exchange_items(exchange) | safe }}
             </td>
             </tr>
         {% endfor %}
