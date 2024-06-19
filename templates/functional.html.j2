@@ -1,0 +1,132 @@
+{% from "common_macros.html.j2" import linked_name, linked_name_with_icon, display_property_values, display_traceability, render_requirements_table, draw_icon, first_upper %}
+
+{% macro list_unused_ports(ports_list) %}
+{% set unused_ports = ports_list | rejectattr("exchanges") | list %}
+{% if unused_ports %}
+<p>The following ports are not connected to any exchange:</p>
+<ul>
+{% for port in unused_ports %}
+    <li><span style="color:red">{{ linked_name_with_icon(port) | safe }}</span></li>
+{% endfor %}
+</ul>
+{% endif %}
+{% endmacro %}
+
+{% macro describe_inputs(object) %}
+{% if object.inputs %}
+{% set owner_name = '<span style="color:red">Unallocated entity</span>' %}
+{% set owner = '<span style="color:red">Unallocated entity</span>'%}
+{% if object.owner %}
+    {% set owner_name = object.owner.name %}
+    {% set owner = linked_name_with_icon(object.owner) %}
+{% endif %}
+<h2>Inputs</h2>
+<table>
+{% for port in object.inputs %}
+    {% if port.exchanges %}
+        {% for exchange in port.exchanges %}
+            {% set source_owner_name = '<span style="color:red">Unallocated entity</span>' %}
+            {% set source_owner = '<span style="color:red">Unallocated entity</span>'%}
+            {% if exchange.source.owner.owner %}
+                {% set source_owner_name = exchange.source.owner.owner.name %}
+                {% set source_owner = linked_name_with_icon(exchange.source.owner.owner) %}
+            {% endif %}
+            <tr>
+            <td>FEX-{{ exchange.uuid[-5:] | upper}}</td>
+            <td>
+                While performing {{ linked_name_with_icon(exchange.source.owner) | safe }} activity {{ source_owner | safe }} may provide {{ linked_name_with_icon(exchange) | safe }} to {{ owner | safe }} so that {{ owner_name }} could {{ object.name }}.
+            </td>
+            </tr>
+        {% endfor %}
+    {% endif %}
+{% endfor %}
+</table>
+{{ list_unused_ports(object.inputs) | safe }}
+{% endif %}
+{% endmacro %}
+
+
+{% macro describe_outputs(object) %}
+{% if object.outputs %}
+{% set owner_name = '<span style="color:red">Unallocated entity</span>' %}
+{% set owner = '<span style="color:red">Unallocated entity</span>'%}
+{% if object.owner %}
+    {% set owner_name = object.owner.name %}
+    {% set owner = linked_name_with_icon(object.owner) %}
+{% endif %}
+<h2>Outputs</h2>
+<table>
+{% for port in object.outputs %}
+    {% if port.exchanges %}
+        {% for exchange in port.exchanges %}
+            <tr>
+            <td>FEX-{{ exchange.uuid[-5:] | upper}}</td>
+            <td>
+                {% set target_owner_name = '<span style="color:red">Unallocated entity</span>' %}
+                {% set target_owner = '<span style="color:red">Unallocated entity</span>'%}
+                {% if exchange.target.owner.owner %}
+                    {% set target_owner_name = exchange.target.owner.owner.name %}
+                    {% set target_owner = linked_name_with_icon(exchange.target.owner.owner) %}
+                {% endif %}
+                While performing {{ object.name }} activity {{ owner | safe }} may provide {{ linked_name_with_icon(exchange) | safe }} to {{ target_owner | safe }} so that {{ target_owner_name }} could {{ linked_name_with_icon(exchange.target.owner) | safe }}.
+            </td>
+            </tr>
+        {% endfor %}
+    {% endif %}
+{% endfor %}
+</table>
+{{ list_unused_ports(object.outputs) | safe }}
+{% endif %}
+{% endmacro %}
+
+{% macro describe_availability_conditions(object) %}
+{% set owner_name = '<span style="color:red">Unallocated entity</span>' %}
+{% set owner = '<span style="color:red">Unallocated entity</span>'%}
+{% if object.owner %}
+    {% set owner_name = object.owner.name %}
+    {% set owner = linked_name_with_icon(object.owner) %}
+{% endif %}
+<h2>Conditional availability</h2>
+{% if object.available_in_states %}
+<p>The function is available in the following states of the {{ owner | safe }}:</p>
+<ul>
+    {% for state in object.available_in_states %}
+        <li>{{linked_name_with_icon(state) | safe}}</a></li>
+    {% endfor %}
+</ul>
+{% else %}
+    <p>The function is always available (unconditionally) / not bound to specific states of {{ owner | safe }}</p>
+{% endif %}
+{% endmacro %}
+
+{% macro describe_function(object) %}
+
+<h1>{{ first_upper(object.name) }}</h1>
+
+{% if object.owner %}
+    <p>A function of {{ linked_name(object.owner) | safe }}</p>
+{% else %}
+    <p style="color: red;">This function is not allocated to any entity / no entity is responsible for it.</p>
+{% endif %}
+
+{% if object.description %}
+<p>{{ object.description }}</p>
+{% else %}
+<p style="color:red">No description available.</p>
+{% endif %}
+
+{{ describe_availability_conditions(object) | safe }}
+<h2>Context Diagram</h2>
+<p>The diagram below provides an overview over the functional context: functions on the left provide functional inputs to the function of interest, functions on the right consume the outputs of the function of interest. The system is responsible for the functions with the green background. Functions with the blue background are allocated to external actors.</p>
+
+{{ object.context_diagram.as_svg | safe }}
+{{ describe_inputs(object) | safe }}
+{{ describe_outputs(object) | safe }}
+{{ display_property_values(object) | safe }}
+{{ display_traceability(object) | safe }}
+{% if object.requirements %}
+<h2>Requirements</h2>
+<p>The following requirement objects are linked to "{{ object.name}}"</p>
+{{ render_requirements_table(object.requirements) | safe }}
+{% endif%}
+{% endmacro %}

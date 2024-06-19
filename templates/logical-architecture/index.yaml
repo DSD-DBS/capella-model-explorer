@@ -22,7 +22,7 @@ templates:
     type: ComponentExchange
     below: la
 
-- template: __generic__.html.j2
+- template: logical-architecture/logical-function.html.j2
   idx: logical-function
   name: Logical Functions
   description: Defines function of a system component or an actor
