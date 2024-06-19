@@ -2,10 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { useEffect } from 'react';
-import {
-  TransformWrapper,
-  TransformComponent
-} from 'react-zoom-pan-pinch';
+import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
+import { Printer, XIcon } from 'lucide-react';
+import { LightboxButton } from './LightboxButton';
 
 export const Lightbox = ({ onClose, imageSource }) => {
   useEffect(() => {
@@ -30,10 +29,23 @@ export const Lightbox = ({ onClose, imageSource }) => {
   }, [onClose]);
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-center items-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div
-        className="fixed inset-0 bg-black bg-opacity-50"
+        className="fixed inset-0 bg-black bg-opacity-85"
         onClick={onClose}></div>
+      <div
+        className={`
+          absolute left-0 right-0 top-0 z-50 bg-black py-4 print:hidden
+        `}>
+        <div className="flex justify-center">
+          <LightboxButton onClick={() => window.print()} className="mr-4">
+            <Printer />
+          </LightboxButton>
+          <LightboxButton onClick={onClose}>
+            <XIcon />
+          </LightboxButton>
+        </div>
+      </div>
       <div
         style={{
           position: 'absolute',
