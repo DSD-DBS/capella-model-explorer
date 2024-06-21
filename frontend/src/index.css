@@ -108,6 +108,14 @@ h1 {
   margin-top: 0;
 }
 
+.html-content table tr td p:last-of-type {
+  margin-bottom: 0.2em;
+}
+
+.html-content table tr td ul {
+  padding-bottom: 0.6em;
+}
+
 .html-content p {
   margin-top: 0.75em;
   margin-bottom: 0.75em;

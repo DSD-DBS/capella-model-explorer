@@ -8,5 +8,5 @@
 {{ describe_function(object) | safe }}
 
 <h2>Other properties of "{{ object.name }}"</h2>
-{% set excluded = ["context_diagram", "description", "name", "owner", "xtype", "inputs", "outputs", "parent", "related_exchanges", "validate", "applied_property_value_groups", "property_value_groups", "realization_view"] %}
+{% set excluded = ["context_diagram", "description", "name", "owner", "xtype", "inputs", "outputs", "parent", "related_exchanges", "validate", "applied_property_value_groups", "available_in_states", "property_value_groups", "realization_view"] %}
 {{ show_other_attributes(object, excluded) | safe}}

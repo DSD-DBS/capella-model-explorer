@@ -3,7 +3,7 @@
     SPDX-License-Identifier: Apache-2.0
 #}
 
-{% from 'common_macros.html.j2' import show_other_attributes %}
+{% from 'common_macros.html.j2' import show_other_attributes, linked_name, description %}
 
 <style>
     .table {
@@ -22,37 +22,48 @@
     }
 </style>
 
+{% macro display_property_label(object, property) %}
+    <p>
+        <b>{{ property.name }}</b> : 
+        {% if property.type.__class__ == obj.__class__ %}
+            {{ linked_name(property.type) | safe }}</a>
+        {% else %}
+            {{ property.type.name }}
+        {% endif %}
+        {% if property.min_card.value == property.max_card.value and property.max_card.value == "1" %}
+        {% elif property.min_card.value == property.max_card.value %}
+        [ {{ property.min_card.value }} ]
+        {% else %}
+        [ {{ property.min_card.value }} .. {{ property.max_card.value }} ]
+        {% endif %}
+        {% if property.parent != object %}
+        (inherited from {{ linked_name(property.parent) | safe }})
+        {% endif %}
+    </p>
+{% endmacro %}
+
 {% macro properties_table(props, obj) %}
 <table className="min-w-full divide-y divide-gray-200">
     <thead>
         <tr>
-            <th>Property Name</th>
-            <th>Type</th>
-            <th>Kind</th>
-            <th>Multiplicity</th>
-            <th>Description</th>
+            <th>Property</th>
         </tr>
     </thead>
     <tbody>
     {% for property in props %}
-        <tr>
-            <td>{{ property.name }}</td>
+        <tr  style="border-bottom: none;">
             <td>
-                {% if property.type.__class__ == obj.__class__ %}
-                    <a href="{{ property.type | make_href }}">{{ property.type.name }}</a>
-                {% else %}
-                    {{ property.type.name }}
+                {{ display_property_label(obj, property) | safe }}
+                {% if property.kind != "UNSET" %}
+                <p>KIND: {{ property.kind }}</p>
                 {% endif %}
             </td>
-            <td>{{ property.kind }}</td>
-            <td>{{ property.min_card.value }} .. {{ property.max_card.value }}</td>
-            <td>{% if property.description %}
-            {{ property.description }}
-            {% else %}
-<p style="color:red">No description available.</p>
-            {% endif %}
+        </tr><tr>
+            <td style="padding-left: 2.5em !important; padding-bottom: 0.6em;">
+                {{ description(property) | safe}}
             </td>
         </tr>
+
     {% endfor %}
     </tbody>
 </table>
@@ -71,10 +82,16 @@
 
 {{ object.tree_view.as_svg|safe}}
 
+{% set props = [] %}
+{% if object.super %}
+    {% set props = props | list + object.super.properties | list %}
+{% endif %}
+{% set props = props + object.owned_properties | list %}
+
 <h2>Owned Properties</h2>
-{% if object.owned_properties %}
-    <p>The object owns the following properties:</p><br>
-    {{ properties_table(object.owned_properties, object) |safe }}
+{% if props %}
+    <p>The object owns the properties listed below; We use the following format to describe property: name : type [min .. max (instances of type)] or [ fixed number]; if no multiplicity is shown assume its 1 (single instance).</p><br>
+    {{ properties_table(props, object) |safe }}
 {% else %}
     <p style="color:red">No properties are owned by this object.</p>
 {% endif %}
