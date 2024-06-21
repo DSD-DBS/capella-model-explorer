@@ -3,7 +3,7 @@
     SPDX-License-Identifier: Apache-2.0
 #}
 
-{% from 'common_macros.html.j2' import show_other_attributes, linked_name, description %}
+{% from 'common_macros.html.j2' import show_other_attributes, linked_name, linked_name_with_icon, description, display_property_label %}
 
 <style>
     .table {
@@ -22,25 +22,7 @@
     }
 </style>
 
-{% macro display_property_label(object, property) %}
-    <p>
-        <b>{{ property.name }}</b> : 
-        {% if property.type.__class__ == obj.__class__ %}
-            {{ linked_name(property.type) | safe }}</a>
-        {% else %}
-            {{ property.type.name }}
-        {% endif %}
-        {% if property.min_card.value == property.max_card.value and property.max_card.value == "1" %}
-        {% elif property.min_card.value == property.max_card.value %}
-        [ {{ property.min_card.value }} ]
-        {% else %}
-        [ {{ property.min_card.value }} .. {{ property.max_card.value }} ]
-        {% endif %}
-        {% if property.parent != object %}
-        (inherited from {{ linked_name(property.parent) | safe }})
-        {% endif %}
-    </p>
-{% endmacro %}
+
 
 {% macro properties_table(props, obj) %}
 <table className="min-w-full divide-y divide-gray-200">
@@ -70,7 +52,7 @@
 {% endmacro %}
 
 <h1><span style="font-weight: normal">{{ object.__class__.__name__ }}</span> <b>{{ object.name }}</b></h1>
-<p>Parent: {{ object.parent._short_html_() }}</p><br>
+<p>Parent: {{ linked_name_with_icon(object.parent) | safe }}</p><br>
 {% if object.description %}
 <p>{{ object.description }}</p>
 {% else %}
@@ -96,18 +78,8 @@
     <p style="color:red">No properties are owned by this object.</p>
 {% endif %}
 
-{% if object.generalizations %}
-<h2>Inherited Properties</h2>
-{% for gen in object.generalizations %}
-    {% set sup = gen.super %}
-    <h3>From <b>{{sup.name}}</b></h3>
-    <p>Object <b>{{object.name}}</b> inherits the following properties from {{sup._short_html_() }}</p>
-    {{ properties_table(sup.owned_properties, sup) |safe }}
-{% endfor%}
-{% endif %}
 
-
-{% set handled_attrs = ["from_model", "pvmt", "owned_properties", "parent", "generalizations", "super", "tree_view", "xtype", "name"]%}
+{% set handled_attrs = ["from_model", "pvmt", "owned_properties", "properties", "parent", "generalizations", "super", "tree_view", "xtype", "name"]%}
 
 <h2>Other Object Attributes</h2>
 {{ show_other_attributes(object, handled_attrs) | safe }}
