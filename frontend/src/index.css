@@ -108,17 +108,27 @@ ul {
 }
 
 @media print {
-  body,
+  body.svg-hidden,
   .html-wrapper,
   .flex-1,
   .html-content {
     overflow: hidden !important;
     height: auto !important;
   }
-  .print\\:hidden {
+  body.svg-hidden .print\\:hidden {
     display: none !important;
   }
-  .html-content {
+  body.svg-hidden .html-content {
+    border: none !important;
+    box-shadow: none !important;
+    margin: auto !important;
+    width: 100% !important;
+  }
+  body.svg-visible {
+    overflow: hidden !important;
+    height: 100vh !important;
+  }
+  body.svg-visible .html-content {
     border: none !important;
     box-shadow: none !important;
     margin: auto !important;
