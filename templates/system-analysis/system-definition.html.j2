@@ -3,11 +3,442 @@
     SPDX-License-Identifier: Apache-2.0
 #}
 
-{% from 'common_macros.html.j2' import show_other_attributes %}
+{% from 'common_macros.html.j2' import show_other_attributes, printNoContent, printDiagram %}
 
 {% set object = model.sa.root_component%}
-<h1>System Definition</h1>
 
+<h1 style="text-align:center; font-size:50px;">System Definition Template</h1>
+
+
+<h1>System Definition Template</h1>
+<hr />
+<font style="font-size:24px; font-weight: bold;">List of figures (optional)</font>
+<div style="border:2px solid rgb(200, 200, 200); background-color:rgb(227, 227, 227);">
+<b>Example:</b><br />
+    <ol type="1">
+        <li>1. Figure of the DBS strategy roadmap</li>
+        <li>2. Figure of safety roles within the project</li>
+    </ol>
+    <u>This note can be deleted.</u>
+</div>
+
+<font style="font-size:24px; font-weight: bold;">List of tables (optional)</font>
+<div style="border:2px solid rgb(200, 200, 200); background-color:rgb(227, 227, 227);">
+<b>Example:</b><br />
+    <ol type="1">
+        <li>1. List of process roles</li>
+        <li>2. List of deliverables</li>
+    </ol>
+    <u>This note can be deleted.</u>
+</div>
+
+<h1>Preamble</h1>
+<h2>Change history</h2>
+<table style="border: 1px solid;">
+    <tr>
+        <th style="border: 1px solid;">Revision</th>
+        <th style="border: 1px solid;">Date</th>
+        <th style="border: 1px solid;">Changes</th>
+    </tr>
+    <tr>
+        <td style="border: 1px solid;">v0.1 (rev xxxx)</td>
+        <td style="border: 1px solid;">dd.mm.yyyy</td>
+        <td style="border: 1px solid;">initial version</td>
+    </tr>
+</table>
+
+<h2>Confidentiality classification</h2>
+
+<h2>Organisational scope</h2>
+
+<h2>Document purpose and structure</h2>
+
+<h2>Glossary</h2>
+
+<h3>General abbreviations</h3>
+
+<h3>Document specific abbreviations</h3>
+<table style="border:2px solid rgb(200, 200, 200); background-color:rgb(227, 227, 227);">
+    <tr>
+        <th style="border:2px solid rgb(200, 200, 200); background-color:rgb(227, 227, 227);">
+            Abbreviation
+        </th>
+        <th style="border:2px solid rgb(200, 200, 200); background-color:rgb(227, 227, 227);">
+            Meaning
+        </th>
+    </tr>
+    <tr>
+        <td style="border:2px solid rgb(200, 200, 200); background-color:rgb(227, 227, 227);">x</td>
+        <td style="border:2px solid rgb(200, 200, 200); background-color:rgb(227, 227, 227);">x</td>
+    </tr>
+</table>
+
+<h3>Term definition</h3>
+<div style="border:2px solid rgb(200, 200, 200); background-color:rgb(227, 227, 227);">
+<p><b>Note:</b> The term definition table might be deleted. Another possibility could be to refer to a project specific term definition within this section or to add a reference to a term definition list to the
+"referenced documents section".</p>
+<u>This note can be deleted.</u>
+</div><br />
+<table style="border:2px solid rgb(200, 200, 200); background-color:rgb(227, 227, 227);">
+    <tr>
+        <th style="border:2px solid rgb(200, 200, 200); background-color:rgb(227, 227, 227);">
+            Term
+        </th>
+        <th style="border:2px solid rgb(200, 200, 200); background-color:rgb(227, 227, 227);">
+            Meaning
+        </th>
+    </tr>
+    <tr>
+        <td style="border:2px solid rgb(200, 200, 200); background-color:rgb(227, 227, 227);">x</td>
+        <td style="border:2px solid rgb(200, 200, 200); background-color:rgb(227, 227, 227);">x</td>
+    </tr>
+</table>
+
+<h1>System Definition</h1>
+<p><font>The purpose of the System Definition (phase 2) as per [1] is to provide a basis of information about the system (SoI /
+SuC) to enable RAMS and security analysis (phase 3). This section also contains information to enable system
+requirements creation (phase 4).</font></p>
+<h2>System objective (intended purpose) and mission profile</h2>
+<h3>System description</h3>
+<p><font color="blue">Provide a high level description of the system and its objectives (purpose/goals/benefits), as first outlined during concept
+of operation/project target definition/stakeholder discussion.
+Stakeholder level documents / operational concept documents may be referenced here.</font></p>
+<h3>System modes and states</h3>
+<p>
+<font color="blue">
+List the different modes of operation (i.e. normal, abnormal/degraded, maintenance mode), states, transitions and their interactions, if they could have an impact on the systems functionality and safety.
+</font>
+</p>
+########### SYSTEM FUNCTIONS START #################### 2.1.3.
+<h3>System functions</h3>
+{% if object.allocated_functions | length > 0 %}
+    <p>The system is expected to perform the following functions:</p>
+    <ul>
+        {% for fnc in object.allocated_functions %}
+            <li><a href="{{ fnc | make_href }}">{{ fnc.name }}</a>
+                <p>
+                    <p><u>Description</u>: {{ fnc.description | replace('<p>&nbsp;</p>', '') | safe }}</p>
+                    <p><u>Rationale</u>: {% if fnc.requirements|length == 0 %}{{ printNoContent() }}{% endif %}
+                    {% if fnc.requirements|length > 0 %}
+                        <ul>
+                            {% for req in fnc.requirements%}
+                                <li style="list-style-type: circle;">{%if req.text|length > 0%}{{req.text}}{%else%}{{ printNoContent(text="No description defined") }}{%endif%}</li>
+                            {%endfor%}
+                        </ul>
+                    {% endif %}</p>
+                </p>
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p style="color:red">No functions allocated to the system.</p>
+{% endif %}
+
+{% if object.diagrams %}
+    <h2>Diagrams</h2>
+    <p>The following diagrams provide additional details on the system</p>
+    {% for diagram in object.diagrams %}
+        <h3>{{diagram.name}}</h3>
+        {{ printDiagram(diagram, filter='FEX_OR_EX_ITEMS') |safe }}
+    {% endfor %}
+{% endif %}
+########### SYSTEM FUNCTIONS ENDE #################### 2.1.3.
+<h3>Life cycle strategy and conditions (mission profiles)</h3>
+<p>
+<font color="blue">
+Describe active operation missions / mission profiles for the respective life cycle phases, e.g.:
+<ul>
+    <li>Long term operating strategy and conditions</li>
+    <li>Long term maintenance strategy and conditions</li>
+    <li>Life-time considerations</li>
+    <li>Logistic considerations</li>
+</ul>
+</font>
+</p>
+########### CONTEXT DIAGRAM DBS REFERENCE START #################### 2.2.
+<h2>System boundary</h2>
+{{ object.context_diagram.as_svg | safe}}
+########### CONTEXT DIAGRAM DBS REFERENCE ENDE #################### 2.2.
+<h3>Physical environment</h3>
+<p>
+<font color="blue">
+Describe the physical environment, e.g. climatic conditions, mechanical conditions, altitude.
+Note: Consider to define such details in a separate document and reference it only to improve the maintainability of the
+System Definition document.
+</font>
+</p>
+########### ALLE ACTORS START #################### 2.2.2
+<h3>(External) actors</h3>
+{% set actors = model.sa.all_actors %}
+{% if actors|length > 0 %}
+    <ul>
+    {% for actor in actors %}
+        <li><a href="{{ actor | make_href }}">{{ actor.name }}</a>
+        <p>
+            {{ printDiagram(actor.context_diagram) |safe }}
+        </p>
+        <p>
+            <p><u>Description</u>: {{ actor.description }}</p>
+            <p><u>Functions</u>: {% if actor.allocated_functions | length == 0 %}{{ printNoContent() }}{% endif %}
+            {% if actor.allocated_functions | length > 0 %}
+                <ul>
+                {% for func in actor.allocated_functions %}
+                    <li style="list-style-type: circle;"><a href="{{ func | make_href }}">{{ func.name }}</a></li>
+                {% endfor %}
+                </ul>
+            {% endif %}</p>
+            <p><u>Rationale</u>: {% if actor.requirements|length == 0 %}{{ printNoContent() }}{% endif %}
+            {% if actor.requirements|length > 0 %}
+                <ul>
+                    {% for req in actor.requirements%}
+                        <li style="list-style-type: circle;">{%if req.text|length > 0%}{{req.text}}{%else%}{{ printNoContent(text="No description defined") }}{%endif%}</li>
+                    {%endfor%}
+                </ul>
+            {% endif %}</p>
+        </p>
+        </li>
+    {% endfor %}
+    </ul>
+{% endif %}
+########### ALLE ACTORS ENDE #################### 2.2.2
+<p>
+<font color="blue">
+List the actors (as far as available and necessary) by name, description, rationale and allocation of actor functions (create
+system context diagram) that interface with the system to be developed or modified.
+</font>
+</p>
+<h3>External systems</h3>
+<p>
+<font color="blue">
+List the external systems (as far as available and necessary) by name, description, rationale and allocation of actor
+functions (create system context diagram) that interface with the system to be developed or modified.
+</font>
+</p>
+<h3>Other railway duty holders</h3>
+<p>
+<font color="blue">
+List the other railway duty holders interacting with the system, such as
+<ul>
+    <li>Infrastructure Managers (IM)</li>
+    <li>Railway Undertakings (RU, "Eisenbahnverkehrsunternehmen (EVU)" in German)</li>
+</ul>
+</font>
+</p>
+<h3>Interfaces and interactions</h3>
+########### ALLE INTERFACES START #################### 2.2.5.<br />
+{#% set interfaces = model.la.all_component_exchanges %#}
+{% set interfaces = model.sa.actor_exchanges|sort(attribute='name') %}
+{% if interfaces|length > 0 %}
+    <ul>
+    {% for inter in interfaces %}
+        <li><a href="{{ inter | make_href }}">{{ inter.name }}</a>
+        <p>
+            {{ printDiagram(inter.context_diagram) |safe }}
+        </p>
+        <p>
+            <p><u>Description</u>: {{ inter.description or printNoContent() }}</p>
+            <p><u>Functions</u>: {% if inter.allocated_functions | length == 0 %}{{ printNoContent() }}{% endif %}
+            {% if inter.allocated_functions | length > 0 %}
+                <ul>
+                {% for func in inter.allocated_functions %}
+                    <li style="list-style-type: circle;"><a href="{{ func | make_href }}">{{ func.name }}</a></li>
+                {% endfor %}
+                </ul>
+            {% endif %}</p>
+            <p><u>Rationale</u>: {% if inter.requirements|length == 0 %}{{ printNoContent() }}{% endif %}
+            {% if inter.requirements|length > 0 %}
+                <ul>
+                    {% for req in inter.requirements%}
+                        <li style="list-style-type: circle;">{%if req.text|length > 0%}{{req.text}}{%else%}{{ printNoContent(text="No description defined") }}{%endif%}</li>
+                    {%endfor%}
+                </ul>
+            {% endif %}</p>
+        </p>
+    {% endfor %}
+    </ul>
+{% endif %}
+########### ALLE INTERFACES ENDE  #################### 2.2.5.<br />
+<p>
+<font color="blue">
+List the external interfaces and interactions with<br />
+<ul>
+    <li>physical environment</li>
+    <li>humans/actors</li>
+    <li>other technological systems</li>
+    <li>other railway duty holders</li>
+</ul>
+<br />respectively providing (as far as already known)
+<br />
+<ul>
+    <li>name, description and rationale and interacting actor/system/other party</li>
+    <li>definition of exchange items, including direction</li>
+    <li>definition of the most important interface layers, needs to be decided per interface (e.g. if an interface is using an
+existing standard on lower interface layers, etc.)</li>
+</ul><br />
+
+Note: In addition to the functional interfaces, the location(s) of the system parts and their interfaces can influence
+neighboring systems and environment.
+</font>
+</p>
+<h2>Scope of operational requirements and constraints</h2>
+<h3>Constraints by existing infrastructure</h3>
+<p>
+<font color="blue">
+List constraints by existing infrastructure.
+</font>
+</p>
+<h3>Operating conditions and constraints</h3>
+<p>
+<font color="blue">
+List known safety and RAM related related operating conditions/constraints, including by environment (e.g. shock,
+thermal flow).
+</font>
+</p>
+<h3>Maintenance conditions</h3>
+<p>
+<font color="blue">
+List maintenance conditions required either by system details (as far as already known) or legal requirements.
+</font>
+</p>
+<h3>Logistic support considerations</h3>
+<p>
+<font color="blue">
+List known key points regarding logistics of the new system.
+</font>
+</p>
+<h3>Past experience data of similar systems</h3>
+<p>
+<font color="blue">
+This section has to list any predecessor reference system(s), providing identification of the system(s) and related
+documents.
+</font>
+</p>
+<h3>System influence on humans and environment</h3>
+<p>
+<font color="blue">
+Please provide provide a list of system factors (e.g. gforce, noise levels) that have an impact on:
+<ul>
+<li>operational personnel</li>
+<li>maintenance personnel</li>
+<li>passengers</li>
+<li>public</li>
+<li>environment</li>
+</ul>
+<br />
+Note: Describe relevant mitigation measures, if available.
+</font>
+</p>
+<h3>Operating procedures</h3>
+<p>
+<font color="blue">
+Describe existing operating procedures, identification of personnel permitted to carry out these actions and indication of
+the skills, qualifications and time-resources required, if part of the system operating conditions and constraints.
+Note: If no human activities have been included in the analysis, the reasons for this should be clearly stated.
+Note: Consider also the different modes of operation (i.e. normal, abnormal/degraded, maintenance mode), states and
+transitions and their interactions as introduced above 2.1.2 - System modes and states , if they could have an impact on
+operating procedures.
+</font>
+</p>
+<h2>Existing safety requirements, measures and assumptions</h2>
+<p>
+<font color="blue">
+List the existing safety requirements, measures, as well as the existing and new assumptions, which determine the limits
+for the risk assessment.
+Consider also external requirements e.g. external safety requirements, resulting from the overall safety policy of the
+railway duty holder, from prevailing legal considerations, or from standards.
+</font>
+</p>
+<h2>Identification of the system and related documents</h2>
+<p>
+<font color="blue">
+Identify the system to be developed and the related documents, including assumptions made about particular
+functions or subsystems that are different from an existing reference version, explicitly stating and
+justifying the deviations.
+</font>
+</p>
+<h1>Appendix</h1>
+<h2>Input Documents</h2>
+<p>
+<font color="blue">
+List all preceding project documents from which the system definition has been derived, e.g. concept of operation /
+system concept etc.
+</font>
+    <table style="border:2px solid rgb(200, 200, 200); background-color:white;">
+        <tr>
+            <th style="border:2px solid rgb(200, 200, 200); background-color:rgb(227, 227, 227);">
+                Reference No.
+            </th>
+            <th style="border:2px solid rgb(200, 200, 200); background-color:rgb(227, 227, 227);">
+                Document ID
+            </th>
+            <th style="border:2px solid rgb(200, 200, 200); background-color:rgb(227, 227, 227);">
+                Version
+            </th>
+            <th style="border:2px solid rgb(200, 200, 200); background-color:rgb(227, 227, 227);">
+                Dated
+                (release date)
+            </th>
+            <th style="border:2px solid rgb(200, 200, 200); background-color:rgb(227, 227, 227);">
+                Title
+            </th>
+            <th style="border:2px solid rgb(200, 200, 200); background-color:rgb(227, 227, 227);">
+                link (informative)
+            </th>
+        </tr>
+        <tr>
+            <td style="border:2px solid rgb(200, 200, 200);">1</td>
+            <td style="border:2px solid rgb(200, 200, 200);">ExampleDoc</td>
+            <td style="border:2px solid rgb(200, 200, 200);">...</td>
+            <td style="border:2px solid rgb(200, 200, 200);">...</td>
+            <td style="border:2px solid rgb(200, 200, 200);">...</td>
+            <td style="border:2px solid rgb(200, 200, 200);">...</td>
+        </tr>
+    </table>
+</p>
+<h2>Referenced documents</h2>
+<p>
+<font color="blue">
+List standards and legislates that this specification must refer to. The entries in this list serve as examples. They can be
+removed as needed and, if more feasible, the user may choose to state a reference to an external list of references
+instead.
+This note must be deleted.
+</font>
+</p>
+<table style="border:2px solid rgb(200, 200, 200); background-color:white;">
+    <tr>
+        <th style="border:2px solid rgb(200, 200, 200); background-color:rgb(227, 227, 227);">
+            Reference No.
+        </th>
+        <th style="border:2px solid rgb(200, 200, 200); background-color:rgb(227, 227, 227);">
+            Document ID
+        </th>
+        <th style="border:2px solid rgb(200, 200, 200); background-color:rgb(227, 227, 227);">
+            Version
+        </th>
+        <th style="border:2px solid rgb(200, 200, 200); background-color:rgb(227, 227, 227);">
+            Dated
+            (release date)
+        </th>
+        <th style="border:2px solid rgb(200, 200, 200); background-color:rgb(227, 227, 227);">
+            Title
+        </th>
+        <th style="border:2px solid rgb(200, 200, 200); background-color:rgb(227, 227, 227);">
+            link (informative)
+        </th>
+    </tr>
+    <tr>
+        <td style="border:2px solid rgb(200, 200, 200);">1</td>
+        <td style="border:2px solid rgb(200, 200, 200);">EN 50126-1</td>
+        <td style="border:2px solid rgb(200, 200, 200);">2017 (E)</td>
+        <td style="border:2px solid rgb(200, 200, 200);">1.10.2017</td>
+        <td style="border:2px solid rgb(200, 200, 200);">Railway Applications - The Specification and Demonstration of
+            Reliability, Availability, Maintainability and Safety (RAMS) - Part
+            1: Generic RAMS Process</td>
+        <td style="border:2px solid rgb(200, 200, 200);">...</td>
+    </tr>
+</table>
+<!--
+#######################################################################################
 <h2>Introduction</h2>
 <h3>Purpose</h3>
 <p>The purpose of this document is the following:</p>
@@ -87,3 +518,6 @@
 {% set excluded = ["description", "context_diagram", "owner", "parent", "allocated_functions", "diagrams", "name", "parts", "realizing_components", "state_machines", "xtype"] %}
 
 {{ show_other_attributes(object, excluded) | safe}}
+
+
+-->

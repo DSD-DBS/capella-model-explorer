@@ -133,3 +133,21 @@
     {% endfor %}
 {% endif %}
 {% endmacro %}
+
+<!-- ########################## Neue Macros ########################## -->
+{% set filters = {
+    'EX_ITEMS':'show.exchange.items.filter',
+    'FEX_EX_ITEMS':'show.functional.exchanges.exchange.items.filter',
+    'FEX_OR_EX_ITEMS':'capellambse_context_diagrams-show.functional.exchanges.or.exchange.items.filter',
+    'NO_UUID':'capellambse_context_diagrams-hide.uuids.filter'
+  }
+%}
+{% macro printNoContent(text="None") %}{{text}}{% endmacro %}
+{% macro printDiagram(diagram, filter=None) %}
+    {% if filter in filters %}
+        {% if diagram.filters.clear() %}{% endif %}
+        {% if diagram.filters.add(filters['NO_UUID']) %}{% endif %}
+        {% if diagram.filters.add(filters[filter]) %}{% endif %}
+    {% endif %}
+    {{ diagram.as_svg | safe }}
+{% endmacro %}
