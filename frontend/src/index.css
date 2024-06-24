@@ -124,10 +124,7 @@ ul {
     margin: auto !important;
     width: 100% !important;
   }
-  body.svg-visible,
-  .html-wrapper,
-  .flex-1,
-  .html-content {
+  body.svg-visible {
     overflow: hidden !important;
     height: 100vh !important;
   }
