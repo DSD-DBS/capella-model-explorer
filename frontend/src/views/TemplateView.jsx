@@ -15,7 +15,7 @@ import { useMediaQuery } from "react-responsive";
 import { Header } from "../components/Header";
 import { InstanceView } from "../components/InstanceView";
 import { TemplateDetails } from "../components/TemplateDetails";
-import { SoftwareVersion } from "../components/SoftwareVersion";
+import { AppInfo } from "../components/AppInfo";
 
 export const TemplateView = ({ endpoint }) => {
   let { templateName, objectID } = useParams();
@@ -108,7 +108,7 @@ export const TemplateView = ({ endpoint }) => {
         </main>
       </div>
       <div className="hidden text-center 3xl:fixed 3xl:bottom-4 3xl:left-4 3xl:mb-0 3xl:mt-0 3xl:block 3xl:text-left">
-        <SoftwareVersion />
+        <AppInfo />
       </div>
     </div>
   );

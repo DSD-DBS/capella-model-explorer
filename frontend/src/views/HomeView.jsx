@@ -4,7 +4,7 @@
 import React, { useState, useEffect } from 'react';
 import { WiredTemplatesList } from '../components/WiredTemplatesList';
 import { API_BASE_URL } from '../APIConfig';
-import { SoftwareVersion } from '../components/SoftwareVersion';
+import { AppInfo } from '../components/AppInfo';
 import { ModelDiff } from '../components/ModelDiff';
 
 export const HomeView = () => {
@@ -127,8 +127,8 @@ export const HomeView = () => {
       <div className="mt-4">
         <WiredTemplatesList />
       </div>
-      <div className="mt-8 text-center 3xl:fixed 3xl:bottom-4 3xl:left-4 3xl:block 3xl:text-left">
-        <SoftwareVersion />
+      <div className="mt-10 text-center 3xl:fixed 3xl:bottom-4 3xl:left-4 3xl:block 3xl:text-left">
+        <AppInfo />
       </div>
     </div>
   );
