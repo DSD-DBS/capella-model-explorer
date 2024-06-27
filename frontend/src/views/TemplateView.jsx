@@ -107,9 +107,15 @@ export const TemplateView = ({ endpoint }) => {
           </div>
         </main>
       </div>
-      <div className="hidden text-center 3xl:fixed 3xl:bottom-4 3xl:left-4 3xl:mb-0 3xl:mt-0 3xl:block 3xl:text-left">
-        <AppInfo />
-      </div>
+      {!objectID && !singleObjectID ? (
+        <div className="fixed bottom-4 left-1/2 mb-0 -translate-x-1/2 text-center 3xl:left-4 3xl:translate-x-0 3xl:text-left">
+          <AppInfo />
+        </div>
+      ) : (
+        <div className="hidden text-center 3xl:fixed 3xl:bottom-4 3xl:left-4 3xl:mb-0 3xl:mt-0 3xl:block 3xl:text-left">
+          <AppInfo />
+        </div>
+      )}
     </div>
   );
 };
