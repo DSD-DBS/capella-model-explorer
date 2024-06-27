@@ -35,6 +35,7 @@ templates:
       name: State Machine Regions
       description: Defines a state machine region of a component or an actor
       category: xc
+      isExperimental: true
       variable:
         name: object
         type: Region

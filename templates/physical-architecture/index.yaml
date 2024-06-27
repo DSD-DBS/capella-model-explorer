@@ -7,6 +7,7 @@ templates:
   name: Physical Interface
   description: Defines a Physical Interface between 2 components
   category: pa
+  isExperimental: true
   variable:
     name: object
     type: PhysicalLink
@@ -17,6 +18,7 @@ templates:
   name: Physical Component
   description: Defines a Physical Component
   category: pa
+  isExperimental: true
   variable:
     name: object
     type: PhysicalComponent
@@ -27,6 +29,7 @@ templates:
   name: Physical Functions
   description: Defines function of a physical component or an actor
   category: pa
+  isExperimental: true
   variable:
     name: object
     type: PhysicalFunction
@@ -37,6 +40,7 @@ templates:
   name: Software Interfaces
   description: Defines interfaces between software components
   category: pa
+  isExperimental: true
   variable:
     name: object
     type: ComponentExchange

@@ -40,6 +40,8 @@ templates:
   description: defines the need for the system, its boundary and interfaces
   category: sa
   single: true
+  isExperimental: true
+  isDocument: true
   variable:
       name: object
       type: SystemComponent

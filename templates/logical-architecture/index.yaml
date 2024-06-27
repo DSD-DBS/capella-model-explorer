@@ -7,6 +7,7 @@ templates:
   idx: logical-component
   description: Specifies a logical component. This is a ported template from a prototype project.
   category: la
+  isExperimental: true
   variable:
     name: object
     type: LogicalComponent
@@ -17,6 +18,7 @@ templates:
   name: Logical Interfaces
   description: Defines interfaces between actors and logical system components
   category: la
+  isExperimental: true
   variable:
     name: object
     type: ComponentExchange
@@ -37,6 +39,7 @@ templates:
   name: Logical Component States and Modes
   description: Defines states and modes of a system component or an actor
   category: la
+  isExperimental: true
   variable:
     name: object
     type: Mode
