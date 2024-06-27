@@ -10,7 +10,6 @@ export default {
   component: TemplateCard,
   // This component will have an automatically generated Autodocs entry:
   //  https://storybook.js.org/docs/writing-docs/autodocs
-  tags: ['autodocs'],
   parameters: {
     // More on how to position stories at:
     //  https://storybook.js.org/docs/configure/story-layout
@@ -18,7 +17,31 @@ export default {
   }
 };
 
-export const Demo = {
+export const Normal = {
+  args: {
+    template: {
+      name: 'System Capability',
+      description: `Specifies what the system should be capable of
+      and how it needs to interact with external actors.`,
+      idx: 'THE IDENTIFIER'
+    },
+    onClickCallback: (idx) => alert(idx)
+  }
+};
+
+export const Draft = {
+  args: {
+    template: {
+      name: 'System Capability',
+      description: `Specifies what the system should be capable of
+      and how it needs to interact with external actors.`,
+      idx: 'THE IDENTIFIER'
+    },
+    onClickCallback: (idx) => alert(idx)
+  }
+};
+
+export const Broken = {
   args: {
     template: {
       name: 'System Capability',
