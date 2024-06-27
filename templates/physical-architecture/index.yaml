@@ -31,3 +31,13 @@ templates:
     name: object
     type: PhysicalFunction
     below: pa
+
+- template: physical-architecture/sw-interface.html.j2
+  idx: sw-interface
+  name: Software Interfaces
+  description: Defines interfaces between software components
+  category: pa
+  variable:
+    name: object
+    type: ComponentExchange
+    below: pa
