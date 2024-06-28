@@ -28,9 +28,9 @@ from jinja2 import (
     is_undefined,
 )
 
-from capella_model_explorer.backend.templates import TemplateLoader
+from capella_model_explorer.backend import templates as tl
 
-from . import __version__, makers
+from . import __version__
 
 esc = markupsafe.escape
 
@@ -46,12 +46,14 @@ class CapellaModelExplorerBackend:
     templates: dict[str, t.Any] = dataclasses.field(
         init=False, default_factory=dict
     )
-    templates_loader: TemplateLoader = dataclasses.field(init=False)
+    templates_loader: tl.TemplateLoader = dataclasses.field(init=False)
 
     templates_path: Path
     model: capellambse.MelodyModel
 
-    templates_index: t.Optional[t.Any] = dataclasses.field(init=False)
+    templates_index: t.Optional[tl.TemplateCategories] = dataclasses.field(
+        init=False
+    )
 
     def __post_init__(self):
         self.app = FastAPI(version=__version__)
@@ -63,13 +65,10 @@ class CapellaModelExplorerBackend:
             allow_methods=["*"],
             allow_headers=["*"],
         )
-        self.templates_loader = TemplateLoader(self.model)
+        self.templates_loader = tl.TemplateLoader(self.model)
         self.env = Environment(loader=FileSystemLoader(self.templates_path))
         self.env.finalize = self.__finalize
         self.env.filters["make_href"] = self.__make_href_filter
-        #self.grouped_templates, self.templates = index_templates(
-        #    self.templates_path
-        #)
         self.app.state.templates = Jinja2Templates(directory=PATH_TO_FRONTEND)
         self.configure_routes()
         self.app.include_router(self.router)
@@ -175,13 +174,20 @@ class CapellaModelExplorerBackend:
 
         @self.router.get("/api/views")
         def read_templates():
-            self.templates_index = self.templates_loader.index_path(self.templates_path)
+            self.templates_index = self.templates_loader.index_path(
+                self.templates_path
+            )
             return self.templates_index.as_dict
 
         @self.router.get("/api/objects/{uuid}")
         def read_object(uuid: str):
             obj = self.model.by_uuid(uuid)
-            return makers.typed_object(obj)
+            details = tl.simple_object(obj)
+            return {
+                "idx": details.idx,
+                "name": details.name,
+                "type": obj.xtype,
+            }
 
         @self.router.get("/api/views/{template_name}")
         def read_template(template_name: str):
@@ -283,5 +289,3 @@ def index_templates(
                 template, templates, templates_grouped, filename=idx
             )
     return templates_grouped, templates
-
-
