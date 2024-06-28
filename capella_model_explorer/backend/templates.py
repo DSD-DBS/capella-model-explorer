@@ -110,7 +110,9 @@ class TemplateCategories(BaseModel):
         for category in other.categories:
             category_id = category.idx
             if category_id in [cat.idx for cat in self.categories]:
-                self[category_id].templates += category.templates
+                for template in other[category_id].templates:
+                    if template.idx not in [t.idx for t in self[category_id].templates]:
+                        self[category_id].templates.append(template)
             else:
                 self.categories.append(TemplateCategory(idx=category_id, templates=category.templates))
         return self
@@ -136,7 +138,7 @@ class TemplateLoader():
         self.templates = TemplateCategories()
 
     def index_path(self, path: Path) -> TemplateCategories:
-        self.templates = TemplateCategories()  # reset templates
+        self.templates = TemplateCategories(categories=[])  # reset templates
         for template_file in path.glob("**/*.yaml"):
             templates_data = yaml.safe_load(template_file.read_text(encoding="utf8"))
             if "categories" in templates_data:

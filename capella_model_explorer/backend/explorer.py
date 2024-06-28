@@ -176,6 +176,7 @@ class CapellaModelExplorerBackend:
 
         @self.router.get("/api/views")
         def read_templates():
+            self.templates_loader.templates = None
             self.templates_index = self.templates_loader.index_path(self.templates_path)
             return self.templates_index.as_dict
 
