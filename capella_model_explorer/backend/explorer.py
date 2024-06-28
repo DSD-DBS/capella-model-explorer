@@ -28,6 +28,8 @@ from jinja2 import (
     is_undefined,
 )
 
+from capella_model_explorer.backend.templates import TemplateLoader
+
 from . import __version__, makers
 
 esc = markupsafe.escape
@@ -44,9 +46,12 @@ class CapellaModelExplorerBackend:
     templates: dict[str, t.Any] = dataclasses.field(
         init=False, default_factory=dict
     )
+    templates_loader: TemplateLoader = dataclasses.field(init=False)
 
     templates_path: Path
     model: capellambse.MelodyModel
+
+    templates_index: t.Optional[t.Any] = dataclasses.field(init=False)
 
     def __post_init__(self):
         self.app = FastAPI(version=__version__)
@@ -58,12 +63,13 @@ class CapellaModelExplorerBackend:
             allow_methods=["*"],
             allow_headers=["*"],
         )
+        self.templates_loader = TemplateLoader(self.model)
         self.env = Environment(loader=FileSystemLoader(self.templates_path))
         self.env.finalize = self.__finalize
         self.env.filters["make_href"] = self.__make_href_filter
-        self.grouped_templates, self.templates = index_templates(
-            self.templates_path
-        )
+        #self.grouped_templates, self.templates = index_templates(
+        #    self.templates_path
+        #)
         self.app.state.templates = Jinja2Templates(directory=PATH_TO_FRONTEND)
         self.configure_routes()
         self.app.include_router(self.router)
@@ -169,18 +175,8 @@ class CapellaModelExplorerBackend:
 
         @self.router.get("/api/views")
         def read_templates():
-            new_grouped_templates, new_templates = index_templates(
-                self.templates_path
-            )
-            for template_name, template_data in new_templates.items():
-                if template_name in self.templates:
-                    template_data.update(self.templates[template_name])
-
-            print(self.templates["system-actors"])
-
-            self.grouped_templates = new_grouped_templates
-            self.templates.update(new_templates)
-            return self.grouped_templates
+            self.templates_index = self.templates_loader.index_path(self.templates_path)
+            return self.templates_index.as_dict
 
         @self.router.get("/api/objects/{uuid}")
         def read_object(uuid: str):
@@ -190,38 +186,10 @@ class CapellaModelExplorerBackend:
         @self.router.get("/api/views/{template_name}")
         def read_template(template_name: str):
             template_name = urlparse.unquote(template_name)
-            if not template_name in self.templates:
+            if not template_name in self.templates_index.flat:
                 return {"error": f"Template {template_name} not found"}
-            base = self.templates[urlparse.quote(template_name)]
-            base["single"] = base.get("single", False)
-            filters = base.get("filters")
-            variable = base["variable"]
-            below = variable.get("below")
-            attr = variable.get("attr")
-            obj_type = variable.get("type")
-            if base["single"]:
-                base["objects"] = []
-                return base
-            try:
-                objects = find_objects(
-                    self.model,
-                    obj_type,
-                    below=below,
-                    attr=attr,
-                    filters=filters,
-                )
-                base["objects"] = [
-                    makers.simple_object(obj) for obj in objects
-                ]
-            except Exception as e:
-                import traceback
-
-                LOGGER.exception(
-                    "Error finding objects for template %s", template_name
-                )
-                base["objects"] = []
-                base["error"] = str(e)
-                base["traceback"] = traceback.format_exc()
+            base = self.templates_index.flat[template_name]
+            base.compute_instance_list(self.model)
             return base
 
         @self.router.get("/api/views/{template_name}/{object_id}")
@@ -317,32 +285,3 @@ def index_templates(
     return templates_grouped, templates
 
 
-def find_objects(model, obj_type=None, below=None, attr=None, filters=None):
-    if attr:
-        getter = operator.attrgetter(attr)
-        objects = getter(model)
-        if hasattr(objects, "_element"):
-            objects = [objects]
-        elif not isinstance(objects, capellambse.model.ElementList):
-            raise ValueError(
-                f"Expected a list of model objects or a single model object"
-                f" for {attr!r} of the model, got {objects!r}"
-            )
-    elif below and obj_type:
-        getter = operator.attrgetter(below)
-        objects = model.search(obj_type, below=getter(model))
-    elif obj_type:
-        objects = model.search(obj_type)
-    else:
-        raise ValueError("No search criteria provided")
-
-    if filters:
-        objects = [
-            obj
-            for obj in objects
-            if all(
-                getattr(obj, key) == value for key, value in filters.items()
-            )
-        ]
-
-    return objects

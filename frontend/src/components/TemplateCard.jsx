@@ -1,7 +1,7 @@
 // Copyright DB InfraGO AG and contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { FlaskConical, TriangleAlert, Book, FileStack } from "lucide-react";
+import { FlaskConical, TriangleAlert, Book, FileStack, FileText } from "lucide-react";
 import { Badge } from "./Badge";
 
 /**
@@ -19,9 +19,8 @@ export const TemplateCard = ({
   onClickCallback,
   isDocument=false,
   isExperimental=false,
-  instances=0,
-  isBroken=false,
-  errorMessage=""
+  instanceCount=0,
+  error=false
 }) => (
   <div
     onClick={() => onClickCallback(idx)}
@@ -38,13 +37,14 @@ export const TemplateCard = ({
           } style={{	overflowWrap: "break-word" }} >
           {name}
         </h5>
-        {instances > 0 && <span className="ml-0.5"><FileStack size={16} style={{display: "inline-block"}}/> {instances}</span>}
+        {instanceCount === 1 && <span className="ml-0.5"><FileText size={16} style={{display: "inline-block"}}/></span> }
+        {instanceCount > 1 && <span className="ml-0.5"><FileStack size={16} style={{display: "inline-block"}}/> {instanceCount}</span>}
       </div>
       <p className="mb-3 font-normal text-gray-700 dark:text-gray-300 text-left">
         {description}
       </p>
       <div className={"text-left"}>
-      {isBroken && <Badge color={"danger"}><TriangleAlert  size={16} style={{display: "inline-block"}}/> Broken</Badge>}
+      {error && <Badge color={"danger"}><TriangleAlert  size={16} style={{display: "inline-block"}}/> {error}</Badge>}
       {isExperimental && <Badge color={"warning"}><FlaskConical  size={16} style={{display: "inline-block"}}/> Experimental</Badge>}
       {isDocument && <Badge><Book size={16} style={{display: "inline-block"}}/> Document</Badge>}
       </div>
