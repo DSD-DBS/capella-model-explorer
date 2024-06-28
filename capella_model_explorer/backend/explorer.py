@@ -124,7 +124,7 @@ class CapellaModelExplorerBackend:
 
         return f"{ROUTE_PREFIX}/__generic__/{obj.uuid}"
 
-    def render_instance_page(self, template_text, object=None):
+    def render_instance_page(self, template_text, base, object=None):
         try:
             # render the template with the object
             template = self.env.from_string(template_text)
@@ -134,6 +134,8 @@ class CapellaModelExplorerBackend:
             error_message = markupsafe.Markup(
                 "<p style='color:red'>Template syntax error: {}, line {}</p>"
             ).format(e.message, e.lineno)
+            base["isBroken"] = True
+            print(base)
             return HTMLResponse(content=error_message)
         except Exception as e:
             error_message = markupsafe.Markup(
@@ -148,6 +150,7 @@ class CapellaModelExplorerBackend:
                 obj=repr(object),
                 model=repr(self.model),
             )
+            base["isBroken"] = True
             return HTMLResponse(content=error_message)
 
     def configure_routes(self):
@@ -166,10 +169,17 @@ class CapellaModelExplorerBackend:
 
         @self.router.get("/api/views")
         def read_templates():
-            # list all templates in the templates folder from .yaml
-            self.grouped_templates, self.templates = index_templates(
+            new_grouped_templates, new_templates = index_templates(
                 self.templates_path
             )
+            for template_name, template_data in new_templates.items():
+                if template_name in self.templates:
+                    template_data.update(self.templates[template_name])
+
+            print(self.templates["system-actors"])
+
+            self.grouped_templates = new_grouped_templates
+            self.templates.update(new_templates)
             return self.grouped_templates
 
         @self.router.get("/api/objects/{uuid}")
@@ -241,7 +251,7 @@ class CapellaModelExplorerBackend:
                         "Requested object not found: {}</p>"
                     ).format(str(e))
                     return HTMLResponse(content=error_message)
-            return self.render_instance_page(content, object)
+            return self.render_instance_page(content, base, object)
 
         @self.router.get("/api/model-info")
         def model_info():
