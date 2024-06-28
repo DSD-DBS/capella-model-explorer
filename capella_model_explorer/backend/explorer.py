@@ -78,6 +78,7 @@ class CapellaModelExplorerBackend:
             "Time in minutes since the last user interaction",
         )
         self.last_interaction = time.time()
+        self.templates_index = self.templates_loader.index_path(self.templates_path)
 
         @self.app.middleware("http")
         async def update_last_interaction_time(request: Request, call_next):
@@ -140,7 +141,7 @@ class CapellaModelExplorerBackend:
             error_message = markupsafe.Markup(
                 "<p style='color:red'>Template syntax error: {}, line {}</p>"
             ).format(e.message, e.lineno)
-            base["isBroken"] = True
+            base.error = error_message
             print(base)
             return HTMLResponse(content=error_message)
         except Exception as e:
@@ -197,8 +198,11 @@ class CapellaModelExplorerBackend:
             content = None
             object = None
             try:
-                base = self.templates[urlparse.quote(template_name)]
-                template_filename = base["template"]
+                template_name = urlparse.unquote(template_name)
+                if not template_name in self.templates_index.flat:
+                    return {"error": f"Template {template_name} not found"}
+                base = self.templates_index.flat[template_name]
+                template_filename = base.template
                 # load the template file from the templates folder
                 content = (self.templates_path / template_filename).read_text(
                     encoding="utf8"

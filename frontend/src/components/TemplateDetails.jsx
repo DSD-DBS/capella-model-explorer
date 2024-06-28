@@ -97,9 +97,9 @@ export const TemplateDetails = ({ endpoint, onSingleInstance }) => {
               'dark:scrollbar-track-custom-dark-3 ' +
               'dark:scrollbar-thumb-slate-600'
             }>
-            {details.objects &&
+            {details.instanceList &&
             details.single === false &&
-            details.objects.length === 0 ? (
+            details.instanceList.length === 0 ? (
               <p
                 className={
                   'mb-3 font-normal text-gray-700 dark:text-gray-300'
@@ -107,8 +107,8 @@ export const TemplateDetails = ({ endpoint, onSingleInstance }) => {
                 No objects found
               </p>
             ) : (
-              details.objects &&
-              details.objects
+              details.instanceList &&
+              details.instanceList
                 .filter((object) =>
                   object.name
                     .toLowerCase()
