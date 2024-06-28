@@ -48,13 +48,20 @@
 
 {% macro show_other_attributes(object, excluded=[], hide_rules_check=False) %}
     {% set empty_attrs = [] %}
-
+    <table style="width: max-content;">
+    <thead>
+        <tr><th style="width: fit-content;">Property</th><th style="width: 100%;">Value</th></tr>
+    </thead>
     {%- for attr in object.__dir__()|sort if not attr.startswith("_") and attr not in ["from_model", "pvmt"]+excluded -%}
     {% if attr == "validation" %}
     {% else %}
         {%- set value = object[attr] -%}
         {% if value %}
-            <h2 style="opacity: 0.8; border-top: 1px solid grey; margin-top: 1rem; padding-left: 1rem; font: 1rem monospace">{{ attr }}</h2>
+            <tr>
+            <td style="width: fit-content;">
+            {{ attr }}
+            </td>
+            <td style="width: max-content;">
             {%- if value.as_svg -%}
             {{ value.as_svg|safe }}
             {% elif value._short_html_ -%}
@@ -62,12 +69,14 @@
             {% else -%}
             <p>{{ value }}</p>
             {% endif -%}
+            </td>
+            </tr>
         {% else %}
             {% set _none = empty_attrs.append(attr) %}
         {% endif %}
     {% endif %}
     {% endfor -%}
-
+    </table>
     {% if empty_attrs %}
     <h3>Unset attributes</h3>
     <p>The object has the following attributes in unset state (empty values): {{ ", ".join(empty_attrs) }}</p>
@@ -83,7 +92,7 @@
 {% for rel in rels %}
     <li>
         <a href="{{ rel.type | make_href }}">{{rel.type.long_name }}</a>
-        {{ rel.target.__class__.__name__ }} {{ linked_name_with_icon(rel.target) | safe}}</a>
+        {{ linked_name_with_icon(rel.target) | safe}}</a>
     </li>
 {% endfor %}
 </ul>
@@ -171,7 +180,7 @@
     {% if realized_objects %}
     <p>{{ object.name }} realizes the following objects:<p>
     <ul>
-    {%- for obj in realized_objects -%}<li>{{ linked_name_with_icon(obj) | safe}}</li>{%- endfor -%}
+    {%- for obj in realized_objects -%}<li style="display: block;">{{ linked_name_with_icon(obj) | safe}}</li>{%- endfor -%}
     </ul>
     {%- else -%}
         <p style="color: red;">{{ first_upper(object.name) }} doesn't seem to realize any object</p>
@@ -179,7 +188,7 @@
     {% if realizing_objects %}
     <p>{{ object.name }} is realized by the following objects:</p>
     <ul>
-    {%- for obj in realizing_objects -%}<li>{{ linked_name_with_icon(obj) | safe}}</li>{%- endfor -%}
+    {%- for obj in realizing_objects -%}<li style="display: block;">{{ linked_name_with_icon(obj) | safe}}</li>{%- endfor -%}
     </ul>
     {%- else -%}
         <p style="color: red;">{{ first_upper(object.name) }} doesn't seem to be realized by any object</p>

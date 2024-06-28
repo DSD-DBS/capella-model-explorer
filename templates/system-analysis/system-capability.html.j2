@@ -2,7 +2,7 @@
     Copyright DB InfraGO AG and contributors
     SPDX-License-Identifier: Apache-2.0
 #}
-{% from 'common_macros.html.j2' import show_other_attributes %}
+{% from 'common_macros.html.j2' import show_other_attributes, linked_name_with_icon %}
 
 <h1>{{ object.name }}</h1>
 {% if object.description %}
@@ -46,11 +46,11 @@
 
 {% for entity in real_entities %}
 <h3>{{ entity.name }}</h3>
-<p>To enable the system Capability <b>{{object.name}}</b> the <b>{{entity.name}}</b> shall:</p>
+<p>To enable the system Capability <b>{{object.name}}</b> the {{ linked_name_with_icon(entity) | safe}} shall:</p>
 <ul>
     {% for fnc in object.involved_functions %}
         {% if fnc.owner == entity %}
-            <li><a href="{{ fnc | make_href }}">{{ fnc.name }}</a></li>
+            <li>{{linked_name_with_icon(fnc) | safe}}</li>
         {% endif %}
     {% endfor %}
 </ul>

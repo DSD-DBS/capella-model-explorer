@@ -101,7 +101,8 @@ class TemplateCategories(BaseModel):
     categories: List[TemplateCategory] = Field([], title="Template Categories")
 
     def __getitem__(self, category_id: str):
-        return [cat for cat in self.categories if cat.idx == category_id].first()
+        results = [cat for cat in self.categories if cat.idx == category_id]
+        return results[0] if results else None
 
     def __add__(self, other):
         if not isinstance(other, TemplateCategories):
@@ -109,7 +110,7 @@ class TemplateCategories(BaseModel):
         for category in other.categories:
             category_id = category.idx
             if category_id in [cat.idx for cat in self.categories]:
-                self.categories[category_id].templates += category.templates
+                self[category_id].templates += category.templates
             else:
                 self.categories.append(TemplateCategory(idx=category_id, templates=category.templates))
         return self

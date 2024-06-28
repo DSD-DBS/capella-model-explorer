@@ -12,7 +12,7 @@
     {%- elif object.is_actor and object.is_human -%}
     Human actor&nbsp;
     {%- endif -%}
-    <b>{{ object.name as }}</b>
+    <b>{{ object.name }}</b>
 </h1>
 {% else %}
 <h1>Unnamed ({{ object.__class__.__name__ }})</small></h1>
