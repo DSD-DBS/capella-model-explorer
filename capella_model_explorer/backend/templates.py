@@ -32,7 +32,8 @@ def find_objects(model, obj_type=None, below=None, attr=None, filters=None):
             obj
             for obj in objects
             if all(
-                getattr(obj, key) == value for key, value in filters.items()
+                operator.attrgetter(key)(obj) == value
+                for key, value in filters.items()
             )
         ]
 
