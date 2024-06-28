@@ -28,7 +28,7 @@ from jinja2 import (
     is_undefined,
 )
 
-from . import __version__
+from . import __version__, makers
 
 esc = markupsafe.escape
 
@@ -175,7 +175,7 @@ class CapellaModelExplorerBackend:
         @self.router.get("/api/objects/{uuid}")
         def read_object(uuid: str):
             obj = self.model.by_uuid(uuid)
-            return {"idx": obj.uuid, "name": obj.name, "type": obj.xtype}
+            return makers.typed_object(obj)
 
         @self.router.get("/api/views/{template_name}")
         def read_template(template_name: str):
@@ -201,19 +201,7 @@ class CapellaModelExplorerBackend:
                     filters=filters,
                 )
                 base["objects"] = [
-                    {
-                        "idx": obj.uuid,
-                        "name": str(
-                            obj.name
-                            if obj.name
-                            else (
-                                obj.long_name
-                                if hasattr(obj, "long_name")
-                                else "undefined"
-                            )
-                        ),
-                    }
-                    for obj in objects
+                    makers.simple_object(obj) for obj in objects
                 ]
             except Exception as e:
                 import traceback
