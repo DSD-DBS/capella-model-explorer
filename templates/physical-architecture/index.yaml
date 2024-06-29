@@ -1,47 +1,41 @@
 # Copyright DB InfraGO AG and contributors
 # SPDX-License-Identifier: Apache-2.0
 
-templates:
-- template: physical-architecture/physical-link.html.j2
-  idx: physical-link
-  name: Physical Interface
-  description: Defines a Physical Interface between 2 components
-  category: pa
-  isExperimental: true
-  variable:
-    name: object
-    type: PhysicalLink
-    below: pa
+categories:
+- idx: pa
+  templates:
+  - template: physical-architecture/physical-link.html.j2
+    idx: physical-link
+    name: Physical Interface
+    description: Defines a Physical Interface between 2 components
+    isExperimental: true
+    scope:
+      type: PhysicalLink
+      below: pa
 
-- template: __generic__.html.j2
-  idx: physical-component
-  name: Physical Component
-  description: Defines a Physical Component
-  category: pa
-  isExperimental: true
-  variable:
-    name: object
-    type: PhysicalComponent
-    below: pa
+  - template: __generic__.html.j2
+    idx: physical-component
+    name: Physical Component
+    description: Defines a Physical Component
+    isExperimental: true
+    scope:
+      type: PhysicalComponent
+      below: pa
 
-- template: physical-architecture/physical-function.html.j2
-  idx: physical-function
-  name: Physical Functions
-  description: Defines function of a physical component or an actor
-  category: pa
-  isExperimental: true
-  variable:
-    name: object
-    type: PhysicalFunction
-    below: pa
+  - template: physical-architecture/physical-function.html.j2
+    idx: physical-function
+    name: Physical Functions
+    description: Defines function of a physical component or an actor
+    isExperimental: true
+    scope:
+      type: PhysicalFunction
+      below: pa
 
-- template: physical-architecture/sw-interface.html.j2
-  idx: sw-interface
-  name: Software Interfaces
-  description: Defines interfaces between software components
-  category: pa
-  isExperimental: true
-  variable:
-    name: object
-    type: ComponentExchange
-    below: pa
+  - template: physical-architecture/sw-interface.html.j2
+    idx: sw-interface
+    name: Software Interfaces
+    description: Defines interfaces between software components
+    isExperimental: true
+    scope:
+      type: ComponentExchange
+      below: pa

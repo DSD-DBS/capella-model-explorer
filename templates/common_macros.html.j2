@@ -46,14 +46,14 @@
 {% endif %}
 {% endmacro %}
 
-{% macro show_other_attributes(object, excluded=[], hide_rules_check=False) %}
+{% macro show_other_attributes(object, excluded=[], hide_rules_check=False, hide_unset_attrs=False) %}
     {% set empty_attrs = [] %}
     <table style="width: 100%;">
     <thead>
         <tr><th>Property</th><th>Value</th></tr>
     </thead>
     {%- for attr in object.__dir__()|sort if not attr.startswith("_") and attr not in ["from_model", "pvmt"]+excluded -%}
-    {% if attr == "validation" %}
+    {% if attr in ["validation", "validate"] %}
     {% else %}
         {%- set value = object[attr] -%}
         {% if value %}
@@ -64,11 +64,17 @@
             <td>
             {%- if value.as_svg -%}
             {{ value.as_svg|safe }}
-            {% elif value._short_html_ -%}
-            <p>{{ value._short_html_() }}</p>
-            {% else -%}
+            {%- elif value is iterable and value is not string -%}
+            <ul>
+            {% for item in value %}
+                <li>{{ linked_name_with_icon(item) | safe }}</li>
+            {% endfor %}
+            </ul>
+            {%- elif value._short_html_ -%}
+            <p>{{ linked_name_with_icon(value) | safe }}</p>
+            {%- else -%}
             <p>{{ value }}</p>
-            {% endif -%}
+            {%- endif -%}
             </td>
             </tr>
         {% else %}
@@ -78,11 +84,13 @@
     {% endfor -%}
     </table>
     {% if empty_attrs %}
+    {% if not hide_unset_attrs %}
     <h3>Unset attributes</h3>
     <p>The object has the following attributes in unset state (empty values): {{ ", ".join(empty_attrs) }}</p>
     {% endif %}
     {% if not hide_rules_check %}
     {{ show_compliance_to_modeling_rules(object) | safe }}
+    {% endif %}
     {% endif %}
 {% endmacro %}
 
@@ -92,7 +100,7 @@
 {% for rel in rels %}
     <li>
         <a href="{{ rel.type | make_href }}">{{rel.type.long_name }}</a>
-        {{ linked_name_with_icon(rel.target) | safe}}</a>
+        {{ linked_name_with_icon(rel.target) | safe}}
     </li>
 {% endfor %}
 </ul>
@@ -113,6 +121,7 @@
             <td>
                 {{ req.text if req.text else req.long_name }}
                 {{req_rels(req.relations) | safe}}
+                {{show_other_attributes(req, excluded=["related", "relations", "requirements", "text", "owner", "validate", "xtype"], hide_rules_check=True, hide_unset_attrs=True) | safe}}
             </td>
         </div>
         </tr>
@@ -143,20 +152,27 @@
 {%- macro linked_name(object) -%}<a href="{{ object | make_href }}">{{ object.name  | trim }}</a>{%- endmacro -%}
 
 {% macro draw_icon(obj, size) %}
+{% if obj._get_icon %}
 {% set icon = obj._get_icon("datauri_svg", size=size) %}
 {% if icon %}
     <img src="{{ icon | safe }}" height="{{size}}" width="{{size}}" style="display:inline-block"/>
 {% endif %}
+{% endif %}
 {% endmacro %}
 
 {% macro linked_name_with_icon(obj) %}
-    <a href="hlink://{{obj.uuid}}">
-        {% set icon = obj._get_icon("datauri_svg", size=15) %}
-        {% if icon %}
-            <img src="{{ icon | safe }}" height="15" width="15" style="display:inline-block"/>
+    {% if obj %}
+        {% if obj.uuid %}
+        <a href="hlink://{{obj.uuid}}">
+            {{ draw_icon(obj, 15) | safe }}
+            {% if obj.name %}{{ obj.name }}{% elif obj.long_name%}{{ obj.long_name }}{% else %}{{ obj.__class__.__name__ }}{% endif %}
+        </a> 
+        {% else %}
+            {{ obj._short_html_ | safe }}
         {% endif %}
-        {{ obj.name }}
-    </a> 
+    {% else %}
+    <span style="color:red">Deleted object</span>
+    {% endif %}
 {% endmacro %}
 
 {%- macro display_traceability(object, complain=False) -%}

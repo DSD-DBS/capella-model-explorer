@@ -72,7 +72,7 @@ export const TemplateDetails = ({ endpoint, onSingleInstance }) => {
         </div>
       ) : (
         <>
-          {details.single === false ? (
+          {details && !details.single ? (
             <input
               type="text"
               value={filterText}

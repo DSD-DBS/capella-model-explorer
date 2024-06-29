@@ -4,9 +4,16 @@
 categories:
   - idx: other
     templates:
-      - template: __generic__.html.j2
-        idx: __generic__
-        name: Generic object description
-        description: Generic built-in template that shows all available information about a given object.
-        category: other
-        single: true
+    - template: __generic__.html.j2
+      idx: __generic__
+      name: Generic object description
+      description: Generic built-in template that shows all available information about a given object.
+      category: other
+      single: true
+    - idx: req
+      template: req.html.j2
+      name: Requirement Modules
+      description: Basic template to visualize requirement objects
+      scope:
+        name: object
+        type: CapellaModule
