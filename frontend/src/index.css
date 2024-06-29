@@ -72,6 +72,10 @@ h1 {
   text-align: left;
 }
 
+.html-content h1, .html-content h2, .html-content h3, .html-content h4, .html-content h5, .html-content h6 {
+  word-break: break-word;
+}
+
 .html-content svg {
   display: block;
   @apply h-auto max-w-full;
@@ -102,6 +106,12 @@ h1 {
 .html-content table tr td, .html-content table tr th {
   vertical-align: top;
   padding: 0 0.4em;
+  word-break: break-word;
+}
+.html-content table tr td:first-of-type, .html-content table tr th:first-of-type {
+  vertical-align: top;
+  padding: 0 0.4em;
+  word-break: normal;
 }
 .html-content table tr td p {
   padding-top: 0;

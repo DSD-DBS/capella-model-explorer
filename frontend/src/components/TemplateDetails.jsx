@@ -110,7 +110,7 @@ export const TemplateDetails = ({ endpoint, onSingleInstance }) => {
               details.instanceList &&
               details.instanceList
                 .filter((object) =>
-                  object.name
+                  object.name && object.name
                     .toLowerCase()
                     .includes(filterText.toLowerCase())
                 )

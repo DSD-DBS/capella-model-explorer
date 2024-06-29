@@ -45,7 +45,7 @@ class InstanceDetails(BaseModel):
     name: str = Field(..., title="Instance Name")
 
 class TemplateScope(BaseModel):
-    type: str = Field(..., title="Model Element Type")
+    type: Optional[str] = Field(None, title="Model Element Type")
     below: Optional[str] = Field(None, title="Model element to search below, scope limiter")
     filters: Optional[Dict[str, Any]] = Field({}, title="Filters to apply to the search")
 
@@ -54,9 +54,10 @@ class Template(BaseModel):
     name: str = Field(..., title="Template Name")
     template: Path = Field(..., title="Template File Path")
     description: str = Field(..., title="Template Description")
-    scope: TemplateScope = Field(..., title="Template Scope")
-
+    
+    scope: Optional[TemplateScope] = Field({}, title="Template Scope")
     single: Optional[bool] = Field(None, title="Single Instance Flag")
+    isStable: Optional[bool] = Field(None, title="Stable Template Flag")
     isDocument: Optional[bool] = Field(None, title="Document Template Flag")
     isExperimental: Optional[bool] = Field(None, title="Experimental Template Flag")
     error: Optional[str] = Field(None, title="Broken Template Flag")

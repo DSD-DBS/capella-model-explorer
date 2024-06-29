@@ -124,11 +124,11 @@ class CapellaModelExplorerBackend:
             | capellambse.model.diagram.AbstractDiagram
         ),
     ) -> str | None:
-        for idx, template in self.templates.items():
-            clsname = template.get("variable", {}).get("type")
-            if obj.__class__.__name__ == clsname:
-                return f"{ROUTE_PREFIX}/{idx}/{obj.uuid}"
-
+        for idx, template in self.templates_index.flat.items():
+            if "type" in template.scope.__dir__():
+                clsname = template.scope.type
+                if obj.__class__.__name__ == clsname:
+                    return f"{ROUTE_PREFIX}/{idx}/{obj.uuid}"
         return f"{ROUTE_PREFIX}/__generic__/{obj.uuid}"
 
     def render_instance_page(self, template_text, base, object=None):
@@ -157,7 +157,7 @@ class CapellaModelExplorerBackend:
                 obj=repr(object),
                 model=repr(self.model),
             )
-            base["isBroken"] = True
+            # error = error_message
             return HTMLResponse(content=error_message)
 
     def configure_routes(self):

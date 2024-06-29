@@ -48,9 +48,9 @@
 
 {% macro show_other_attributes(object, excluded=[], hide_rules_check=False) %}
     {% set empty_attrs = [] %}
-    <table style="width: max-content;">
+    <table style="width: 100%;">
     <thead>
-        <tr><th style="width: fit-content;">Property</th><th style="width: 100%;">Value</th></tr>
+        <tr><th>Property</th><th>Value</th></tr>
     </thead>
     {%- for attr in object.__dir__()|sort if not attr.startswith("_") and attr not in ["from_model", "pvmt"]+excluded -%}
     {% if attr == "validation" %}
@@ -58,10 +58,10 @@
         {%- set value = object[attr] -%}
         {% if value %}
             <tr>
-            <td style="width: fit-content;">
+            <td style="word-break:normal">
             {{ attr }}
             </td>
-            <td style="width: max-content;">
+            <td>
             {%- if value.as_svg -%}
             {{ value.as_svg|safe }}
             {% elif value._short_html_ -%}

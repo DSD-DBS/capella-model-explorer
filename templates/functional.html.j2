@@ -76,7 +76,7 @@
     {% if port.exchanges %}
         {% for exchange in port.exchanges %}
             <tr>
-            <td>FEX-{{ exchange.uuid[-5:] | upper}}</td>
+            <td style="word-break: normal !important;">FEX-{{ exchange.uuid[-5:] | upper}}</td>
             <td>
                 {% set target_owner_name = '<span style="color:red">Unallocated entity</span>' %}
                 {% set target_owner = '<span style="color:red">Unallocated entity</span>'%}
@@ -127,7 +127,7 @@
     <p style="color: red;">This function is not allocated to any entity / no entity is responsible for it.</p>
 {% endif %}
 {% if object.involved_in %}
-<p>While performing <i>{{ object.name }}</i> the {{ linked_name_with_icon(object.owner) | safe if object.owner else '<span style="color: red">Unallocated Entity</span>'}} contributes to:</p>
+<p>While performing <i>{{ object.name }}</i> the {{ linked_name_with_icon(object.owner) | safe if object.owner else '<span style="color: red">Unallocated entity</span>' | safe}} contributes to:</p>
 <ul>
     {% for capability in object.involved_in %}
         <li style="display: block;">{{ linked_name_with_icon(capability) | safe }}</li>

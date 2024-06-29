@@ -14,6 +14,8 @@ class TypedObject(SimpleObject):
 
 
 def simple_object(obj) -> SimpleObject:
+    if not obj:
+        return {}
     if obj.name:
         name = obj.name
     else:

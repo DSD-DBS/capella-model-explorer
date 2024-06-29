@@ -4,10 +4,18 @@
 categories:
 - idx: sa
   templates:
+  - template: system-analysis/system-capability.html.j2
+    idx: system-capability
+    name: System Capability
+    description: Specifies what the system should be capable of and how it needs to interact with external actors.
+    scope:
+      type: Capability
+      below: sa
   - template: system-analysis/system_function.html.j2
     idx: system-function
     name: System Function
     description: Specifies what the system should do and how it needs to interact with external actors.
+    isStable: true
     scope:
       type: SystemFunction
       below: sa
@@ -20,13 +28,6 @@ categories:
       below: sa
       filters:
         is_actor: true
-  - template: system-analysis/system-capability.html.j2
-    idx: system-capability
-    name: System Capability
-    description: Specifies what the system should be capable of and how it needs to interact with external actors.
-    scope:
-      type: Capability
-      below: sa
   - template: system-analysis/system-definition.html.j2
     idx: system-definition
     name: System Definition

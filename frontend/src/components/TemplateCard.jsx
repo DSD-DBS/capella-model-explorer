@@ -1,7 +1,7 @@
 // Copyright DB InfraGO AG and contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { FlaskConical, TriangleAlert, Book, FileStack, FileText } from "lucide-react";
+import { FlaskConical, TriangleAlert, Book, FileStack, FileText, ShieldCheck } from "lucide-react";
 import { Badge } from "./Badge";
 
 /**
@@ -19,6 +19,7 @@ export const TemplateCard = ({
   onClickCallback,
   isDocument=false,
   isExperimental=false,
+  isStable=true,
   instanceCount=0,
   error=false
 }) => (
@@ -45,6 +46,7 @@ export const TemplateCard = ({
       </p>
       <div className={"text-left"}>
       {error && <Badge color={"danger"}><TriangleAlert  size={16} style={{display: "inline-block"}}/> {error}</Badge>}
+      {isStable && <Badge color={"success"}><ShieldCheck  size={16} style={{display: "inline-block"}}/> Stable</Badge>}
       {isExperimental && <Badge color={"warning"}><FlaskConical  size={16} style={{display: "inline-block"}}/> Experimental</Badge>}
       {isDocument && <Badge><Book size={16} style={{display: "inline-block"}}/> Document</Badge>}
       </div>
