@@ -164,8 +164,10 @@
     {% if obj %}
         {% if obj.uuid %}
         <a href="hlink://{{obj.uuid}}">
+            {% if obj.__class__.__name__ not in [ "Part"]%}
             {{ draw_icon(obj, 15) | safe }}
-            {% if obj.name %}{{ obj.name }}{% elif obj.long_name%}{{ obj.long_name }}{% else %}{{ obj.__class__.__name__ }}{% endif %}
+            {% endif %}
+            {% if obj.name %}{{ obj.name }}{% elif obj.long_name %}{{ obj.long_name }}{% else %}{{ obj.__class__.__name__ }}{% endif %}
         </a> 
         {% else %}
             {{ obj._short_html_ | safe }}
