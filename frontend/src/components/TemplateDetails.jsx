@@ -50,9 +50,7 @@ export const TemplateDetails = ({ endpoint, onSingleInstance }) => {
         'dark:shadow-dark'
       }>
       <h5
-        className={
-          'mb-2 text-2xl font-bold text-gray-900 dark:text-gray-100'
-        }>
+        className={'mb-2 text-2xl font-bold text-gray-900 dark:text-gray-100'}>
         {details.name}
       </h5>
       <p className="mb-3 font-normal text-gray-700 dark:text-gray-300">
@@ -61,8 +59,8 @@ export const TemplateDetails = ({ endpoint, onSingleInstance }) => {
       {details.error ? (
         <div>
           <p className="mb-3 font-bold text-gray-700 dark:text-gray-300">
-            We failed to find matching template instances due to the
-            following error:{' '}
+            We failed to find matching template instances due to the following
+            error:{' '}
           </p>
           <div
             className={
@@ -135,9 +133,7 @@ export const TemplateDetails = ({ endpoint, onSingleInstance }) => {
                       <h5
                         className={
                           'text-md font-bold dark:text-gray-100' +
-                          (objectID && object.idx === objectID
-                            ? ''
-                            : '')
+                          (objectID && object.idx === objectID ? '' : '')
                         }>
                         {object.name}
                       </h5>

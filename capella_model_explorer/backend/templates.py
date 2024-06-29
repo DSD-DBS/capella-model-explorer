@@ -1,11 +1,21 @@
 from pydantic import BaseModel, Field
 from pathlib import Path
-from typing import List, Dict, Optional, Any
+from typing import List, Dict, Optional, Any, TypedDict
 import yaml
 import capellambse
 import operator
-from capella_model_explorer.backend import makers
 import traceback
+
+
+def simple_object(obj) -> Dict[str, Any]:
+    if not obj:
+        return {}
+    if obj.name:
+        name = obj.name
+    else:
+        name = obj.long_name if hasattr(obj, "long_name") else "undefined"
+
+    return {"idx": obj.uuid, "name": str(name)}
 
 
 def find_objects(model, obj_type=None, below=None, attr=None, filters=None):
@@ -80,7 +90,7 @@ class Template(BaseModel):
 
     def compute_instance_list(self, model: capellambse.MelodyModel):
         self.instanceList =  [
-                    makers.simple_object(obj) for obj in self.find_instances(model)
+                    simple_object(obj) for obj in self.find_instances(model)
                 ]
 
 

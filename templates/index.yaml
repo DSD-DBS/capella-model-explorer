@@ -1,0 +1,12 @@
+# Copyright DB InfraGO AG and contributors
+# SPDX-License-Identifier: Apache-2.0
+
+categories:
+  - idx: other
+    templates:
+      - template: __generic__.html.j2
+        idx: __generic__
+        name: Generic object description
+        description: Generic built-in template that shows all available information about a given object.
+        category: other
+        single: true
