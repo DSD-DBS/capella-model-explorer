@@ -24,31 +24,62 @@
 
 
 
-{% macro properties_table(props, obj) %}
-<table className="min-w-full divide-y divide-gray-200">
-    <thead>
-        <tr>
-            <th>Property</th>
-        </tr>
-    </thead>
-    <tbody>
+{% macro properties_list(props, obj) %}
     {% for property in props %}
-        <tr  style="border-bottom: none;">
-            <td>
-                {{ display_property_label(obj, property) | safe }}
-                {% if property.kind != "UNSET" %}
-                <p>KIND: {{ property.kind }}</p>
-                {% endif %}
-            </td>
-        </tr><tr>
-            <td style="padding-left: 2.5em !important; padding-bottom: 0.6em;">
-                {{ description(property) | safe}}
-            </td>
-        </tr>
+        {{ display_property_label(obj, property) | safe }}
+        {% if property.kind != "UNSET" %}
+            <p>KIND: {{ property.kind }}</p>
+        {% endif %}
+        {% set prop_props = [] %}
+        {% if property.kind != "UNSET" %}{% set _none = prop_props.append(["Kind", property.kind]) %}{% endif %}
+        {% if property.min_value %}{% set _none = prop_props.append(["Min. value", property.min_value])%}{% endif %}
+        {% if property.max_value %}{% set _none = prop_props.append(["Max. value", property.max_value])%}{% endif %}
+        <div style="padding-left: 2.5em !important; padding-bottom: 0.6em;">
+            {{ description(property) | safe}}
+            {{ property.type.__class__.__name__ }}
+            {% if property.type.__class__.__name__ == "Enumeration" %}
+                <p>{{property.type.name}} enumeration values:</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Enumeration Literal</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for val in property.type.applied_property_values %}
+                            <tr>
+                                <td>{{ val.name }}</td>
+                                <td>{{ val.value if val.value else "0" }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
+            <p>Property {{ property.name }} has the following additional attributes:</p>
+            {% if prop_props %}
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Property</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for key, val in prop_props %}
+                            <tr>
+                                <td>{{ key }}</td>
+                                <td>{{ val.value }} :{{ linked_name_with_icon(val.type) | safe}}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
+        </div>
 
+        {# show_other_attributes(property) | safe #}
+       
     {% endfor %}
-    </tbody>
-</table>
 {% endmacro %}
 
 <h1><span style="font-weight: normal">{{ object.__class__.__name__ }}</span> <b>{{ object.name }}</b></h1>
@@ -70,10 +101,10 @@
 {% endif %}
 {% set props = props + object.owned_properties | list %}
 
-<h2>Owned Properties</h2>
+<h2>Properties</h2>
 {% if props %}
-    <p>The object owns the properties listed below; We use the following format to describe property: name : type [min .. max (instances of type)] or [ fixed number]; if no multiplicity is shown assume its 1 (single instance).</p><br>
-    {{ properties_table(props, object) |safe }}
+    <p>The object owns the properties listed below; We use the following format to describe property: name : type [min .. max (instances of type)] or [ fixed number]; if no multiplicity is shown assume its 1 (single instance). Properties that were inherited through specialization are indicated accordingly.</p><br>
+    {{ properties_list(props, object) |safe }}
 {% else %}
     <p style="color:red">No properties are owned by this object.</p>
 {% endif %}
