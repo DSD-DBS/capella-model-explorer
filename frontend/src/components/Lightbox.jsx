@@ -7,8 +7,6 @@ import { Printer, XIcon } from 'lucide-react';
 import { LightboxButton } from './LightboxButton';
 
 export const Lightbox = ({ onClose, imageSource }) => {
-  const [adjustedWidth, setAdjustedWidth] = useState('100%');
-  const [adjustedHeight, setAdjustedHeight] = useState('100%');
   const [isClicked, setIsClicked] = useState(false);
 
   useEffect(() => {
@@ -45,27 +43,13 @@ export const Lightbox = ({ onClose, imageSource }) => {
     };
   }, [onClose]);
 
-  useEffect(() => {
-    if (imageSource) {
-      const controlBar = document.getElementById('control-bar');
-      const heightMatch = imageSource.match(/height="(\d+)"/);
-      const widthMatch = imageSource.match(/width="(\d+)"/);
-      const imgHeight = heightMatch ? heightMatch[1] : 'defaultHeight';
-      const imgWidth = widthMatch ? widthMatch[1] : 'defaultWidth';
-
-      if (imgHeight + controlBar.clientHeight > window.innerHeight) {
-        let widthScale = window.innerWidth / imgWidth;
-        let heightScale =
-          (window.innerHeight - controlBar.clientHeight - 40) / imgHeight;
-        const scalingFactor = Math.min(heightScale, widthScale);
-
-        let adjustedHeight = imgHeight * scalingFactor;
-        let adjustedWidth = imgWidth * scalingFactor;
-        setAdjustedHeight(adjustedHeight);
-        setAdjustedWidth(adjustedWidth);
-      }
-    }
-  }, [imageSource]);
+  function setHeightAndWeightOfSVG(imageSource) {
+    const doc = new DOMParser().parseFromString(imageSource, 'image/svg+xml');
+    const svg = doc.querySelector('svg');
+    svg.setAttribute('height', 'calc(100vh - 72px)');
+    svg.setAttribute('width', '100%');
+    return new XMLSerializer().serializeToString(doc);
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -88,19 +72,17 @@ export const Lightbox = ({ onClose, imageSource }) => {
         </div>
         <div className="mt-2 flex h-full w-full overflow-visible pt-16">
           {imageSource && (
-            <TransformWrapper
-              options={{ limitToBounds: true, centerContent: true }}>
+            <TransformWrapper wheel={{ smoothStep: 0.005 }}>
               <TransformComponent>
                 <div
-                  dangerouslySetInnerHTML={{ __html: imageSource }}
-                  className={`
-                    select-text overflow-visible
-                    ${isClicked ? 'cursor-grabbing' : 'cursor-grab'}`}
-                  onMouseDown={() => setIsClicked(true)}
-                  style={{
-                    width: adjustedWidth,
-                    height: adjustedHeight
-                  }}></div>
+                  dangerouslySetInnerHTML={{
+                    __html: setHeightAndWeightOfSVG(imageSource)
+                  }}
+                  className={
+                    'select-text overflow-visible ' +
+                    (isClicked ? 'cursor-grabbing' : 'cursor-grab')
+                  }
+                  onMouseDown={() => setIsClicked(true)}></div>
               </TransformComponent>
             </TransformWrapper>
           )}
