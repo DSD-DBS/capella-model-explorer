@@ -50,9 +50,7 @@ export const TemplateDetails = ({ endpoint, onSingleInstance }) => {
         'dark:shadow-dark'
       }>
       <h5
-        className={
-          'mb-2 text-2xl font-bold text-gray-900 dark:text-gray-100'
-        }>
+        className={'mb-2 text-2xl font-bold text-gray-900 dark:text-gray-100'}>
         {details.name}
       </h5>
       <p className="mb-3 font-normal text-gray-700 dark:text-gray-300">
@@ -61,8 +59,8 @@ export const TemplateDetails = ({ endpoint, onSingleInstance }) => {
       {details.error ? (
         <div>
           <p className="mb-3 font-bold text-gray-700 dark:text-gray-300">
-            We failed to find matching template instances due to the
-            following error:{' '}
+            We failed to find matching template instances due to the following
+            error:{' '}
           </p>
           <div
             className={
@@ -110,9 +108,7 @@ export const TemplateDetails = ({ endpoint, onSingleInstance }) => {
               details.objects &&
               details.objects
                 .filter((object) =>
-                  object.name
-                    .toLowerCase()
-                    .includes(filterText.toLowerCase())
+                  object.name.toLowerCase().includes(filterText.toLowerCase())
                 )
                 .map((object) => (
                   <div
@@ -126,7 +122,7 @@ export const TemplateDetails = ({ endpoint, onSingleInstance }) => {
                           'dark:bg-custom-blue dark:text-gray-100'
                         : 'w-full bg-gray-200 text-gray-900 ' +
                           'dark:bg-custom-dark-4') +
-                      ' dark:bg-dark-quaternary m-2 max-w-sm cursor-pointer ' +
+                      ' dark:bg-dark-quaternary m-2 min-w-0 cursor-pointer ' +
                       'rounded-lg shadow-md hover:bg-custom-blue ' +
                       'hover:text-white dark:border-gray-700 ' +
                       'dark:shadow-dark dark:hover:bg-blue-500 '
@@ -134,10 +130,8 @@ export const TemplateDetails = ({ endpoint, onSingleInstance }) => {
                     <div className="p-2">
                       <h5
                         className={
-                          'text-md font-bold dark:text-gray-100' +
-                          (objectID && object.idx === objectID
-                            ? ''
-                            : '')
+                          'text-md break-words font-bold dark:text-gray-100' +
+                          (objectID && object.idx === objectID ? '' : '')
                         }>
                         {object.name}
                       </h5>
