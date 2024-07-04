@@ -124,7 +124,7 @@ export const TemplateDetails = ({ endpoint, onSingleInstance }) => {
                           'dark:bg-custom-blue dark:text-gray-100'
                         : 'w-full bg-gray-200 text-gray-900 ' +
                           'dark:bg-custom-dark-4') +
-                      ' dark:bg-dark-quaternary m-2 max-w-sm cursor-pointer ' +
+                      ' dark:bg-dark-quaternary m-2 min-w-0 cursor-pointer ' +
                       'rounded-lg shadow-md hover:bg-custom-blue ' +
                       'hover:text-white dark:border-gray-700 ' +
                       'dark:shadow-dark dark:hover:bg-blue-500 '
@@ -132,7 +132,7 @@ export const TemplateDetails = ({ endpoint, onSingleInstance }) => {
                     <div className="p-2">
                       <h5
                         className={
-                          'text-md font-bold dark:text-gray-100' +
+                          'text-md break-words font-bold dark:text-gray-100' +
                           (objectID && object.idx === objectID ? '' : '')
                         }>
                         {object.name}
