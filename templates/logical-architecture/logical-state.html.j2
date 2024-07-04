@@ -31,9 +31,9 @@ Upon completion of all entry activities of <i>{{ render_name_with_icon(tx.source
 {% endif %}
 
 {% if object.entry %}
-<p>On entry into the <b>{{ object.name }}</b> {{ object.__class__.__name__ }} the system shall perform the following activities: 
+<p>On entry into the <b>{{ object.name }}</b> {{ object.__class__.__name__ }} the system shall perform the following activities:
 {% for fnc in object.entry %}
-{{ render_name_with_icon(fnc) | safe }}; 
+{{ render_name_with_icon(fnc) | safe }};
 {% endfor %}</p>
 {% endif %}
 
@@ -64,9 +64,9 @@ Upon completion of all entry activities of <i>{{ render_name_with_icon(tx.source
 
 
 {% if object.exit %}
-<p>On exit from the <b>{{ object.name }}</b> {{ object.__class__.__name__ }} the system shall perform the following activities: 
+<p>On exit from the <b>{{ object.name }}</b> {{ object.__class__.__name__ }} the system shall perform the following activities:
 {% for fnc in object.exit %}
-{{ render_name_with_icon(fnc) | safe }}; 
+{{ render_name_with_icon(fnc) | safe }};
 {% endfor %}</p>
 {% endif %}
 

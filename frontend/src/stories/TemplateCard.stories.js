@@ -26,7 +26,7 @@ export const ExperimentalDocument = {
     idx: 'THE IDENTIFIER',
     isDocument: true,
     isExperimental: true,
-    instances: 0, 
+    instances: 0,
     isBroken: false,
     onClickCallback: (idx) => alert(idx)
   }

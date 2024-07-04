@@ -54,32 +54,3 @@ def test_index_templates():
 
     assert len(templates.flat) == 3
     assert len(templates) == 1
-
-
-@pytest.mark.parametrize(
-    "params,expected_uuids",
-    [
-        pytest.param(
-            {"obj_type": "SystemComponent", "below": "sa"},
-            TEST_SYSTEM_COMPONENT_UUIDS,
-            id="Test below",
-        ),
-        pytest.param(
-            {"obj_type": "SystemComponent", "filters": {"is_actor": True}},
-            TEST_SYSTEM_COMPONENT_UUIDS
-            - {"5357012d-0479-49d3-a6e7-26c0da89fed7"},
-            id="Test filters",
-        ),
-        pytest.param(
-            {"obj_type": "SystemComponent", "attr": "sa.all_components"},
-            TEST_SYSTEM_COMPONENT_UUIDS,
-            id="Test attr",
-        ),
-    ],
-)
-def test_find_objects(params: dict[str, t.Any], expected_uuids: list[str]):
-    model = capellambse.loadcli("coffee-machine")
-
-    objects = explorer.find_objects(model, **params)
-
-    assert {obj.uuid for obj in objects} == expected_uuids

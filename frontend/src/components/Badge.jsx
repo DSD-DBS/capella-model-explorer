@@ -1,4 +1,7 @@
 
+// Copyright DB InfraGO AG and contributors
+// SPDX-License-Identifier: Apache-2.0
+
 const color_classes = {
     "default": "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300",
     "danger": "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300",

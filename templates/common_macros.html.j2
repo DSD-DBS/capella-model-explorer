@@ -19,7 +19,7 @@
                     <td style="{% if not result.passed %}padding-top: 0.4em;{% endif %}">
                         <b style="white-space: nowrap;">{{ result.rule.id }}</b>
                     </td>
-                    <td style="{% if not result.passed %}padding-top: 0.4em;{% endif %}"> 
+                    <td style="{% if not result.passed %}padding-top: 0.4em;{% endif %}">
                         <b>{{ result.rule.name }}</b>
                     </td>
                     <td style="{% if not result.passed %}padding-top: 0.4em;{% endif %}">
@@ -27,7 +27,7 @@
                             {{ "PASSED" if result.passed else "FAILED"}}
                         </b>
                     </td>
-                    
+
                 </tr>
                 {% if not result.passed %}
                 <tr>
@@ -168,7 +168,7 @@
             {{ draw_icon(obj, 15) | safe }}
             {% endif %}
             {% if obj.name %}{{ obj.name }}{% elif obj.long_name %}{{ obj.long_name }}{% else %}{{ obj.__class__.__name__ }}{% endif %}
-        </a> 
+        </a>
         {% else %}
             {{ obj._short_html_ | safe }}
         {% endif %}
@@ -241,7 +241,7 @@
 
 {% macro display_property_label(object, property) %}
     <p>
-        <b>{{ property.name }}</b> : 
+        <b>{{ property.name }}</b> :
         {% set type = None %}
         {% if "type" in property.__dir__() %}
             {% set type = property.type %}

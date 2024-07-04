@@ -12,8 +12,8 @@ import { Badge } from "./Badge";
  * - indicate if the template is broken / cant enumerate objects / other issues
  * - maybe indicate modeling rules compliance score
  */
-export const TemplateCard = ({ 
-  name, 
+export const TemplateCard = ({
+  name,
   description,
   idx,
   onClickCallback,
