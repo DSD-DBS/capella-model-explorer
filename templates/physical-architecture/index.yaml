@@ -4,6 +4,15 @@
 categories:
 - idx: pa
   templates:
+  - template: physical-architecture/phy-component.html.j2
+    idx: physical-component
+    name: Physical Component
+    description: Defines a Physical Component
+    isExperimental: true
+    scope:
+      type: PhysicalComponent
+      below: pa
+
   - template: physical-architecture/physical-link.html.j2
     idx: physical-link
     name: Physical Interface
@@ -11,15 +20,6 @@ categories:
     isExperimental: true
     scope:
       type: PhysicalLink
-      below: pa
-
-  - template: __generic__.html.j2
-    idx: physical-component
-    name: Physical Component
-    description: Defines a Physical Component
-    isExperimental: true
-    scope:
-      type: PhysicalComponent
       below: pa
 
   - template: physical-architecture/physical-function.html.j2

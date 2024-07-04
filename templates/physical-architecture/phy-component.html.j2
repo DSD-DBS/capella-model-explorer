@@ -1,0 +1,16 @@
+{#
+    Copyright DB InfraGO AG and contributors
+    SPDX-License-Identifier: Apache-2.0
+#}
+{% from 'common_macros.html.j2' import show_other_attributes, description %}
+
+<h1>{{ object.name }}</h1>
+{{ description(object) | safe }}
+
+<h2>Context</h2>
+<p>The context of {{ object.name }} is summarized by the diagram below:</p>
+{{ object.context_diagram.render("svg", display_derived_interfaces=True) | safe }}
+
+<h2>Other properties of "{{ object.name }}"</h2>
+{% set excluded = [] %}
+{{ show_other_attributes(object, excluded) | safe}}

@@ -27,16 +27,12 @@
 {% macro properties_list(props, obj) %}
     {% for property in props %}
         {{ display_property_label(obj, property) | safe }}
-        {% if property.kind != "UNSET" %}
-            <p>KIND: {{ property.kind }}</p>
-        {% endif %}
         {% set prop_props = [] %}
         {% if property.kind != "UNSET" %}{% set _none = prop_props.append(["Kind", property.kind]) %}{% endif %}
         {% if property.min_value %}{% set _none = prop_props.append(["Min. value", property.min_value])%}{% endif %}
         {% if property.max_value %}{% set _none = prop_props.append(["Max. value", property.max_value])%}{% endif %}
         <div style="padding-left: 2.5em !important; padding-bottom: 0.6em;">
             {{ description(property) | safe}}
-            {{ property.type.__class__.__name__ }}
             {% if property.type.__class__.__name__ == "Enumeration" %}
                 <p>{{property.type.name}} enumeration values:</p>
                 <table>
@@ -47,7 +43,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for val in property.type.applied_property_values %}
+                        {% for val in property.type.literals %}
                             <tr>
                                 <td>{{ val.name }}</td>
                                 <td>{{ val.value if val.value else "0" }}</td>
