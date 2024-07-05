@@ -1,8 +1,15 @@
 // Copyright DB InfraGO AG and contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { FlaskConical, TriangleAlert, Book, FileStack, FileText, ShieldCheck } from "lucide-react";
-import { Badge } from "./Badge";
+import {
+  FlaskConical,
+  TriangleAlert,
+  Book,
+  FileStack,
+  FileText,
+  ShieldCheck
+} from 'lucide-react';
+import { Badge } from './Badge';
 
 /**
  * TemplateCard shall introduce the template to the user and provide some basic insights:
@@ -17,11 +24,11 @@ export const TemplateCard = ({
   description,
   idx,
   onClickCallback,
-  isDocument=false,
-  isExperimental=false,
-  isStable=true,
-  instanceCount=0,
-  error=false
+  isDocument = false,
+  isExperimental = false,
+  isStable = true,
+  instanceCount = 0,
+  error = false
 }) => (
   <div
     onClick={() => onClickCallback(idx)}
@@ -34,21 +41,50 @@ export const TemplateCard = ({
       <div className="flex flex-row justify-between">
         <h5
           className={
-            'mb-2 text-2xl font-normal text-left text-gray-900 dark:text-gray-100'
-          } style={{	overflowWrap: "break-word" }} >
+            'mb-2 text-left text-2xl font-normal text-gray-900 dark:text-gray-100'
+          }
+          style={{ overflowWrap: 'break-word' }}>
           {name}
         </h5>
-        {instanceCount === 1 && <span className="ml-0.5"><FileText size={16} style={{display: "inline-block"}}/></span> }
-        {instanceCount > 1 && <span className="ml-0.5"><FileStack size={16} style={{display: "inline-block"}}/> {instanceCount}</span>}
+        {instanceCount === 1 && (
+          <span className="ml-4 text-gray-900 dark:text-gray-100">
+            <FileText size={16} style={{ display: 'inline-block' }} />
+          </span>
+        )}
+        {instanceCount > 1 && (
+          <span className="ml-4 text-gray-900 dark:text-gray-100">
+            <FileStack size={16} style={{ display: 'inline-block' }} />{' '}
+            {instanceCount}
+          </span>
+        )}
       </div>
-      <p className="mb-3 font-normal text-gray-700 dark:text-gray-300 text-left">
+      <p className="mb-3 text-left font-normal text-gray-700 dark:text-gray-300">
         {description}
       </p>
-      <div className={"text-left"}>
-      {error && <Badge color={"danger"}><TriangleAlert  size={16} style={{display: "inline-block"}}/> {error}</Badge>}
-      {isStable && <Badge color={"success"}><ShieldCheck  size={16} style={{display: "inline-block"}}/> Stable</Badge>}
-      {isExperimental && <Badge color={"warning"}><FlaskConical  size={16} style={{display: "inline-block"}}/> Experimental</Badge>}
-      {isDocument && <Badge><Book size={16} style={{display: "inline-block"}}/> Document</Badge>}
+      <div className={'text-left'}>
+        {error && (
+          <Badge color={'danger'}>
+            <TriangleAlert size={16} style={{ display: 'inline-block' }} />{' '}
+            {error}
+          </Badge>
+        )}
+        {isStable && (
+          <Badge color={'success'}>
+            <ShieldCheck size={16} style={{ display: 'inline-block' }} />{' '}
+            Stable
+          </Badge>
+        )}
+        {isExperimental && (
+          <Badge color={'warning'}>
+            <FlaskConical size={16} style={{ display: 'inline-block' }} />{' '}
+            Experimental
+          </Badge>
+        )}
+        {isDocument && (
+          <Badge>
+            <Book size={16} style={{ display: 'inline-block' }} /> Document
+          </Badge>
+        )}
       </div>
     </div>
   </div>
