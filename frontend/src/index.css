@@ -72,7 +72,12 @@ h1 {
   text-align: left;
 }
 
-.html-content h1, .html-content h2, .html-content h3, .html-content h4, .html-content h5, .html-content h6 {
+.html-content h1,
+.html-content h2,
+.html-content h3,
+.html-content h4,
+.html-content h5,
+.html-content h6 {
   word-break: break-word;
 }
 
@@ -101,14 +106,16 @@ h1 {
   border-bottom: 1px solid #ddd;
 }
 .html-content table tr:last-of-type {
-  border-bottom: none
+  border-bottom: none;
 }
-.html-content table tr td, .html-content table tr th {
+.html-content table tr td,
+.html-content table tr th {
   vertical-align: top;
   padding: 0 0.4em;
   word-break: break-word;
 }
-.html-content table tr td:first-of-type, .html-content table tr th:first-of-type {
+.html-content table tr td:first-of-type,
+.html-content table tr th:first-of-type {
   vertical-align: top;
   padding: 0 0.4em;
   word-break: normal;
@@ -125,7 +132,6 @@ h1 {
 .html-content table tr td ul {
   padding-bottom: 0.6em;
 }
-
 
 .html-content p {
   margin-top: 0.75em;

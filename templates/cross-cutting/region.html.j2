@@ -11,7 +11,7 @@
             <img src="{{ icon | safe }}" height="15" width="15" style="display:inline-block"/>
         {% endif %}
         {{ obj.name }}
-    </a> 
+    </a>
 {% endmacro %}
 
 {% macro render_name_with_icon_and_type(obj) %}
@@ -46,9 +46,9 @@ Upon completion of all entry activities of <i>{{ render_name_with_icon(tx.source
 {% endif %}
 
 {% if state.entry %}
-<p>On entry into the <b>{{ state.name }}</b> {{ state.__class__.__name__ }} the system shall perform the following activities: 
+<p>On entry into the <b>{{ state.name }}</b> {{ state.__class__.__name__ }} the system shall perform the following activities:
 {% for fnc in state.entry %}
-{{ render_name_with_icon(fnc) | safe }}; 
+{{ render_name_with_icon(fnc) | safe }};
 {% endfor %}</p>
 {% endif %}
 
@@ -93,9 +93,9 @@ Upon completion of all entry activities of <i>{{ render_name_with_icon(tx.source
 
 
 {% if state.exit %}
-<p>On exit from the <b>{{ state.name }}</b> {{ state.__class__.__name__ }} the system shall perform the following activities: 
+<p>On exit from the <b>{{ state.name }}</b> {{ state.__class__.__name__ }} the system shall perform the following activities:
 {% for fnc in state.exit %}
-{{ render_name_with_icon(fnc) | safe }}; 
+{{ render_name_with_icon(fnc) | safe }};
 {% endfor %}</p>
 {% endif %}
 

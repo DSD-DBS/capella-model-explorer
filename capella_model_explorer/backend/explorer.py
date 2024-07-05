@@ -3,7 +3,6 @@
 
 import dataclasses
 import logging
-import operator
 import os
 import pathlib
 import time
@@ -15,7 +14,7 @@ import capellambse
 import fastapi
 import markupsafe
 import prometheus_client
-import yaml
+import yaml  # type: ignore
 from fastapi import APIRouter, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
@@ -77,7 +76,9 @@ class CapellaModelExplorerBackend:
             "Time in minutes since the last user interaction",
         )
         self.last_interaction = time.time()
-        self.templates_index = self.templates_loader.index_path(self.templates_path)
+        self.templates_index = self.templates_loader.index_path(
+            self.templates_path
+        )
 
         @self.app.middleware("http")
         async def update_last_interaction_time(request: Request, call_next):
@@ -123,8 +124,11 @@ class CapellaModelExplorerBackend:
             | capellambse.model.diagram.AbstractDiagram
         ),
     ) -> str | None:
+        if self.templates_index is None:
+            return None
+
         for idx, template in self.templates_index.flat.items():
-            if "type" in template.scope.__dir__():
+            if "type" in dir(template.scope):
                 clsname = template.scope.type
                 if obj.__class__.__name__ == clsname:
                     return f"{ROUTE_PREFIX}/{idx}/{obj.uuid}"
@@ -175,8 +179,9 @@ class CapellaModelExplorerBackend:
 
         @self.router.get("/api/views")
         def read_templates():
-            self.templates_loader.templates = None
-            self.templates_index = self.templates_loader.index_path(self.templates_path)
+            self.templates_index = self.templates_loader.index_path(
+                self.templates_path
+            )
             return self.templates_index.as_dict
 
         @self.router.get("/api/objects/{uuid}")
@@ -192,8 +197,16 @@ class CapellaModelExplorerBackend:
         @self.router.get("/api/views/{template_name}")
         def read_template(template_name: str):
             template_name = urlparse.unquote(template_name)
-            if not template_name in self.templates_index.flat:
-                return {"error": f"Template {template_name} not found"}
+            if (
+                self.templates_index is None
+                or not template_name in self.templates_index.flat
+            ):
+                return {
+                    "error": (
+                        f"Template {template_name} not found or"
+                        + " templates index not initialized"
+                    )
+                }
             base = self.templates_index.flat[template_name]
             base.compute_instance_list(self.model)
             return base
@@ -204,7 +217,10 @@ class CapellaModelExplorerBackend:
             object = None
             try:
                 template_name = urlparse.unquote(template_name)
-                if not template_name in self.templates_index.flat:
+                if (
+                    self.templates_index is None
+                    or not template_name in self.templates_index.flat
+                ):
                     return {"error": f"Template {template_name} not found"}
                 base = self.templates_index.flat[template_name]
                 template_filename = base.template

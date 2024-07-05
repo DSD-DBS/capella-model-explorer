@@ -7,12 +7,11 @@ from pathlib import Path
 import capellambse
 import pytest
 
-from capella_model_explorer.backend import explorer
 from capella_model_explorer.backend.templates import (
-    find_objects,
     Template,
     TemplateCategory,
     TemplateLoader,
+    find_objects,
 )
 
 TEST_SYSTEM_COMPONENT_UUIDS = {
