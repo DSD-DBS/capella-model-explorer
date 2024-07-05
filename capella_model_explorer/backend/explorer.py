@@ -130,7 +130,7 @@ class CapellaModelExplorerBackend:
         for idx, template in self.templates_index.flat.items():
             if "type" in dir(template.scope):
                 clsname = template.scope.type
-                if obj.__class__.__name__ == clsname:
+                if obj.xtype.rsplit(":", 1)[-1] == clsname:
                     return f"{ROUTE_PREFIX}/{idx}/{obj.uuid}"
         return f"{ROUTE_PREFIX}/__generic__/{obj.uuid}"
 

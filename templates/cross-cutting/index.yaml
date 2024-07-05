@@ -16,7 +16,7 @@ categories:
       idx: diagram
       description: Provides access to all human-made diagrams inside the model
       scope:
-        type: Diagram
+        type: DRepresentationDescriptor
         attr: diagrams
 
     - template: cross-cutting/exchange-item.html.j2
