@@ -3,7 +3,7 @@
     SPDX-License-Identifier: Apache-2.0
 #}
 
-{% from 'common_macros.html.j2' import show_other_attributes, description, render_reqs_by_type, typed_name, linked_name %}
+{% from 'common_macros.html.j2' import show_other_attributes, description, render_reqs_by_type, typed_name, linked_name, linked_name_with_icon %}
 
 {% if object.name %}
 <h1>
@@ -12,7 +12,8 @@
     {%- elif object.is_actor and object.is_human -%}
     Human actor&nbsp;
     {%- endif -%}
-    <b>{{ object.name }}</b></h1>
+    <b>{{ object.name }}</b>
+</h1>
 {% else %}
 <h1>Unnamed ({{ object.__class__.__name__ }})</small></h1>
 {% endif %}
@@ -27,21 +28,21 @@
 {% if involving_caps %}
 <p><b>{{ object.name }}</b> is involved in the following system capabilities:&nbsp;
     {%- for cap in involving_caps -%}
-    {{ linked_name(cap) | safe }}{% if not loop.last %}, {% endif %}
+    {{ linked_name_with_icon(cap) | safe }}{% if not loop.last %}, {% endif %}
     {%- endfor -%}
 </p>
 {% endif %}
 
 <h2>Context</h2>
 <p>The context of {{ object.name }} is summarized by the diagram below:</p>
-{{ object.context_diagram.as_svg | safe }}
+{{ object.context_diagram.render("svg", display_derived_interfaces=True) | safe }}
 
 <h2>Functions</h2>
 {% if object.allocated_functions %}
 <p>The {{ object.name }} is responsible for the following functions:</p>
 <ul>
     {%- for func in object.allocated_functions -%}
-    <li>{{ linked_name(func) | safe }}</li>
+    <li>{{ linked_name_with_icon(func) | safe }}</li>
     {%- endfor -%}
 </ul>
 {% else %}
@@ -54,7 +55,7 @@
 <ul>
     {%- for ex in object.related_exchanges -%}
     {%- set partner = ex.source.owner if ex.source.owner != object else ex.target.owner -%}
-    <li>{{ linked_name(ex) | safe }} with {{ linked_name(partner) | safe }}</li>
+    <li>{{ linked_name_with_icon(ex) | safe }} with {{ linked_name_with_icon(partner) | safe }}</li>
     {%- endfor -%}
 </ul>
 {% else %}

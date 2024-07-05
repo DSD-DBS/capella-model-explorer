@@ -1,0 +1,12 @@
+{#
+    Copyright DB InfraGO AG and contributors
+    SPDX-License-Identifier: Apache-2.0
+#}
+{% from 'common_macros.html.j2' import show_other_attributes %}
+{% from 'functional.html.j2' import describe_function %}
+
+{{ describe_function(object) | safe }}
+
+<h2>Other properties of "{{ object.name }}"</h2>
+{% set excluded = ["context_diagram", "description", "name", "owner", "xtype", "inputs", "outputs", "parent", "related_exchanges", "validate", "applied_property_value_groups", "available_in_states", "property_value_groups", "realization_view"] %}
+{{ show_other_attributes(object, excluded) | safe}}

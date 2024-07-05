@@ -72,6 +72,15 @@ h1 {
   text-align: left;
 }
 
+.html-content h1,
+.html-content h2,
+.html-content h3,
+.html-content h4,
+.html-content h5,
+.html-content h6 {
+  word-break: break-word;
+}
+
 .html-content svg {
   display: block;
   @apply h-auto max-w-full;
@@ -91,8 +100,39 @@ h1 {
 }
 
 .html-content table {
-  @apply min-w-full divide-y divide-gray-200;
+  @apply min-w-full divide-y divide-gray-400;
 }
+.html-content table tr {
+  border-bottom: 1px solid #ddd;
+}
+.html-content table tr:last-of-type {
+  border-bottom: none;
+}
+.html-content table tr td,
+.html-content table tr th {
+  vertical-align: top;
+  padding: 0 0.4em;
+  word-break: break-word;
+}
+.html-content table tr td:first-of-type,
+.html-content table tr th:first-of-type {
+  vertical-align: top;
+  padding: 0 0.4em;
+  word-break: normal;
+}
+.html-content table tr td p {
+  padding-top: 0;
+  margin-top: 0;
+}
+
+.html-content table tr td p:last-of-type {
+  margin-bottom: 0.2em;
+}
+
+.html-content table tr td ul {
+  padding-bottom: 0.6em;
+}
+
 .html-content p {
   margin-top: 0.75em;
   margin-bottom: 0.75em;

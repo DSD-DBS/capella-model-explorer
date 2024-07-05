@@ -42,7 +42,7 @@ export const ViewsList = ({ templates, cardClickCallback }) => {
                 {templates[cat].map((template) => (
                   <TemplateCard
                     key={template.idx}
-                    template={template}
+                    {...template}
                     onClickCallback={cardClickCallback}
                   />
                 ))}

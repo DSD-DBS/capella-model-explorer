@@ -1,0 +1,123 @@
+{#
+    Copyright DB InfraGO AG and contributors
+    SPDX-License-Identifier: Apache-2.0
+#}
+{% from 'common_macros.html.j2' import show_other_attributes, description %}
+
+{% macro render_name_with_icon(obj) %}
+    <a href="hlink://{{obj.uuid}}">
+        {% set icon = obj._get_icon("datauri_svg", size=15) %}
+        {% if icon %}
+            <img src="{{ icon | safe }}" height="15" width="15" style="display:inline-block"/>
+        {% endif %}
+        {{ obj.name }}
+    </a>
+{% endmacro %}
+
+{% macro render_name_with_icon_and_type(obj) %}
+    {{ render_name_with_icon(obj) | safe}}
+    {{ obj.__class__.__name__ }}
+{% endmacro %}
+
+<h1><b>{{ object.name }}</b> <span style="font-weight:normal">{{ object.__class__.__name__}}</span></h1>
+
+<p>A region of {{ render_name_with_icon_and_type(object.parent) | safe }}</p>
+
+
+
+{% macro describe_transition(tx) %}
+{% if tx.guard %}
+While in <i>{{ render_name_with_icon_and_type(tx.source) | safe }}</i>, if {{ tx.guard.specification['capella:linkedText'] | safe }}, the System shall transition to <i>{{ render_name_with_icon_and_type(tx.destination) | safe }}</i>
+{% else %}
+Upon completion of all entry activities of <i>{{ render_name_with_icon(tx.source) | safe}}</i> the System shall transition to <i>{{ render_name_with_icon_and_type(tx.destination) | safe }}</i>
+{% endif %}
+{% endmacro %}
+
+{% for state in object.states %}
+<h2><span style="font-weight:normal">{{ state.__class__.__name__}}</span> {{ state.name }}</h2>
+
+{% if state.incoming_transitions %}
+<p>The system may transition to {{ state.__class__.__name__ }} <i>{{ state.name }}</i> in the following cases:<p>
+<ul>
+{% for tx in state.incoming_transitions %}
+<li>{{ describe_transition(tx) | safe }}</li>
+{% endfor %}
+</ul>
+{% endif %}
+
+{% if state.entry %}
+<p>On entry into the <b>{{ state.name }}</b> {{ state.__class__.__name__ }} the system shall perform the following activities:
+{% for fnc in state.entry %}
+{{ render_name_with_icon(fnc) | safe }};
+{% endfor %}</p>
+{% endif %}
+
+{% if state.do_activity %}
+<p>While in <b>{{ state.name }}</b> {{ state.__class__.__name__ }} the system may perform the following activities: </p>
+<ul>
+{% for fnc in state.do_activity %}
+<li>{{ render_name_with_icon(fnc) | safe }} </li>
+{% endfor %}</p>
+</ul>
+{% endif %}
+
+{% set substates = [] %}
+{% for region in state.regions %}
+{% for rstate in region.states %}
+{% set none_ = substates.append(rstate) %}
+{% endfor %}
+{% endfor %}
+
+{% if substates %}
+<p>While in <b>{{ state.name }}</b> {{ state.__class__.__name__ }} the system may be in one of the following sub-{{ state.__class__.__name__ | lower }}s</p>
+{% if state.regions | length > 1 %}
+<ul>
+{% for region in state.regions %}
+    <li>Substates of {{ render_name_with_icon(region) | safe }} region:
+    <ul>
+    {% for substate in region.states %}
+    <li>{{ render_name_with_icon(substate) | safe}}</li>
+    {% endfor%}
+    </ul>
+    </li>
+{% endfor%}
+</ul>
+{% else %}
+<ul>
+{% for substate in substates %}
+<li>{{ render_name_with_icon(substate) | safe}}</li>
+{% endfor %}
+</ul>
+{% endif %}
+{% endif %}
+
+
+{% if state.exit %}
+<p>On exit from the <b>{{ state.name }}</b> {{ state.__class__.__name__ }} the system shall perform the following activities:
+{% for fnc in state.exit %}
+{{ render_name_with_icon(fnc) | safe }};
+{% endfor %}</p>
+{% endif %}
+
+{% set transitions_from = object.transitions | selectattr("source", "equalto", state) | list %}
+{% if transitions_from %}
+<p>The system may transition from {{ state.__class__.__name__ }} <i>{{ state.name }}</i> in the following cases:<p>
+<ul>
+{% for tx in transitions_from %}
+<li>{{ describe_transition(tx) | safe }}</li>
+{% endfor %}
+</ul>
+{% endif %}
+
+{% endfor %}
+
+<h2>Related diagrams</h2>
+
+{% for diagram in object.diagrams %}
+    <h3>{{ diagram.name }}</h3>
+    {{ diagram.as_svg | safe }}
+{% endfor %}
+
+<h2>Other properties of "{{ object.name }}"</h2>
+{% set excluded = ["name", "xtype", "transitions", "states"] %}
+{{ show_other_attributes(object, excluded) | safe  }}

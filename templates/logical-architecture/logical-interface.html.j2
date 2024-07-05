@@ -1,0 +1,63 @@
+{#
+    Copyright DB InfraGO AG and contributors
+    SPDX-License-Identifier: Apache-2.0
+#}
+
+{% from 'common_macros.html.j2' import show_other_attributes, linked_name %}
+
+{% macro describe_exchange(object) %}
+{%- set source_function = object.source.owner -%}
+{%- set target_function = object.target.owner -%}
+{%- set source = source_function.owner -%}
+{%- set target = target_function.owner -%}
+The {{ linked_name(source) | safe }} shall provide {{ linked_name(object) | safe }} to {{ linked_name(target) | safe }} so that the {{ linked_name(target) | safe }} could {{ linked_name(target_function)|safe }}.
+{% endmacro %}
+
+{% macro describe_functional_chain(object) %}
+{% endmacro %}
+
+{% macro describe_interface(object) %}
+{% endmacro %}
+
+<h1>Logical Interface {{ object.name }}</h1>
+
+<h2>Document Purpose</h2>
+<p>This document specifies logical interface between {{ linked_name(object.source.owner) | safe}} and {{ linked_name(object.target.owner) | safe}}.</p>
+<p>Its purpose is to explain the need for interface and provide requirements so that the interface partners could find an appropriate interface definition (solution)</p>
+<h2>Enabled interactions</h2>
+<p>The figure below provides an overview of the behaviors that depend on this interface:</p>
+{{ object.context_diagram.as_svg | safe}}
+<p>This interface enables the following interactions:</p>
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Interaction description</th>
+    </thead>
+    <tbody>
+    {% for exchange in object.allocated_functional_exchanges %}
+        <tr>
+            <td><a href="{{ exchange | make_href }}">{{ "LEXC-" + exchange.uuid[:5] | upper }}</a></td>
+            <td>
+                {{ describe_exchange(exchange) | safe }}
+                {% if exchange.exchange_items %}
+                {% if exchange.exchange_items | length > 1 %}
+                <p>{{ exchange.name }} is further specified via the following Exchange Items:</p>
+                <ul>
+                    {% for item in exchange.exchange_items %}
+                    <li>{{ linked_name(item) | safe }}</li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p>This interaction is further specified via {{ linked_name(exchange.exchange_items[0]) | safe}} Exchange Item</p>
+                {% endif %}
+                {% endif %}
+            </td>
+        </tr>
+    {% endfor %}
+</table>
+
+
+<h2>Other attributes</h2>
+{% set excluded = ["allocated_functional_exchanges", "context_diagram", "parent", "name", "source", "target", "exchange_items"]%}
+{{show_other_attributes(object, excluded) | safe}}

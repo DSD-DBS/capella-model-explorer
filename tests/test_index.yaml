@@ -1,0 +1,27 @@
+# Copyright DB InfraGO AG and contributors
+# SPDX-License-Identifier: Apache-2.0
+
+categories:
+- idx: oa
+  templates:
+  - idx: operational-activity
+    name: Operational Activity
+    description: Specifies an operational activity.
+    template: operational-analysis/operational-activity.html.j2
+    scope:
+      type: OperationalActivity
+      below: oa
+  - idx: operational-capability
+    name: Operational Capability
+    description: Specifies an operational capability.
+    template: operational-analysis/operational-capability.html.j2
+    scope:
+      type: OperationalCapability
+      below: oa
+  - idx: operational-entity
+    name: Operational Entity
+    description: Specifies an operational entity.
+    template: operational-analysis/operational-entity.html.j2
+    scope:
+      type: Entity
+      below: oa

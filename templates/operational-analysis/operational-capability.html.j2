@@ -2,7 +2,7 @@
     Copyright DB InfraGO AG and contributors
     SPDX-License-Identifier: Apache-2.0
 #}
-{% from 'common_macros.html.j2' import show_other_attributes, description, render_reqs_by_type, linked_name, display_traceability %}
+{% from 'common_macros.html.j2' import show_other_attributes, description, render_reqs_by_type, linked_name, linked_name_with_icon, display_traceability %}
 
 <h1>{{ object.name }}</h1>
 {{ description(object) | safe }}
@@ -34,9 +34,9 @@ To enable the Capability, the following entities and activities are involved:
 {%- for entity in entities | unique -%}
     {%- set activities = object.involved_activities | selectattr("owner", "equalto", entity) | list -%}
     {%- if activities -%}
-        <li>{{ linked_name(entity) | safe }} may need to:&nbsp;
+        <li>{{ linked_name_with_icon(entity) | safe }} may need to:&nbsp;
         {%- for activity in activities -%}
-        {{ linked_name(activity) | safe }};&nbsp;
+        {{ linked_name_with_icon(activity) | safe }};&nbsp;
         {%- endfor -%}
         </li>
     {%- else -%}
@@ -47,7 +47,7 @@ To enable the Capability, the following entities and activities are involved:
 {%- if activities_with_no_owner -%}
     <li>There are involved activities that are not yet assigned to an entity:&nbsp;
     {%- for activity in activities_with_no_owner -%}
-    {{ linked_name(activity) | safe }};&nbsp;
+    {{ linked_name_with_icon(activity) | safe }};&nbsp;
     {%- endfor -%}
     </li>
 {%- endif -%}
