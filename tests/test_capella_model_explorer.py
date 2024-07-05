@@ -9,6 +9,7 @@ import pytest
 
 from capella_model_explorer.backend import explorer
 from capella_model_explorer.backend.templates import (
+    find_objects,
     Template,
     TemplateCategory,
     TemplateLoader,
@@ -50,7 +51,7 @@ def test_category_loading():
 def test_index_templates():
     model = capellambse.loadcli("coffee-machine")
 
-    templates = TemplateLoader(model).index_path(Path("."))
+    templates = TemplateLoader(model).index_path(Path("tests"))
 
     assert len(templates.flat) == 3
     assert len(templates) == 1
@@ -80,6 +81,6 @@ def test_index_templates():
 def test_find_objects(params: dict[str, t.Any], expected_uuids: list[str]):
     model = capellambse.loadcli("coffee-machine")
 
-    objects = explorer.find_objects(model, **params)
+    objects = find_objects(model, **params)
 
     assert {obj.uuid for obj in objects} == expected_uuids
