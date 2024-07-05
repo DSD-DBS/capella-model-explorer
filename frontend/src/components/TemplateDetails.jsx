@@ -112,6 +112,7 @@ export const TemplateDetails = ({ endpoint, onSingleInstance }) => {
                     .toLowerCase()
                     .includes(filterText.toLowerCase())
                 )
+                .sort((a, b) => a.name.localeCompare(b.name))
                 .map((object) => (
                   <div
                     key={object.idx}
