@@ -52,6 +52,12 @@ repos:
       - id: mypy
         additional_dependencies:
           - types-pyyaml==6.0.11
+  - repo: https://github.com/pylint-dev/pylint
+    rev: v3.1.0
+    hooks:
+      - id: pylint
+        require_serial: false
+        args: [-rn, -sn, -dfixme, -dduplicate-code]
   - repo: https://github.com/Lucas-C/pre-commit-hooks
     rev: v1.5.4
     hooks:

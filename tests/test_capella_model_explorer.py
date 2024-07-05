@@ -29,7 +29,7 @@ def test_template_loading():
         "description": "This is a test template",
         "scope": {"type": "System", "below": "System"},
     }
-    template = Template(**template_raw)
+    Template(**template_raw)
 
 
 def test_category_loading():
@@ -44,7 +44,7 @@ def test_category_loading():
         "idx": "test",
         "templates": [template_raw],
     }
-    category = TemplateCategory(**category_raw)
+    TemplateCategory(**category_raw)
 
 
 def test_index_templates():

@@ -4,7 +4,7 @@
 import operator
 import traceback
 from pathlib import Path
-from typing import Any, Dict, List, Optional, TypedDict
+from typing import Any, Dict, List, Optional
 
 import capellambse
 import yaml
