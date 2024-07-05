@@ -4,10 +4,10 @@
 import operator
 import traceback
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, TypedDict
 
 import capellambse
-import yaml  # type: ignore
+import yaml
 from pydantic import BaseModel, Field
 
 
@@ -74,7 +74,9 @@ class Template(BaseModel):
     template: Path = Field(..., title="Template File Path")
     description: str = Field(..., title="Template Description")
 
-    scope: Optional[TemplateScope] = Field({}, title="Template Scope")
+    scope: Optional[TemplateScope] = Field(
+        default_factory=dict, title="Template Scope"
+    )
     single: Optional[bool] = Field(None, title="Single Instance Flag")
     isStable: Optional[bool] = Field(None, title="Stable Template Flag")
     isDocument: Optional[bool] = Field(None, title="Document Template Flag")
@@ -84,9 +86,7 @@ class Template(BaseModel):
     error: Optional[str] = Field(None, title="Broken Template Flag")
     traceback: Optional[str] = Field(None, title="Template Error Traceback")
     instanceCount: Optional[int] = Field(None, title="Number of Instances")
-    instanceList: Optional[List[InstanceDetails]] = Field(
-        None, title="List of Instances"
-    )
+    instanceList: Optional[List[Dict]] = Field(None, title="List of Instances")
 
     def find_instances(self, model: capellambse.MelodyModel):
         if self.single:
@@ -103,7 +103,6 @@ class Template(BaseModel):
                     filters=self.scope.filters,
                 )
             else:
-                self.error = "Template scope not defined"
                 return []
         except Exception as e:
             self.error = f"Template scope error: {e}"
@@ -115,14 +114,15 @@ class Template(BaseModel):
 
     def compute_instance_list(self, model: capellambse.MelodyModel):
         self.instanceList = [
-            InstanceDetails(**simple_object(obj))
-            for obj in self.find_instances(model)
+            simple_object(obj) for obj in self.find_instances(model)
         ]
 
 
 class TemplateCategory(BaseModel):
     idx: str = Field(..., title="Category Identifier")
-    templates: List[Template] = Field([], title="Templates in this category")
+    templates: List[Template] = Field(
+        default_factory=list, title="Templates in this category"
+    )
 
     def __add__(self, other):
         if not isinstance(other, TemplateCategory):
@@ -133,7 +133,9 @@ class TemplateCategory(BaseModel):
 
 
 class TemplateCategories(BaseModel):
-    categories: List[TemplateCategory] = Field([], title="Template Categories")
+    categories: List[TemplateCategory] = Field(
+        default_factory=list, title="Template Categories"
+    )
 
     def __getitem__(self, category_id: str):
         results = [cat for cat in self.categories if cat.idx == category_id]
@@ -179,10 +181,10 @@ class TemplateCategories(BaseModel):
 class TemplateLoader:
     def __init__(self, model: capellambse.MelodyModel) -> None:
         self.model = model
-        self.templates = TemplateCategories(categories=[])
+        self.templates = TemplateCategories()
 
     def index_path(self, path: Path) -> TemplateCategories:
-        self.templates = TemplateCategories(categories=[])  # reset templates
+        self.templates = TemplateCategories()  # reset templates
         for template_file in path.glob("**/*.yaml"):
             templates_data = yaml.safe_load(
                 template_file.read_text(encoding="utf8")

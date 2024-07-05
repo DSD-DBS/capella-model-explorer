@@ -35,9 +35,6 @@ categories:
     single: true
     isExperimental: true
     isDocument: true
-    scope:
-      type: SystemComponent
-      below: sa
   - template: system-analysis/system-interface.html.j2
     idx: system-interfaces
     name: System Interfaces

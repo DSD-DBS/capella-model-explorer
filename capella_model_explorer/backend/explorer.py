@@ -14,7 +14,7 @@ import capellambse
 import fastapi
 import markupsafe
 import prometheus_client
-import yaml  # type: ignore
+import yaml
 from fastapi import APIRouter, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
