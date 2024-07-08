@@ -94,14 +94,23 @@
     {% endif %}
 {% endmacro %}
 
-{% macro req_rels(rels) %}
+{% macro req_rels(rels, scope=None) %}
 {% if rels %}
 <ul>
 {% for rel in rels %}
-    <li>
-        <a href="{{ rel.type | make_href }}">{{rel.type.long_name }}</a>
-        {{ linked_name_with_icon(rel.target) | safe}}
-    </li>
+    {% if scope %}
+        {% if rel.target == scope or rel.source == scope %}
+        <li>
+            <a href="{{ rel.type | make_href }}">{{rel.type.long_name }}</a>
+            {{ linked_name_with_icon(rel.target) | safe}}
+        </li>
+        {% endif %}
+    {% else %}
+        <li>
+            <a href="{{ rel.type | make_href }}">{{rel.type.long_name }}</a>
+            {{ linked_name_with_icon(rel.target) | safe}}
+        </li>
+    {% endif %}
 {% endfor %}
 </ul>
 {% else %}
@@ -109,7 +118,7 @@
 {% endif%}
 {% endmacro %}
 
-{% macro render_requirements_table(reqs) %}
+{% macro render_requirements_table(reqs, scope=None) %}
     <table>
     {% for req in reqs %}
         <tr>
@@ -120,7 +129,7 @@
             </td>
             <td>
                 {{ req.text if req.text else req.long_name }}
-                {{req_rels(req.relations) | safe}}
+                {{req_rels(req.relations, scope=scope) | safe}}
                 {{show_other_attributes(req, excluded=["related", "relations", "requirements", "text", "owner", "validate", "xtype"], hide_rules_check=True, hide_unset_attrs=True) | safe}}
             </td>
         </div>

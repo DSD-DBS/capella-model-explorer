@@ -21,6 +21,8 @@
 <p style="color:red">No post-condition defined</p>
 {% endif %}
 
+{% if object.extended_by %}
+
 <h2>Context Diagram</h2>
 <p>The diagram below provides an overview over the entities immediately involved in the Capability and related Capabilities.</p>
 
@@ -34,10 +36,13 @@ To enable the Capability, the following entities and activities are involved:
 {%- for entity in entities | unique -%}
     {%- set activities = object.involved_activities | selectattr("owner", "equalto", entity) | list -%}
     {%- if activities -%}
-        <li>{{ linked_name_with_icon(entity) | safe }} may need to:&nbsp;
-        {%- for activity in activities -%}
-        {{ linked_name_with_icon(activity) | safe }};&nbsp;
-        {%- endfor -%}
+        <li>
+            {{ linked_name_with_icon(entity) | safe }} may need to:
+            <ul>
+            {%- for activity in activities -%}
+                <li>{{ linked_name_with_icon(activity) | safe }}</li>
+            {%- endfor -%}
+            </ul>
         </li>
     {%- else -%}
         <li>Involvement of {{ linked_name(entity) | safe }} is expected but specific activities are not yet identified</li>

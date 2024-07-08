@@ -106,13 +106,15 @@
         {%- if not diagram in diagrams -%}{%- set _none = diagrams.append(diagram) -%}{%- endif -%}
     {%- elif node.__class__.__name__ == "FunctionalChainInvolvementFunction" and node.involved == object -%}
         {%- if not diagram in diagrams -%}{%- set _none = diagrams.append(diagram) -%}{%- endif -%}
+    {%- elif node.__class__.__name__ == "StateFragment" and object == node.function -%}
+        {%- if not diagram in diagrams -%}{%- set _none = diagrams.append(diagram) -%}{%- endif -%}
     {%- endif -%}
     {%- endfor -%}
 {%- endfor -%}
 
 {% if diagrams %}
-<h2>Other related diagrams</h2>
-<p>This activity is further detailed in the following diagrams:</p>
+<h2>Referencing diagrams</h2>
+<p>This activity appears in the following diagrams:</p>
 <ul>
 {% for diagram in diagrams %}
     <li>{{ linked_name_with_icon(diagram) | safe }}</li>
@@ -122,11 +124,11 @@
 
 {% if object.requirements %}
 <h2>Linked ReqIF objects</h2>
-{{ render_requirements_table(object.requirements) | safe }}
+{{ render_requirements_table(object.requirements, scope=object) | safe }}
 {% endif %}
 
 {{ display_traceability(object, show_upper=False) | safe }}
 
 <h2>Other properties of "{{ object.name }}"</h2>
-{% set excluded = ["name", "available_in_states", "related_exchanges", "inputs", "outputs", "context_diagram", "xtype", "parent", "owner", "owning_entity", "realization_view", "description"] %}
+{% set excluded = ["name", "available_in_states", "related_exchanges", "requirements", "realizing_system_functions", "inputs", "outputs", "context_diagram", "xtype", "parent", "owner", "owning_entity", "realization_view", "description"] %}
 {{ show_other_attributes(object, excluded) | safe  }}
