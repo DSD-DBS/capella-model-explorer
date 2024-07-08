@@ -21,6 +21,7 @@ categories:
     idx: operational-activity
     name: Operational Activity
     description: Specifies an operational activity.
+    isExperimental: true
     scope:
       type: OperationalActivity
       below: oa

@@ -3,22 +3,21 @@
     SPDX-License-Identifier: Apache-2.0
 #}
 
+{% from 'common_macros.html.j2' import show_other_attributes, description, linked_name_with_icon %}
+
+
 <h1>{{ object.name }}</h1>
 {{ object.as_svg | safe }}
 
 <h2>Description</h2>
-{% if object.description %}
-<p>{{ object.description }}</p>
-{% else %}
-<p style="color:red">No description available.</p>
-{% endif %}
+{{ description(object) | safe }}
 
 <h2>Referenced Objects</h2>
 {% if object.nodes %}
 <ul>
 {% for node in object.nodes %}
 {% if node.name %}
-<li><a href="{{ node | make_href }}">{{ node.name }}</a></li>
+<li>{{ linked_name_with_icon(node) | safe }}</li>
 {% endif %}
 {% endfor %}
 </ul>

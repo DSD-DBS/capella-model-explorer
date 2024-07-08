@@ -177,7 +177,7 @@
     {% endif %}
 {% endmacro %}
 
-{%- macro display_traceability(object, complain=False) -%}
+{%- macro display_traceability(object, show_upper=True) -%}
     {%- set realized_attrs = [] -%}
     {%- set realizing_attrs = [] -%}
     {%- for attr in object.__dir__() -%}
@@ -195,14 +195,16 @@
     <p>The figure below provides an overview of objects that "{{ object.name}}" realizes but also those that realize "{{ object.name }}"</p>
     {{ object.realization_view.as_svg | safe }}
     {% endif %}
-    {% if realized_objects %}
-    <p>{{ object.name }} realizes the following objects:<p>
-    <ul>
-    {%- for obj in realized_objects -%}<li style="display: block;">{{ linked_name_with_icon(obj) | safe}}</li>{%- endfor -%}
-    </ul>
-    {%- else -%}
-        <p style="color: red;">{{ first_upper(object.name) }} doesn't seem to realize any object</p>
-    {%- endif -%}
+    {% if show_upper %}
+        {% if realized_objects %}
+        <p>{{ object.name }} realizes the following objects:<p>
+        <ul>
+        {%- for obj in realized_objects -%}<li style="display: block;">{{ linked_name_with_icon(obj) | safe}}</li>{%- endfor -%}
+        </ul>
+        {%- else -%}
+            <p style="color: red;">{{ first_upper(object.name) }} doesn't seem to realize any object</p>
+        {%- endif -%}
+    {% endif %}
     {% if realizing_objects %}
     <p>{{ object.name }} is realized by the following objects:</p>
     <ul>
