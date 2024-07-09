@@ -22,7 +22,7 @@
 {% endif %}
 
 {% if object.extends %}
-    <p>The {{ object.name }} is extends the following operational capabilities:</p>
+    <p>The capability {{ object.name }} extends the following operational capabilities:</p>
     <ul>
     {%- for ext in object.extends -%}
         <li>{{ linked_name_with_icon(ext.target) | safe }}</li>
@@ -31,7 +31,7 @@
 {% endif %}
 
 {% if object.extended_by %}
-    <p>The {{ object.name }} is further extended by the following operational capabilities:</p>
+    <p>The capability {{ object.name }} is further extended by the following operational capabilities:</p>
     <ul>
     {%- for ext in object.extended_by -%}
         <li>{{ linked_name_with_icon(ext.source) | safe }}</li>
