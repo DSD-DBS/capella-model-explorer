@@ -33,3 +33,5 @@ categories:
       isExperimental: true
       scope:
         type: Region
+        filters:
+          states: not_empty
