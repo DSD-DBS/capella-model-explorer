@@ -50,7 +50,7 @@
 <p>The functional interactions between interface partners via {{ object.name }} are summarized by the diagram below:</p>
 {{ object.context_diagram.as_svg | safe }}
 
-{{ display_traceability(object, complain=False) | safe }}
+{{ display_traceability(object) | safe }}
 
 <h2>Other object attributes</h2>
 
