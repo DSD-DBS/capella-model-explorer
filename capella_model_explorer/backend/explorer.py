@@ -9,6 +9,7 @@ import time
 import typing as t
 import urllib.parse as urlparse
 from pathlib import Path
+import traceback
 
 import capellambse
 import fastapi
@@ -148,19 +149,16 @@ class CapellaModelExplorerBackend:
             print(base)
             return HTMLResponse(content=error_message)
         except Exception as e:
+            LOGGER.exception("Error rendering template")
+            trace = markupsafe.escape(traceback.format_exc())
             error_message = markupsafe.Markup(
                 '<p style="color:red">'
-                "Unexpected error: {etype}: {emsg}"
+                f"Unexpected error: {type(e).__name__}: {str(e)}"
                 '</p><pre style="font-size:80%;overflow:scroll">'
-                "object={obj}\nmodel={model}"
+                f"object={repr(object)}\nmodel={repr(self.model)}"
+                f"\n\n{trace}"
                 "</pre>"
-            ).format(
-                etype=type(e).__name__,
-                emsg=str(e),
-                obj=repr(object),
-                model=repr(self.model),
             )
-            # error = error_message
             return HTMLResponse(content=error_message)
 
     def configure_routes(self):
