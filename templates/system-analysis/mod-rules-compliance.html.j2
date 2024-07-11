@@ -1,5 +1,14 @@
-{%- set results = model.validation.validate() -%}
-{% set CATEGORIES = ["REQUIRED", "RECOMMENDED", "SUGGESTED"] -%}
+{#
+    Copyright DB InfraGO AG and contributors
+    SPDX-License-Identifier: Apache-2.0
+
+    ?? validate layer only
+    ?? filter val resultsby layer
+#}
+
+{% from 'common_macros.html.j2' import linked_name_with_icon %}
+{%- set results = model.sa.validation.validate() -%}
+{% set CATEGORIES = ["REQUIRED", "RECOMMENDED"] -%}
 {% set object_types = [
   "Capability",
   "SystemActor",
@@ -32,113 +41,15 @@
   {% endif -%}
 {% endmacro -%}
 
-
-<style type="text/css">
-  .small { font-size: 60%; }
-  .rule-required { color: #ff4f26; }
-  .rule-recommended { color: #039c08; }
-  .rule-suggested { color: #17a3d4; }
-
-/* General styles */
-html, body {
-  font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
-  font-size: 16px;
-  line-height: 1.5;
-  color: #333;
-}
-
-body { margin: 1em; }
-
-/* Hyperlink styles */
-a {
-  color: #0066cc;
-  text-decoration: none;
-  transition: color 0.3s ease;
-}
-
-a:hover {
-  color: #004799;
-  text-decoration: underline;
-}
-
-/* Table styles */
-table {
-  table-layout: fixed; /* This ensures that the table cells have fixed widths */
-  width: 100%; /* Ensures the table takes up the full width of its container */
-  border-collapse: separate;
-  border-spacing: 0;
-  margin-bottom: 1rem;
-  border: 1px solid #ccc;
-}
-
-th, td {
-  padding: 0.75rem;
-  text-align: left;
-  position: relative;
-  border-top: 1px solid #ccc;
-  border-bottom: 1px solid #ccc;
-  min-width: 100px; /* You can adjust the minimum width to fit your needs */
-  word-wrap: break-word; /* Breaks long words if they exceed the cell width */
-  overflow-wrap: break-word; /* A more modern alternative to word-wrap */
-}
-
-thead th {
-  background-color: #f2f2f2;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  font-weight: bold;
-  text-transform: uppercase;
-}
-
-tbody th {
-  background-color: #f2f2f2;
-  position: sticky;
-  left: 0;
-  z-index: 5;
-  border-right: 1px solid #ccc;
-}
-
-td ul {
-  margin: 0;
-  padding-left: 1em;
-}
-
-tr:nth-child(even) { background-color: #f8f8f8; }
-
-.container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: stretch;
-}
-
-.container > table {
-  flex-basis: 50%;
-  max-width: 50%;
-  box-sizing: border-box;
-  padding-right: 10px;
-}
-
-.container > svg {
-  flex-basis: 50%;
-  max-width: 50%;
-  box-sizing: border-box;
-  padding-left: 10px;
-}
-</style>
-
-
-<title>System Analysis Layer: Modelling Rules Compliance Report</title>
 </head>
 <body>
-<h1>System Analysis Layer: Modeling Rules Compliance Report</h1>
+<h1>Modeling Rules Compliance Report for System Analysis Layer</h1>
 <p>
   The report provides an assessment of adherence to Modeling Rules and Best Practices by the contents of the System Analysis model layer.
 </p>
 
 <h2>Assessment Summary</h2>
-<p>We reviewed <strong>{{ model.validation.search(*object_types) | list | count }}</strong> model objects and found that overall compliance with the modelling rules is:</p>
+<p>We reviewed <strong>{{ model.sa.validation.search(*object_types) | list | count }}</strong> model objects and found that overall compliance with the modelling rules is:</p>
 
 {% for category in CATEGORIES -%}
   {% set category_results = results.by_category(category) -%}
@@ -174,7 +85,7 @@ tr:nth-child(even) { background-color: #f8f8f8; }
   </thead>
   <tbody>
     {% for obj_type in object_types %}<tr>
-      {% set total = model.validation.search(obj_type) | count %}
+      {% set total = model.sa.validation.search(obj_type) | count %}
       <th><a href="#{{ obj_type }}">{{ obj_type }}</a></th>
       <td>{{ total }}</td>
       {% for category in CATEGORIES %}<td>
@@ -184,88 +95,15 @@ tr:nth-child(even) { background-color: #f8f8f8; }
   </tbody>
 </table>
 
-<h2>Object Compliance Analysis</h2>
-<p>This section evaluates the selected objects' adherence to modeling rules. If an object needs additional work or has
-  potential for improvement, we provide actionable suggestions to enhance its compliance.</p>
 
-{% for obj_type in object_types %}
-<h3 id="{{ obj_type }}">{{ obj_type }}</h3>
-{% if not results.by_type(obj_type) -%}
-<p>No rules apply to {{ obj_type }} objects or no objects of interest found in the selected layer.</p>
-{% else -%}
-{% for obj in results.by_type(obj_type).by_passed(False).iter_objects() | sort(attribute="name") -%}
-  {% if loop.first -%}
-    <table>
-      <thead>
-        <tr>
-          <th width="250px">{{ obj_type }}</th>
-          <th width="220px">Rule Compliance (%)</th>
-          <th>Improvement Suggestions (Actions)</th>
-        </tr>
-      </thead>
-      <tbody>
-  {% endif -%}
-  {% set categories = results.by_object(obj).by_passed(False) | map(attribute="rule.category") | sort(attribute="value") | unique | list -%}
-  {% for category in categories -%}
-    {% set cat_results = results.by_object(obj).by_category(category) -%}
-    <tr>
-      {% if loop.first -%}
-        <th rowspan="{{ categories | count }}" id="{{ obj.uuid }}">{{ obj.name }}</th>
-      {% endif -%}
-      <td>
-        <b class="rule-{{ category | lower }}">{{ category }}</b>:
-        {{ show_compliance_score(cat_results, align="right") | safe }}
-      </td>
-      <td>
-        {% for rule in cat_results.by_passed(False).iter_rules() -%}
-          {% if loop.first %}<ul>{% endif -%}
-          <li><a href="#{{ rule.id }}">{{ rule.action }}</a></li>
-          {% if loop.last %}</ul>{% endif -%}
-        {% else -%}
-          <em>No action required</em>
-        {% endfor -%}
-      </td>
-    </tr>
-  {% endfor -%}
-  {% if loop.last -%}
-      </tbody>
-    </table>
-  {% endif -%}
-{% endfor -%}
 
-{% set categories_of_interest = [] -%}
-{% for category in CATEGORIES -%}
-  {% set objects_of_interest = [] -%}
-  {% for obj in objects if results.by_category(category).by_uuid(obj.uuid) and not results.by_category(category).by_value(False).by_uuid(obj.uuid) -%}
-    {% set _ = objects_of_interest.append(obj) -%}
-  {% endfor -%}
-  {% if objects_of_interest | count > 0 -%}
-    {% set _ = categories_of_interest.append([category, objects_of_interest]) -%}
-  {% endif -%}
-{% endfor -%}
-{% for category in CATEGORIES if results.by_type(obj_type).by_category(category) | count > 0 and results.by_type(obj_type).by_category(category).iter_compliant_objects() | list | count > 0 %}
-  {% if loop.first %}
-  <p>These objects fully comply with at least one rule category:</p>
-  {% endif %}
-  {% set results_of_interest = results.by_type(obj_type).by_category(category) -%}
-  {% set compliant_objects = results_of_interest.iter_compliant_objects() | sort(attribute="name") -%}
-  <p>
-    All <strong>{{ results_of_interest.iter_rules() | list | count }}</strong>
-    <strong class="rule-{{category|lower}}">{{category}}</strong> rules were met by the following {{ compliant_objects | count }} object(s):</b>
-    {{ compliant_objects | join("; ", attribute="name")}}
-  </p>
-{% endfor %}
-{% endif -%}
-{% endfor -%}
 
 <h2>Validation results by rule</h2>
 <table>
 <thead>
   <tr>
-    <th width="160px">Rule ID
+    <th width="160px">Rule
     <th>Definition
-    <th width="100px">Passed
-    <th>Failed
   <tbody>
     {% for rule in results.iter_rules() | sort(attribute="id") | sort(attribute="category.value") -%}
     {% set rule_results = results.by_rule(rule) -%}
@@ -273,24 +111,33 @@ tr:nth-child(even) { background-color: #f8f8f8; }
       <th id="{{rule.id}}">
         {{rule.id}}<br>
         <span class="rule-{{rule.category.name|lower}}">{{rule.category.name}}</span>
-        <p style="color:#999">Applies to: {{ rule.types | list | join(", ") }}</p>
+        {% set applicable_to = [] %}
+        {% for obj_type in object_types if obj_type in rule.types -%}
+          {% set _none = applicable_to.append(obj_type) %}
+        {%- endfor %}
+        <div>{{ show_compliance_score(rule_results) | safe }}</div>
+        <p style="color:#999">Applies to: {{ applicable_to | join(", ") }}</p>
       </th>
       <td>
         <strong>{{ rule.name }}</strong><br>
         {{ rule.rationale }}
-        <p><b>Recommended action:</b><br>{{ rule.action }}</p>
-      </td>
-      <td>{{ show_compliance_score(rule_results) | safe }}</td>
-      <td>
-        {% for result in rule_results | sort(attribute="object.name") if not result.passed -%}
-          {% if loop.first %}<ul>{%- endif -%}
-          <li><a href="#{{result.object.uuid}}">
-            {{result.object.name|e}} <span class="small">({{result.object.uuid}})</span>
-          </a></li>
-          {% if loop.last %}</ul>{% endif -%}
-        {% else -%}
-          All {{ rule_results.iter_objects() | list | count}} object(s) comply to this rule
-        {%- endfor %}
+        {% if not rule_results.by_passed(True) | length == rule_results | length %}
+            <p><b>Recommended action:</b><br>{{ rule.action }}</p>
+            {% set results = [] %}
+            {% for result in rule_results | sort(attribute="object.name") if not result.passed %}
+                {% set _none = results.append(result) %}
+            {% endfor %}
+            {% if results %}
+            <p style="margin-left: 20px">The following objects <b style="color: red;">failed to comply</b> with the modeling rule:</p>
+            <ul style="margin-left: 20px">
+            {%- for result in results -%}
+            <li>{{ linked_name_with_icon(result.object) | safe}}</li>
+            {%- endfor %}
+            </ul>
+            {% endif %}
+            {% else %}
+                <p>All {{ rule_results | length }} objects are <b style="color: green">compliant</b> to this modeling rule</p>
+            {% endif %}
       </td>
     </tr>
     {%- endfor %}
