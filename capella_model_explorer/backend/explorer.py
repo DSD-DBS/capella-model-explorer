@@ -49,6 +49,7 @@ class CapellaModelExplorerBackend:
 
     templates_path: Path
     model: capellambse.MelodyModel
+    model_diff: str
 
     templates_index: t.Optional[tl.TemplateCategories] = dataclasses.field(
         init=False
@@ -277,6 +278,10 @@ class CapellaModelExplorerBackend:
         @self.app.get(f"{ROUTE_PREFIX}/api/metadata")
         async def version():
             return {"version": self.app.version}
+
+        @self.app.get("/api/model-diff")
+        async def model_diff():
+            return self.model_diff
 
 
 def index_template(template, templates, templates_grouped, filename=None):

@@ -1,6 +1,9 @@
 // Copyright DB InfraGO AG and contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import React, { useState, useEffect } from 'react';
+import { API_BASE_URL } from '../APIConfig';
+
 import {
   FlaskConical,
   TriangleAlert,
@@ -29,63 +32,83 @@ export const TemplateCard = ({
   isStable = true,
   instanceCount = 0,
   error = false
-}) => (
-  <div
-    onClick={() => onClickCallback(idx)}
-    className={
-      'm-2 mt-6 max-w-sm cursor-pointer rounded-lg bg-gray-200 shadow-md ' +
-      'hover:bg-custom-light dark:bg-custom-dark-2 dark:shadow-dark ' +
-      'dark:hover:bg-custom-dark-4'
-    }>
-    <div className="p-5">
-      <div className="flex flex-row justify-between">
-        <h5
-          className={
-            'mb-2 text-left text-2xl font-normal text-gray-900 dark:text-gray-100'
-          }
-          style={{ overflowWrap: 'break-word' }}>
-          {name}
-        </h5>
-        {instanceCount === 1 && (
-          <span className="ml-4 text-gray-900 dark:text-gray-100">
-            <FileText size={16} style={{ display: 'inline-block' }} />
-          </span>
-        )}
-        {instanceCount > 1 && (
-          <span className="ml-4 text-gray-900 dark:text-gray-100">
-            <FileStack size={16} style={{ display: 'inline-block' }} />{' '}
-            {instanceCount}
-          </span>
-        )}
-      </div>
-      <p className="mb-3 text-left font-normal text-gray-700 dark:text-gray-300">
-        {description}
-      </p>
-      <div className={'text-left'}>
-        {error && (
-          <Badge color={'danger'}>
-            <TriangleAlert size={16} style={{ display: 'inline-block' }} />{' '}
-            {error}
-          </Badge>
-        )}
-        {isStable && (
-          <Badge color={'success'}>
-            <ShieldCheck size={16} style={{ display: 'inline-block' }} />{' '}
-            Stable
-          </Badge>
-        )}
-        {isExperimental && (
-          <Badge color={'warning'}>
-            <FlaskConical size={16} style={{ display: 'inline-block' }} />{' '}
-            Experimental
-          </Badge>
-        )}
-        {isDocument && (
-          <Badge>
-            <Book size={16} style={{ display: 'inline-block' }} /> Document
-          </Badge>
-        )}
+}) => {
+  const [modelDiff, setModelDiff] = useState(null);
+  const [errorTest, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchModelDiff = async () => {
+      try {
+        const response = await fetch(API_BASE_URL + '/model-diff');
+        const data = await response.json();
+        setModelDiff(data);
+      } catch (err) {
+        setError('Failed to fetch model info: ' + err.message);
+      }
+      document.body.style.height = 'auto';
+    };
+
+    fetchModelDiff();
+  }, []);
+
+  return (
+    <div
+      onClick={() => onClickCallback(idx)}
+      className={
+        'm-2 mt-6 max-w-sm cursor-pointer rounded-lg bg-gray-200 shadow-md ' +
+        'hover:bg-custom-light dark:bg-custom-dark-2 dark:shadow-dark ' +
+        'dark:hover:bg-custom-dark-4'
+      }>
+      <div className="p-5">
+        <div className="flex flex-row justify-between">
+          <h5
+            className={
+              'mb-2 text-left text-2xl font-normal text-gray-900 dark:text-gray-100'
+            }
+            style={{ overflowWrap: 'break-word' }}>
+            {name}
+          </h5>
+          {instanceCount === 1 && (
+            <span className="ml-4 text-gray-900 dark:text-gray-100">
+              <FileText size={16} style={{ display: 'inline-block' }} />
+            </span>
+          )}
+          {instanceCount > 1 && (
+            <span className="ml-4 text-gray-900 dark:text-gray-100">
+              <FileStack size={16} style={{ display: 'inline-block' }} />{' '}
+              {instanceCount}
+            </span>
+          )}
+        </div>
+        <p className="mb-3 text-left font-normal text-gray-700 dark:text-gray-300">
+          {description}
+        </p>
+        <div className={'text-left'}>
+          {error && (
+            <Badge color={'danger'}>
+              <TriangleAlert size={16} style={{ display: 'inline-block' }} />{' '}
+              {error}
+            </Badge>
+          )}
+          {isStable && (
+            <Badge color={'success'}>
+              <ShieldCheck size={16} style={{ display: 'inline-block' }} />{' '}
+              Stable
+            </Badge>
+          )}
+          {isExperimental && (
+            <Badge color={'warning'}>
+              <FlaskConical size={16} style={{ display: 'inline-block' }} />{' '}
+              Experimental
+            </Badge>
+          )}
+          {isDocument && (
+            <Badge>
+              <Book size={16} style={{ display: 'inline-block' }} /> Document
+            </Badge>
+          )}
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
