@@ -3,7 +3,7 @@
     SPDX-License-Identifier: Apache-2.0
 #}
 
-{% from 'common_macros.html.j2' import show_other_attributes %}
+{% from 'common_macros.html.j2' import show_other_attributes, linked_name_with_icon %}
 
 {% set object = model.sa.root_component%}
 <h1>System Definition</h1>
@@ -42,7 +42,7 @@
     <p>The system is expected to perform the following functions:</p>
     <ul>
         {% for fnc in object.allocated_functions %}
-            <li><a href="{{ fnc | make_href }}">{{ fnc.name }}</a></li>
+            <li><a href="{{ fnc | make_href }}">{{ linked_name_with_icon(fnc) | safe }}</a></li>
         {% endfor %}
     </ul>
 {% else %}
