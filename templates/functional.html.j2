@@ -49,7 +49,7 @@
             <tr>
             <td>FEX-{{ exchange.uuid[-5:] | upper}}</td>
             <td>
-                <p>While performing {{ linked_name_with_icon(exchange.source.owner) | safe }} activity {{ source_owner | safe }} may provide {{ linked_name_with_icon(exchange) | safe }} to {{ owner | safe }} so that {{ owner_name | safe }} could {{ object.name }}.</p>
+                <p>While performing {{ linked_name_with_icon(exchange.source.owner) | safe }} activity {{ source_owner | safe }} may provide {{ linked_name_with_icon(exchange) | safe }} to {{ owner | safe }} so that {{ owner_name | safe }} could {{ linked_name_with_icon(object) | safe }}.</p>
                 {{ list_related_exchange_items(exchange) | safe }}
             </td>
             </tr>
