@@ -13,11 +13,13 @@ export const TemplateDetails = ({ endpoint, onSingleInstance }) => {
   const [details, setDetails] = useState([]);
   const navigate = useNavigate();
   const [filterText, setFilterText] = useState('');
+  const createdItems = [];
+  const modifiedItems = [];
 
   useEffect(() => {
     const fetchModelDiff = async () => {
       try {
-        const response = await fetch(API_BASE_URL + '/model-diff');
+        const response = await fetch(API_BASE_URL + '/data');
         const data = await response.json();
         setModelDiff(data);
       } catch (err) {
@@ -29,29 +31,30 @@ export const TemplateDetails = ({ endpoint, onSingleInstance }) => {
     fetchModelDiff();
   }, []);
 
-  const modifiedItems = [
-    ...Object.values(modelDiff?.Diagrams?.Modified || []).map(
-      (item) => item.uuid
-    ),
-    ...Object.values(modelDiff?.Objects || {}).reduce((acc, object) => {
-      const modifiedNames = object.modified || [];
-      const uuid = modifiedNames.map((item) => item.uuid);
-      return acc.concat(uuid);
-    }, [])
-  ];
+  function processModelDiffItems(items) {
+    Object.entries(items).forEach(([layerKey, layer]) => {
+      if (layerKey === 'stats') return; // Skip 'stats' key
+      Object.values(layer).forEach((item) => {
+        ['created', 'modified'].forEach((action) => {
+          if (Array.isArray(item[action])) {
+            item[action].forEach((detail) => {
+              const targetList =
+                action === 'created' ? createdItems : modifiedItems;
+              targetList.push(detail['uuid']);
+            });
+          }
+        });
+      });
+    });
+  }
 
-  const createdItems = [
-    ...Object.values(modelDiff?.Diagrams?.Created || []).map(
-      (item) => item.uuid
-    ),
-    ...Object.values(modelDiff?.Objects || {}).reduce((acc, object) => {
-      const createdNames = object.created || [];
-      const uuid = createdNames.map((item) => item.uuid);
-      return acc.concat(uuid);
-    }, [])
-  ];
-
-  console.log(createdItems);
+  if (modelDiff) {
+    ['diagrams', 'objects'].forEach((key) => {
+      if (modelDiff[key]) {
+        processModelDiffItems(modelDiff[key]);
+      }
+    });
+  }
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -172,7 +175,7 @@ export const TemplateDetails = ({ endpoint, onSingleInstance }) => {
                         ? 'border-l-8 border-transparent border-l-green-500'
                         : modifiedItems.includes(object.idx)
                           ? 'border-l-8 border-transparent border-l-orange-500'
-                          : 'border-transparent'
+                          : 'border-l-8 border-transparent'
                     } dark:bg-dark-quaternary m-2 min-w-0 cursor-pointer rounded-lg
                     border-2 shadow-md hover:bg-custom-blue hover:text-white
                     dark:shadow-dark dark:hover:bg-blue-500`}>

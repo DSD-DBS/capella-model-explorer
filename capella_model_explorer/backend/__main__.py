@@ -24,11 +24,21 @@ PATH_TO_TEMPLATES = Path("./templates")
     required=False,
     default=PATH_TO_TEMPLATES,
 )
-def run(model: capellambse.MelodyModel, templates: Path):
-    diff = model_diff.model_diff()
+@click.option(
+    "--diff",
+    is_flag=True,
+    help="Run model diff before starting the server.",
+)
+def run(model: capellambse.MelodyModel, templates: Path, diff: bool):
+    data = {}
+
+    if diff:
+        data = model_diff.get_data(model)
+
     backend = explorer.CapellaModelExplorerBackend(
-        Path(templates), model, diff
+        Path(templates), model, data
     )
+
     uvicorn.run(backend.app, host=HOST, port=int(PORT))
 
 

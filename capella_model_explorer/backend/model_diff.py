@@ -1,118 +1,101 @@
 # Copyright DB InfraGO AG and contributors
 # SPDX-License-Identifier: Apache-2.0
 
-import argparse
+import copy
+import datetime
+import logging
 import subprocess
-from pathlib import Path
 
 import capellambse
-from capella_diff_tools import __main__ as capella_diff_tools
+from capella_diff_tools import __main__ as diff
+from capella_diff_tools import compare, report, types
+from capellambse.filehandler import git, local
+
+logger = logging.getLogger(__name__)
 
 
-def model_diff():
-    data: dict = {
-        "created": {},
-        "modified": {},
-        "deleted": {},
+def get_data(model: capellambse.MelodyModel):
+    file_handler = model.resources["\x00"]
+    path = str(file_handler.path)
+    model_data: dict = {
+        "metadata": {"model": {"path": path, "entrypoint": None}},
+        "diagrams": {
+            "created": {},
+            "modified": {},
+            "deleted": {},
+        },
+        "objects": {
+            "created": {},
+            "modified": {},
+            "deleted": {},
+        },
     }
-    parser = argparse.ArgumentParser()
-    parser.add_argument("file_path", type=Path)
-    p = parser.parse_args()
-    model_path = p.file_path
-    model_dict = {"path": capella_diff_tools._ensure_git(model_path)}
-    if model_dict["path"]:
-        print(f"The model at {model_path} is inside a Git repository.")
-        commit_hashes_result = subprocess.run(
-            ["git", "log", "--format=%H"],
-            cwd=model_path,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True,
-            check=True,
+
+    if isinstance(file_handler, git.GitFileHandler):
+        path = str(file_handler.cache_dir)
+    elif (
+        isinstance(file_handler, local.LocalFileHandler)
+        and file_handler.rootdir.joinpath(".git").is_dir()
+    ):
+        pass
+    else:
+        logger.warning("Cannot create a diff: Not a git repo")
+        return model_data
+
+    commit_hashes = (
+        subprocess.check_output(
+            ["git", "log", "-n", "7", "--format=%H"],
+            cwd=path,
+            encoding="utf-8",
         )
-        commit_hashes = commit_hashes_result.stdout.strip().split("\n")
-        if len(commit_hashes) > 1:
+        .strip()
+        .split("\n")
+    )
 
-            old_model = capellambse.MelodyModel(
-                **model_dict, revision=commit_hashes[7]
-            )
-            new_model = capellambse.MelodyModel(
-                **model_dict, revision=commit_hashes[0]
-            )
-            objects = capella_diff_tools.compare.compare_all_objects(
-                old_model, new_model
-            )
-            diagrams = capella_diff_tools.compare.compare_all_diagrams(
-                old_model, new_model
-            )
-            print(objects)
-            transform_object_dict(objects)
-            data = {
-                "Diagrams": transform_diagram_dict(diagrams),
-                "Objects": transform_object_dict(objects),
-            }
-            return data
-        else:
-            pass
+    if len(commit_hashes) > 1:
+        head = commit_hashes[0]
+        prev = commit_hashes[6]
+        old_model = capellambse.MelodyModel(path=f"git+{path}", revision=prev)
 
-    return data
+        metadata: types.Metadata = {
+            "model": {"path": path, "entrypoint": None},
+            "old_revision": _get_revision_info(path, prev),
+            "new_revision": _get_revision_info(path, head),
+        }
+
+        diagrams = compare.compare_all_diagrams(old_model, model)
+        objects = compare.compare_all_objects(old_model, model)
+        data: types.ChangeSummaryDocument = {
+            "metadata": metadata,
+            "diagrams": diagrams,
+            "objects": objects,
+        }
+        data = copy.deepcopy(data)
+        report._compute_diff_stats(data)
+        model_data = report._traverse_and_diff(data)
+        return model_data
+    else:
+        raise ValueError("Not enought commits in the repository to compare")
 
 
-def transform_diagram_dict(dict):
-    modified: list = []
-    created: list = []
-    deleted: list = []
-    traverse_diagrams(dict, created, modified, deleted)
-    created_dict = [
-        {"name": item["display_name"], "uuid": item["uuid"]}
-        for item in created
-    ]
-    modified_dict = [
-        {"name": item["display_name"], "uuid": item["uuid"]}
-        for item in modified
-    ]
-    deleted_dict = [
-        {"name": item["display_name"], "uuid": item["uuid"]}
-        for item in deleted
-    ]
-    diff_dict = {
-        "Created": created_dict,
-        "Modified": modified_dict,
-        "Deleted": deleted_dict,
+def _get_revision_info(
+    repo_path: str,
+    revision: str,
+) -> types.RevisionInfo:
+    """Return the revision info of the given model."""
+    author, date_str, description = (
+        subprocess.check_output(
+            ["git", "log", "-1", "--format=%aN%x00%aI%x00%B", revision],
+            cwd=repo_path,
+            encoding="utf-8",
+        )
+        .strip()
+        .split("\x00")
+    )
+    return {
+        "hash": revision,
+        "revision": revision,
+        "author": author,
+        "date": datetime.datetime.fromisoformat(date_str),
+        "description": description.rstrip(),
     }
-    return diff_dict
-
-
-def traverse_diagrams(node, created, modified, deleted):
-    if isinstance(node, dict):
-        for key, value in node.items():
-            if key == "modified":
-                modified.extend(value)
-            elif key == "created":
-                created.extend(value)
-            elif key == "deleted":
-                deleted.extend(value)
-            else:
-                traverse_diagrams(value, created, modified, deleted)
-    elif isinstance(node, list):
-        for item in node:
-            traverse_diagrams(item, created, modified, deleted)
-
-
-def transform_object_dict(original_dict):
-    obj: dict = {}
-    for _, object in original_dict.items():
-        for category, actions in object.items():
-            if category not in obj:
-                obj[category] = {
-                    "created": [],
-                    "modified": [],
-                    "deleted": [],
-                }
-            for action, items in actions.items():
-                for item in items:
-                    display_name = item["display_name"]
-                    obj[category][action].append(
-                        {"name": display_name, "uuid": item["uuid"]}
-                    )
-    return obj

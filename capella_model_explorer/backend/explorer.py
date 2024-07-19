@@ -49,7 +49,7 @@ class CapellaModelExplorerBackend:
 
     templates_path: Path
     model: capellambse.MelodyModel
-    model_diff: str
+    data: dict[str, t.Any]
 
     templates_index: t.Optional[tl.TemplateCategories] = dataclasses.field(
         init=False
@@ -139,7 +139,9 @@ class CapellaModelExplorerBackend:
         try:
             # render the template with the object
             template = self.env.from_string(template_text)
-            rendered = template.render(object=object, model=self.model)
+            rendered = template.render(
+                object=object, model=self.model, data=self.data
+            )
             return HTMLResponse(content=rendered, status_code=200)
         except TemplateSyntaxError as e:
             error_message = markupsafe.Markup(
@@ -279,9 +281,9 @@ class CapellaModelExplorerBackend:
         async def version():
             return {"version": self.app.version}
 
-        @self.app.get("/api/model-diff")
-        async def model_diff():
-            return self.model_diff
+        @self.app.get("/api/data")
+        async def data():
+            return self.data
 
 
 def index_template(template, templates, templates_grouped, filename=None):

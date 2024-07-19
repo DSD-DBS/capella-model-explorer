@@ -17,3 +17,9 @@ categories:
       scope:
         name: object
         type: CapellaModule
+    - idx: model-diff
+      template: model-diff.html.j2
+      name: Model Version Diff
+      description: Template to visualize differences between two model versions
+      isExperimental: true
+      single: true
