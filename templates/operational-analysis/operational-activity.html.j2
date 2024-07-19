@@ -42,8 +42,8 @@
     <p style="color: red;">No operational activities are known to require the {{ owner_label | safe }} to {{ object.name }}.</p>
 {% endif %}
 
-<h2>Interface partners</h2>
-<p>While performing this activity {{ owner_label | safe }} may interact with the following entities:&nbsp;
+<h2>Involved actors</h2>
+<p>While performing this activity {{ owner_label | safe }} may involve the following entities:&nbsp;
 {% set ins = object.inputs | map(attribute="source") | selectattr("owner") | map(attribute="owner") | list %}
 {% set outs = object.outputs | map(attribute="target") | selectattr("owner") | map(attribute="owner") | list %}
 {%- set partners = ins + outs -%}
@@ -76,7 +76,7 @@
                         <span style="color: red;">Unassigned entity</span>
                     {%- endif -%}
                     {% if input.exchange_items %}
-                    <p>{{input.name}} is further detailed by the following exchange items: {% for exi in input.exchange_items %}{{ linked_name_with_icon(exi) | safe}} {% endfor %}</p>
+                    <p>This interaction is further detailed by the following exchange items: {% for exi in input.exchange_items %}{{ linked_name_with_icon(exi) | safe}} {% endfor %}</p>
                     {% endif %}
             </li>
         {% endfor %}
@@ -121,7 +121,7 @@
 <h2>Referencing diagrams</h2>
 <p>This activity appears in the following diagrams:</p>
 <ul>
-{% for diagram in diagrams %}
+{% for diagram in diagrams | sort(attribute="name") %}
     <li>{{ linked_name_with_icon(diagram) | safe }}</li>
 {% endfor %}
 </ul>
