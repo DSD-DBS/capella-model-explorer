@@ -6,10 +6,10 @@ import logging
 import os
 import pathlib
 import time
+import traceback
 import typing as t
 import urllib.parse as urlparse
 from pathlib import Path
-import traceback
 
 import capellambse
 import fastapi
