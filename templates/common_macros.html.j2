@@ -196,13 +196,13 @@
             {% set _none = realizing_attrs.append(attr) %}
         {%- endif-%}
     {%- endfor -%}
-    {%- set realized_objects = object[realized_attrs | first] if realized_attrs else None -%}
-    {%- set realizing_objects = object[realizing_attrs | first] if realizing_attrs else None -%}
+    {%- set realized_objects = object[realized_attrs | first] if realized_attrs else [] -%}
+    {%- set realizing_objects = object[realizing_attrs | first] if realizing_attrs else [] -%}
 
     <h2>Traceability</h2>
-    {% if "realization_view" in object.__dir__() %}
-    <p>The figure below provides an overview of objects that "{{ object.name}}" realizes but also those that realize "{{ object.name }}"</p>
-    {{ object.realization_view.as_svg | safe }}
+    {% if (realized_objects | length > 0 or realizing_objects | length > 0) and "realization_view" in object.__dir__() %}
+        <p>The figure below provides an overview of objects that "{{ object.name}}" realizes but also those that realize "{{ object.name }}"</p>
+        {{ object.realization_view.as_svg | safe }}
     {% endif %}
     {% if show_upper %}
         {% if realized_objects %}
@@ -215,12 +215,12 @@
         {%- endif -%}
     {% endif %}
     {% if realizing_objects %}
-    <p>{{ object.name }} is realized by the following objects:</p>
-    <ul>
-    {%- for obj in realizing_objects -%}<li style="display: block;">{{ linked_name_with_icon(obj) | safe}}</li>{%- endfor -%}
-    </ul>
-    {%- else -%}
-        <p style="color: red;">{{ first_upper(object.name) }} doesn't seem to be realized by any object</p>
+        <p>{{ object.name }} is realized by the following objects:</p>
+        <ul>
+        {%- for obj in realizing_objects -%}<li style="display: block;">{{ linked_name_with_icon(obj) | safe}}</li>{%- endfor -%}
+        </ul>
+        {%- else -%}
+            <p style="color: red;">{{ first_upper(object.name) }} doesn't seem to be realized by any object</p>
     {% endif %}
 {%- endmacro -%}
 
