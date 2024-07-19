@@ -42,14 +42,17 @@ def find_objects(model, obj_type=None, below=None, attr=None, filters=None):
         raise ValueError("No search criteria provided")
 
     if filters:
-        objects = [
-            obj
-            for obj in objects
-            if all(
-                getattr(obj, key) == value for key, value in filters.items()
-            )
-        ]
-
+        filtered = []
+        for object in objects:
+            for attr_key, filter in filters.items():
+                attr = getattr(object, attr_key)
+                if filter == "not_empty":
+                    if attr:
+                        filtered.append(object)
+                else:
+                    if attr == filter:
+                        filtered.append(object)
+        objects = filtered
     return objects
 
 

@@ -1,0 +1,145 @@
+{#
+    Copyright DB InfraGO AG and contributors
+    SPDX-License-Identifier: Apache-2.0
+
+    ?? validate layer only
+    ?? filter val resultsby layer
+#}
+
+{% from 'common_macros.html.j2' import linked_name_with_icon %}
+{%- set results = model.sa.validation.validate() -%}
+{% set CATEGORIES = ["REQUIRED", "RECOMMENDED"] -%}
+{% set object_types = [
+  "Capability",
+  "SystemActor",
+  "SystemComponent",
+  "SystemFunction",
+  "ComponentExchange",
+  "FunctionalExchange"
+] -%}
+{% set results = results.by_type(*object_types) -%}
+
+{% macro show_compliance_score(results, align=None) -%}
+  {% if results | count > 0 -%}
+    {% set total = results | count -%}
+    {% set passed = results.by_passed(True) | count -%}
+    {% set score = (passed / total * 100) | round(1) -%}
+    {% if score < 30 -%}
+      {% set color = "#bc2604" -%}
+    {% elif score < 70 -%}
+      {% set color = "#ae930d" -%}
+    {% else -%}
+      {% set color = "#0a6600" -%}
+    {% endif -%}
+    <span style="color: {{color}}{% if align %}; float: {{align}}{% endif %}">
+      {{score}}% <small>({{passed}} / {{total}})</small>
+    </span>
+    <div style="margin: 0; height: 5px; background: linear-gradient(to right, green {{score}}%, red {{score}}%)"></div>
+  {% else -%}
+    <span style="color: #ccc">not applicable</span>
+    <div style="margin: 0; height: 5px; background: #ccc"></div>
+  {% endif -%}
+{% endmacro -%}
+
+</head>
+<body>
+<h1>Modeling Rules Compliance Report for System Analysis Layer</h1>
+<p>
+  The report provides an assessment of adherence to Modeling Rules and Best Practices by the contents of the System Analysis model layer.
+</p>
+
+<h2>Assessment Summary</h2>
+<p>We reviewed <strong>{{ model.sa.validation.search(*object_types) | list | count }}</strong> model objects and found that overall compliance with the modelling rules is:</p>
+
+{% for category in CATEGORIES -%}
+  {% set category_results = results.by_category(category) -%}
+  {% set total = category_results | count -%}
+  {% set passed = category_results.by_passed(True) | count -%}
+  {% set score = (passed / total * 100) | round(1) if total else 100 -%}
+  {% if score < 30 -%}
+    {% set color = "#bc2604" -%}
+  {% elif score < 70 -%}
+    {% set color = "#ae930d" -%}
+  {% else -%}
+    {% set color = "#0a6600" -%}
+  {% endif -%}
+  {% if total != 0 %}
+    <p><span style="color: {{color}}">{{score}}%</span> <small>({{passed}} / {{total}} rule checks)</small> for {{category}} rules category</p>
+  {% else %}
+    <p><span style="color: #ccc">No rules in {{category}} category apply to objects under evaluation.</p>
+  {% endif -%}
+{% endfor %}
+
+<table>
+  <thead>
+    <tr>
+      <th rowspan="2">Reviewed objects</th>
+      <th rowspan="2" width="90px">Total objects</th>
+      <th colspan="{{ CATEGORIES | count }}">Compliance to applicable modeling rules</th>
+    </tr>
+    <tr>
+      {% for category in CATEGORIES -%}
+        <th>{{ category }}</th>
+      {% endfor -%}
+    </tr>
+  </thead>
+  <tbody>
+    {% for obj_type in object_types %}<tr>
+      {% set total = model.sa.validation.search(obj_type) | count %}
+      <th><a href="#{{ obj_type }}">{{ obj_type }}</a></th>
+      <td>{{ total }}</td>
+      {% for category in CATEGORIES %}<td>
+        {{ show_compliance_score(results.by_category(category).by_type(obj_type)) | safe }}
+      </td>{% endfor %}
+    </tr>{% endfor %}
+  </tbody>
+</table>
+
+
+
+
+<h2>Validation results by rule</h2>
+<table>
+<thead>
+  <tr>
+    <th width="160px">Rule
+    <th>Definition
+  <tbody>
+    {% for rule in results.iter_rules() | sort(attribute="id") | sort(attribute="category.value") -%}
+    {% set rule_results = results.by_rule(rule) -%}
+    <tr>
+      <th id="{{rule.id}}">
+        {{rule.id}}<br>
+        <span class="rule-{{rule.category.name|lower}}">{{rule.category.name}}</span>
+        {% set applicable_to = [] %}
+        {% for obj_type in object_types if obj_type in rule.types -%}
+          {% set _none = applicable_to.append(obj_type) %}
+        {%- endfor %}
+        <div>{{ show_compliance_score(rule_results) | safe }}</div>
+        <p style="color:#999">Applies to: {{ applicable_to | join(", ") }}</p>
+      </th>
+      <td>
+        <strong>{{ rule.name }}</strong><br>
+        {{ rule.rationale }}
+        {% if not rule_results.by_passed(True) | length == rule_results | length %}
+            <p><b>Recommended action:</b><br>{{ rule.action }}</p>
+            {% set results = [] %}
+            {% for result in rule_results | sort(attribute="object.name") if not result.passed %}
+                {% set _none = results.append(result) %}
+            {% endfor %}
+            {% if results %}
+            <p style="margin-left: 20px">The following objects <b style="color: red;">failed to comply</b> with the modeling rule:</p>
+            <ul style="margin-left: 20px">
+            {%- for result in results -%}
+            <li>{{ linked_name_with_icon(result.object) | safe}}</li>
+            {%- endfor %}
+            </ul>
+            {% endif %}
+            {% else %}
+                <p>All {{ rule_results | length }} objects are <b style="color: green">compliant</b> to this modeling rule</p>
+            {% endif %}
+      </td>
+    </tr>
+    {%- endfor %}
+  </tbody>
+</table>

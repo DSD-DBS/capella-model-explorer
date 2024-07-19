@@ -13,6 +13,7 @@ categories:
   - template: operational-analysis/operational-entity.html.j2
     idx: operational-entity
     name: Operational Entity
+    isExperimental: true
     description: Specifies an operational entity.
     scope:
       type: Entity
@@ -21,6 +22,7 @@ categories:
     idx: operational-activity
     name: Operational Activity
     description: Specifies an operational activity.
+    isExperimental: true
     scope:
       type: OperationalActivity
       below: oa
