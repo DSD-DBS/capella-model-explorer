@@ -4,7 +4,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { API_BASE_URL } from '../APIConfig';
-import { Recycle } from 'lucide-react';
 
 export const TemplateDetails = ({ endpoint, onSingleInstance }) => {
   const [modelDiff, setModelDiff] = useState(null);
@@ -33,7 +32,7 @@ export const TemplateDetails = ({ endpoint, onSingleInstance }) => {
 
   function processModelDiffItems(items) {
     Object.entries(items).forEach(([layerKey, layer]) => {
-      if (layerKey === 'stats') return; // Skip 'stats' key
+      if (layerKey === 'stats') return;
       Object.values(layer).forEach((item) => {
         ['created', 'modified'].forEach((action) => {
           if (Array.isArray(item[action])) {
@@ -169,7 +168,7 @@ export const TemplateDetails = ({ endpoint, onSingleInstance }) => {
                     className={`${
                       objectID && object.idx === objectID
                         ? 'w-full bg-custom-blue text-white dark:bg-custom-blue dark:text-gray-100'
-                        : 'w-full bg-gray-200 text-gray-900 dark:bg-custom-dark-4'
+                        : 'borer-r-8 w-full border-transparent bg-gray-200 text-gray-900 dark:bg-custom-dark-4'
                     } ${
                       createdItems.includes(object.idx)
                         ? 'border-l-8 border-transparent border-l-green-500'

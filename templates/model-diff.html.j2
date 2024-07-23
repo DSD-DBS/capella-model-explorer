@@ -3,8 +3,9 @@
     SPDX-License-Identifier: Apache-2.0
 #}
 
-{% from 'common_macros.html.j2' import show_other_attributes, description, render_reqs_by_type, linked_name, linked_name_with_icon, display_traceability %}
+{% from 'common_macros.html.j2' import linked_name, linked_name_with_icon %}
 
+{% if data["metadata"].get("old_revision") %}
 <h1>Model Change Assessment Report</h1>
 <p>This report provides an analysis of changes to the following model repository:</p>
 <p>
@@ -151,3 +152,7 @@
     {% endif %}
 {% endfor %}
 </div>
+{% else %}
+<h1 style="color: red">Could not generate model diff report.</h1>
+<p>Select 'Deep clone' before running the session or --diff for developer mode</p>
+{% endif %}

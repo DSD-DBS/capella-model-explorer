@@ -28,6 +28,7 @@ classifiers = [
 dependencies = [
   "capellambse",
   "capellambse-context-diagrams",
+  "capella-diff-tools",
   "jinja2",
   "fastapi",
   "uvicorn",

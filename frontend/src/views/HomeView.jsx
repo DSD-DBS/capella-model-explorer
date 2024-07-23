@@ -1,29 +1,44 @@
 // Copyright DB InfraGO AG and contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import React, { useState, useEffect } from "react";
-import { WiredTemplatesList } from "../components/WiredTemplatesList";
-import { API_BASE_URL } from "../APIConfig";
-import { ThemeSwitcher } from "../components/ThemeSwitcher";
-import { SoftwareVersion } from "../components/SoftwareVersion";
+import React, { useState, useEffect } from 'react';
+import { WiredTemplatesList } from '../components/WiredTemplatesList';
+import { API_BASE_URL } from '../APIConfig';
+import { SoftwareVersion } from '../components/SoftwareVersion';
 
 export const HomeView = () => {
   const [modelInfo, setModelInfo] = useState(null);
   const [error, setError] = useState(null);
+  const [modelDiff, setModelDiff] = useState(null);
 
   useEffect(() => {
     const fetchModelInfo = async () => {
       try {
-        const response = await fetch(API_BASE_URL + "/model-info");
+        const response = await fetch(API_BASE_URL + '/model-info');
         const data = await response.json();
         setModelInfo(data);
       } catch (err) {
-        setError("Failed to fetch model info: " + err.message);
+        setError('Failed to fetch model info: ' + err.message);
       }
-      document.body.style.height = "auto";
+      document.body.style.height = 'auto';
     };
 
     fetchModelInfo();
+  }, []);
+
+  useEffect(() => {
+    const fetchModelDiff = async () => {
+      try {
+        const response = await fetch(API_BASE_URL + '/data');
+        const data = await response.json();
+        setModelDiff(data);
+      } catch (err) {
+        setError('Failed to fetch model info: ' + err.message);
+      }
+      document.body.style.height = 'auto';
+    };
+
+    fetchModelDiff();
   }, []);
 
   if (error) {
@@ -45,11 +60,34 @@ export const HomeView = () => {
             )}
             {modelInfo.revision && <p>Revision: {modelInfo.revision}</p>}
             {modelInfo.branch && <p>Branch: {modelInfo.branch}</p>}
-            {modelInfo.hash && <p>Commit Hash: {modelInfo.hash}</p>}
+            {modelInfo.hash && <p>Current Commit Hash: {modelInfo.hash}</p>}
+            {modelDiff?.metadata?.new_revision && (
+              <>
+                <p className="pb-2">
+                  Created on:{' '}
+                  {new Date(
+                    modelDiff.metadata.new_revision.date
+                  ).toLocaleString()}
+                </p>
+              </>
+            )}
             <div
               className="hidden md:block"
-              dangerouslySetInnerHTML={{ __html: modelInfo.badge }}
-            ></div>
+              dangerouslySetInnerHTML={{ __html: modelInfo.badge }}></div>
+            {modelDiff?.metadata?.old_revision && (
+              <>
+                <p className="pt-2">
+                  Comparing with commit hash:{' '}
+                  {modelDiff.metadata.old_revision.hash}
+                </p>
+                <p>
+                  Created on:{' '}
+                  {new Date(
+                    modelDiff.metadata.old_revision.date
+                  ).toLocaleString()}
+                </p>
+              </>
+            )}
           </div>
         )}
       </div>
