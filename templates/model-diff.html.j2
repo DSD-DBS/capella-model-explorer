@@ -5,6 +5,7 @@
 
 {% from 'common_macros.html.j2' import linked_name, linked_name_with_icon %}
 
+{%if data.get("metadata")%}
 {% if data["metadata"].get("old_revision") %}
 <h1>Model Change Assessment Report</h1>
 <p>This report provides an analysis of changes to the following model repository:</p>
@@ -151,8 +152,9 @@
     {{ render_section(data, layer) | safe }}
     {% endif %}
 {% endfor %}
+{% endif %}
 </div>
 {% else %}
-<h1 style="color: red">Could not generate model diff report.</h1>
-<p>Select 'Deep clone' before running the session or --diff for developer mode</p>
+<h1 style="color: red">Could not generate model comparison report.</h1>
+<p>Select 'Deep clone' before running the session or select a model that belongs to a git repo for developer mode.</p>
 {% endif %}

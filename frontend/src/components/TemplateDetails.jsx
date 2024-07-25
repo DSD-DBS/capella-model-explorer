@@ -22,7 +22,7 @@ export const TemplateDetails = ({ endpoint, onSingleInstance }) => {
         const data = await response.json();
         setModelDiff(data);
       } catch (err) {
-        setError('Failed to fetch model info: ' + err.message);
+        setModelDiff({});
       }
       document.body.style.height = 'auto';
     };

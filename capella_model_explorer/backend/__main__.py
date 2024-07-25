@@ -8,7 +8,7 @@ import capellambse
 import click
 import uvicorn
 
-from . import explorer, model_diff
+from . import explorer
 
 HOST = os.getenv("CAPELLA_MODEL_EXPLORER_HOST_IP", "0.0.0.0")
 PORT = os.getenv("CAPELLA_MODEL_EXPLORER_PORT", "8000")
@@ -24,19 +24,11 @@ PATH_TO_TEMPLATES = Path("./templates")
     required=False,
     default=PATH_TO_TEMPLATES,
 )
-@click.option(
-    "--diff",
-    is_flag=True,
-    help="Run model diff before starting the server.",
-)
-def run(model: capellambse.MelodyModel, templates: Path, diff: bool):
-    data = {}
-
-    if diff:
-        data = model_diff.get_data(model)
+def run(model: capellambse.MelodyModel, templates: Path):
 
     backend = explorer.CapellaModelExplorerBackend(
-        Path(templates), model, data
+        Path(templates),
+        model,
     )
 
     uvicorn.run(backend.app, host=HOST, port=int(PORT))

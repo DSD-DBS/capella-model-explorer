@@ -7,14 +7,13 @@ import logging
 import subprocess
 
 import capellambse
-from capella_diff_tools import __main__ as diff
 from capella_diff_tools import compare, report, types
 from capellambse.filehandler import git, local
 
 logger = logging.getLogger(__name__)
 
 
-def get_data(model: capellambse.MelodyModel):
+def init_model(model: capellambse.MelodyModel):
     file_handler = model.resources["\x00"]
     path = str(file_handler.path)
     model_data: dict = {
@@ -39,43 +38,40 @@ def get_data(model: capellambse.MelodyModel):
     ):
         pass
     else:
-        logger.warning("Cannot create a diff: Not a git repo")
-        return model_data
+        return {"error": "Not a git repo"}, model_data
+    return path, model_data
 
-    commit_hashes = (
-        subprocess.check_output(
-            ["git", "log", "-n", "7", "--format=%H"],
-            cwd=path,
-            encoding="utf-8",
-        )
-        .strip()
-        .split("\n")
-    )
 
-    if len(commit_hashes) > 1:
-        head = commit_hashes[0]
-        prev = commit_hashes[6]
-        old_model = capellambse.MelodyModel(path=f"git+{path}", revision=prev)
+def populate_commits(model: capellambse.MelodyModel):
+    result, _ = init_model(model)
+    if "error" in result:
+        return result
+    commits = get_commit_hashes(result)
+    return commits
 
-        metadata: types.Metadata = {
-            "model": {"path": path, "entrypoint": None},
-            "old_revision": _get_revision_info(path, prev),
-            "new_revision": _get_revision_info(path, head),
-        }
 
-        diagrams = compare.compare_all_diagrams(old_model, model)
-        objects = compare.compare_all_objects(old_model, model)
-        data: types.ChangeSummaryDocument = {
-            "metadata": metadata,
-            "diagrams": diagrams,
-            "objects": objects,
-        }
-        data = copy.deepcopy(data)
-        report._compute_diff_stats(data)
-        model_data = report._traverse_and_diff(data)
-        return model_data
-    else:
-        raise ValueError("Not enought commits in the repository to compare")
+def get_data(model: capellambse.MelodyModel, head: str, prev: str):
+    path, model_data = init_model(model)
+
+    old_model = capellambse.MelodyModel(path=f"git+{path}", revision=prev)
+
+    metadata: types.Metadata = {
+        "model": {"path": path, "entrypoint": None},
+        "old_revision": _get_revision_info(path, prev),
+        "new_revision": _get_revision_info(path, head),
+    }
+
+    diagrams = compare.compare_all_diagrams(old_model, model)
+    objects = compare.compare_all_objects(old_model, model)
+    data: types.ChangeSummaryDocument = {
+        "metadata": metadata,
+        "diagrams": diagrams,
+        "objects": objects,
+    }
+    data = copy.deepcopy(data)
+    report._compute_diff_stats(data)
+    model_data = report._traverse_and_diff(data)
+    return model_data
 
 
 def _get_revision_info(
@@ -99,3 +95,17 @@ def _get_revision_info(
         "date": datetime.datetime.fromisoformat(date_str),
         "description": description.rstrip(),
     }
+
+
+def get_commit_hashes(path: str):
+    commit_hashes = (
+        subprocess.check_output(
+            ["git", "log", "-n", "7", "--format=%H"],
+            cwd=path,
+            encoding="utf-8",
+        )
+        .strip()
+        .split("\n")
+    )
+    commits = [_get_revision_info(path, c) for c in commit_hashes]
+    return commits

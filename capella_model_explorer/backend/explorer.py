@@ -26,7 +26,9 @@ from jinja2 import (
     TemplateSyntaxError,
     is_undefined,
 )
+from pydantic import BaseModel
 
+from capella_model_explorer.backend import model_diff
 from capella_model_explorer.backend import templates as tl
 
 from . import __version__
@@ -36,6 +38,11 @@ esc = markupsafe.escape
 PATH_TO_FRONTEND = Path("./frontend/dist")
 ROUTE_PREFIX = os.getenv("ROUTE_PREFIX", "")
 LOGGER = logging.getLogger(__name__)
+
+
+class DataPayload(BaseModel):
+    head: str
+    prev: str
 
 
 @dataclasses.dataclass
@@ -49,7 +56,6 @@ class CapellaModelExplorerBackend:
 
     templates_path: Path
     model: capellambse.MelodyModel
-    data: dict[str, t.Any]
 
     templates_index: t.Optional[tl.TemplateCategories] = dataclasses.field(
         init=False
@@ -80,6 +86,7 @@ class CapellaModelExplorerBackend:
         self.templates_index = self.templates_loader.index_path(
             self.templates_path
         )
+        self.data = {}
 
         @self.app.middleware("http")
         async def update_last_interaction_time(request: Request, call_next):
@@ -281,8 +288,31 @@ class CapellaModelExplorerBackend:
         async def version():
             return {"version": self.app.version}
 
+        @self.app.post("/api/data")
+        async def post_data(payload: DataPayload):
+            try:
+                self.data = {"head": payload.head, "prev": payload.prev}
+                return self.data
+            except Exception:
+                return {}
+
+        @self.app.get("/api/commits")
+        async def commits():
+            result = model_diff.populate_commits(self.model)
+            return result
+
         @self.app.get("/api/data")
-        async def data():
+        async def retrieve_data():
+            if "metadata" not in self.data:
+                try:
+                    self.data = model_diff.get_data(
+                        self.model,
+                        self.data["head"],
+                        self.data["prev"],
+                    )
+                    return {"data": self.data}
+                except Exception:
+                    return {"error": "Couldn't retrieve model comparison data"}
             return self.data
 
 
