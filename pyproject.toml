@@ -11,7 +11,7 @@ dynamic = ["version"]
 name = "capella-model-explorer"
 description = "A webapp for exploring Capella models"
 readme = "README.md"
-requires-python = ">=3.10, <3.13"
+requires-python = ">=3.11, <3.13"
 license = { text = "Apache-2.0" }
 authors = [{ name = "DB InfraGO AG" }]
 keywords = []
@@ -21,7 +21,6 @@ classifiers = [
   "Natural Language :: English",
   "Operating System :: OS Independent",
   "Programming Language :: Python :: 3 :: Only",
-  "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
 ]
@@ -76,7 +75,7 @@ no_implicit_optional = true
 show_error_codes = true
 warn_redundant_casts = true
 warn_unreachable = true
-python_version = "3.10"
+python_version = "3.11"
 
 [[tool.mypy.overrides]]
 module = ["tests.*"]
