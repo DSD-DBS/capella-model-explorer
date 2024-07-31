@@ -36,20 +36,20 @@ export const TemplateCard = ({
   const [modelDiff, setModelDiff] = useState(null);
   const [errorTest, setError] = useState(null);
 
-  useEffect(() => {
-    const fetchModelDiff = async () => {
-      try {
-        const response = await fetch(API_BASE_URL + '/model-diff');
-        const data = await response.json();
-        setModelDiff(data);
-      } catch (err) {
-        setError('Failed to fetch model info: ' + err.message);
-      }
-      document.body.style.height = 'auto';
-    };
+  //useEffect(() => {
+  //   const fetchModelDiff = async () => {
+  //     try {
+  //       const response = await fetch(API_BASE_URL + '/model-diff');
+  //       const data = await response.json();
+  //       setModelDiff(data);
+  //     } catch (err) {
+  //       setError('Failed to fetch model info: ' + err.message);
+  //     }
+  //     document.body.style.height = 'auto';
+  //   };
 
-    fetchModelDiff();
-  }, []);
+  //   fetchModelDiff();
+  // }, []);
 
   return (
     <div

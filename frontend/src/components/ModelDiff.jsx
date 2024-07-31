@@ -25,33 +25,6 @@ export const ModelDiff = () => {
     setSelectedDetails(selectedDetails || {});
   };
 
-  useEffect(() => {
-    const fetchedOptions = async () => {
-      try {
-        const response = await fetch(API_BASE_URL + '/commits');
-        if (!response.ok) {
-          throw new Error(
-            'Failed to fetch commits info: ' + response.statusText
-          );
-        }
-        const data = await response.json();
-        if (data.error) {
-          throw new Error(data.error);
-        }
-        setCommitDetails(data);
-        const options = data.map((commit) => ({
-          value: commit.hash,
-          label: `${commit.hash.substring(0, 7)} - Created on ${commit.date.substring(0, 10)}`
-        }));
-
-        setSelectionOptions(options);
-      } catch (err) {
-        setError(err.message);
-      }
-    };
-    fetchedOptions();
-  }, []);
-
   const handleGenerateDiff = async () => {
     if (!commitDetails[0].hash || !prevSelection) {
       alert('Please select a version.');
@@ -89,16 +62,41 @@ export const ModelDiff = () => {
     return response.json();
   };
 
+  async function openModelCompareDialog(){
+    try {
+      const response = await fetch(API_BASE_URL + '/commits');
+      if (!response.ok) {
+        throw new Error(
+          'Failed to fetch commits info: ' + response.statusText
+        );
+      }
+      const data = await response.json();
+      if (data.error) {
+        throw new Error(data.error);
+      }
+      setCommitDetails(data);
+      const options = data.map((commit) => ({
+        value: commit.hash,
+        label: `${commit.hash.substring(0, 7)} - Created on ${commit.date.substring(0, 10)}`
+      }));
+
+      setSelectionOptions(options);
+      setIsPopupVisible(true);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
   return (
     <div className="mb-2 mt-2 flex flex-col items-center">
       <button
         className="rounded border border-black bg-gray-200 px-4 py-2
          text-gray-700 hover:bg-custom-light dark:bg-custom-dark-2 dark:text-gray-100 dark:hover:bg-custom-dark-4"
-        onClick={() => setIsPopupVisible(true)}>
+        onClick={openModelCompareDialog}>
         Compare with previous version
       </button>
       {isPopupVisible && (
-        <>
+        <div>
           <div
             className="fixed inset-0 z-10 bg-black bg-opacity-50"
             onClick={() => {
@@ -195,7 +193,7 @@ export const ModelDiff = () => {
               </div>
             </div>
           </div>
-        </>
+        </div>
       )}
     </div>
   );
