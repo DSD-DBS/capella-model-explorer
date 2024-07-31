@@ -40,7 +40,7 @@ ROUTE_PREFIX = os.getenv("ROUTE_PREFIX", "")
 LOGGER = logging.getLogger(__name__)
 
 
-class DataPayload(BaseModel):
+class CommitRange(BaseModel):
     head: str
     prev: str
 
@@ -86,7 +86,7 @@ class CapellaModelExplorerBackend:
         self.templates_index = self.templates_loader.index_path(
             self.templates_path
         )
-        self.data = {}
+        self.diff = {}
 
         @self.app.middleware("http")
         async def update_last_interaction_time(request: Request, call_next):
@@ -147,7 +147,7 @@ class CapellaModelExplorerBackend:
             # render the template with the object
             template = self.env.from_string(template_text)
             rendered = template.render(
-                object=object, model=self.model, data=self.data
+                object=object, model=self.model, data=self.diff
             )
             return HTMLResponse(content=rendered, status_code=200)
         except TemplateSyntaxError as e:
@@ -288,32 +288,28 @@ class CapellaModelExplorerBackend:
         async def version():
             return {"version": self.app.version}
 
-        @self.app.post("/api/data")
-        async def post_data(payload: DataPayload):
+        @self.app.post("/api/compare")
+        async def post_data(commit_range: CommitRange):
             try:
-                self.data = {"head": payload.head, "prev": payload.prev}
-                return self.data
-            except Exception:
-                return {}
+                self.diff = model_diff.get_data(
+                    self.model, commit_range.head, commit_range.prev
+                )
+                return {"success": True}
+            except Exception as e:
+                return {"success": False, "error": str(e)}
 
         @self.app.get("/api/commits")
         async def commits():
             result = model_diff.populate_commits(self.model)
             return result
 
-        @self.app.get("/api/data")
+        @self.app.get("/api/diff")
         async def retrieve_data():
-            if "metadata" not in self.data:
-                try:
-                    self.data = model_diff.get_data(
-                        self.model,
-                        self.data["head"],
-                        self.data["prev"],
-                    )
-                    return {"data": self.data}
-                except Exception:
-                    return {"error": "Couldn't retrieve model comparison data"}
-            return self.data
+            if self.diff:
+                return self.diff
+            return {
+                "error": "No data available. Please compare two commits first."
+            }
 
 
 def index_template(template, templates, templates_grouped, filename=None):

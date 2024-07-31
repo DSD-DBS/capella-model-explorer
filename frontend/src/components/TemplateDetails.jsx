@@ -18,7 +18,7 @@ export const TemplateDetails = ({ endpoint, onSingleInstance }) => {
   useEffect(() => {
     const fetchModelDiff = async () => {
       try {
-        const response = await fetch(API_BASE_URL + '/data');
+        const response = await fetch(API_BASE_URL + '/diff');
         const data = await response.json();
         setModelDiff(data);
       } catch (err) {

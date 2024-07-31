@@ -4,6 +4,7 @@
 import copy
 import datetime
 import logging
+import pathlib
 import subprocess
 
 import capellambse
@@ -52,7 +53,7 @@ def populate_commits(model: capellambse.MelodyModel):
 
 def get_data(model: capellambse.MelodyModel, head: str, prev: str):
     path, model_data = init_model(model)
-
+    path = pathlib.Path(path).resolve()
     old_model = capellambse.MelodyModel(path=f"git+{path}", revision=prev)
 
     metadata: types.Metadata = {
@@ -100,7 +101,7 @@ def _get_revision_info(
 def get_commit_hashes(path: str):
     commit_hashes = (
         subprocess.check_output(
-            ["git", "log", "-n", "7", "--format=%H"],
+            ["git", "log", "-n", "20", "--format=%H"],
             cwd=path,
             encoding="utf-8",
         )

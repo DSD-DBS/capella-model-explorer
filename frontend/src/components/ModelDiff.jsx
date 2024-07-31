@@ -60,13 +60,16 @@ export const ModelDiff = () => {
     setCompleteLoading(false);
     setIsLoading(true);
     try {
-      const url = new URL(API_BASE_URL + '/data');
-      const postDataResponse = await postData(url, {
+      const url = new URL(API_BASE_URL + '/compare');
+      const response = await postData(url, {
         head: commitDetails[0].hash,
         prev: prevSelection
       });
-      const response = await fetch(API_BASE_URL + '/data');
+      //const response = await fetch(API_BASE_URL + '/data');
       const data = await response.json();
+      if (data.error) {
+        throw new Error(data.error);
+      }
     } catch (error) {
       console.error('Error:', error);
     } finally {
@@ -103,7 +106,7 @@ export const ModelDiff = () => {
               setCompleteLoading(false);
             }}></div>
           <div
-            className="absolute left-1/2 top-1/2 z-20 w-1/3 -translate-x-1/2
+            className="absolute left-1/2 top-1/2 z-20 w-1/2 -translate-x-1/2
             -translate-y-1/2 transform rounded bg-gray-100 p-4 shadow-lg
             dark:bg-custom-dark-2 dark:text-gray-100"
             onClick={(e) => e.stopPropagation()}>
@@ -151,9 +154,13 @@ export const ModelDiff = () => {
                       ))}
                     </select>
                     {selectedDetails && (
-                      <div className="text-left font-semibold">
+                      <div className="text-left">
                         <p>Hash: {selectedDetails.hash}</p>
                         <p>Author: {selectedDetails.author}</p>
+                        <div>
+                          <p className='text-bold'>Description</p>
+                          <p className='whitespace-pre-wrap'>{selectedDetails.description}</p>
+                        </div>
                         <p>Description: {selectedDetails.description}</p>
                         <p>Date: {selectedDetails.date.substring(0, 10)}</p>
                       </div>
