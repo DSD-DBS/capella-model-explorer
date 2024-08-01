@@ -89,12 +89,21 @@ def _get_revision_info(
         .strip()
         .split("\x00")
     )
+    try:
+        tag = subprocess.check_output(
+            ["git", "describe", "--tags", revision],
+            cwd=repo_path,
+            encoding="utf-8",
+        ).strip()
+    except subprocess.CalledProcessError:
+        tag = None
     return {
         "hash": revision,
         "revision": revision,
         "author": author,
         "date": datetime.datetime.fromisoformat(date_str),
         "description": description.rstrip(),
+        "tag": tag,
     }
 
 

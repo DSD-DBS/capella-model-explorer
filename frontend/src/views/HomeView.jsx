@@ -10,6 +10,10 @@ import { ModelDiff } from '../components/ModelDiff';
 export const HomeView = () => {
   const [modelInfo, setModelInfo] = useState(null);
   const [error, setError] = useState(null);
+  const [headDate, setHeadDate] = useState(null);
+  const [headTag, setHeadTag] = useState(null);
+  const [comparedVersionInfo, setComparedVersionInfo] = useState(null);
+  const [hasDiffed, setHasDiffed] = useState(false);
 
   useEffect(() => {
     const fetchModelInfo = async () => {
@@ -25,6 +29,43 @@ export const HomeView = () => {
 
     fetchModelInfo();
   }, []);
+
+  const fetchDiffInfo = async () => {
+    try {
+      const response = await fetch(API_BASE_URL + '/diff');
+      const data = await response.json();
+      if (data.error) {
+        console.log('Error fetching model diff:', data.error);
+        setComparedVersionInfo(null);
+      } else {
+        setComparedVersionInfo(data);
+        setHasDiffed(true);
+      }
+    } catch (err) {
+      console.log('Failed to fetch model diff: ' + err.message);
+      setComparedVersionInfo(null);
+    }
+  };
+
+  useEffect(() => {
+    fetchDiffInfo();
+  }, []);
+
+  useEffect(() => {
+    const fetchHeadDate = async () => {
+      try {
+        const response = await fetch(API_BASE_URL + '/commits');
+        const data = await response.json();
+        setHeadDate(data[0].date.substring(0, 10));
+        setHeadTag(data[0].tag);
+      } catch (err) {
+        console.log('Failed to fetch head date: ' + err.message);
+        setHeadDate('');
+        setHeadTag('');
+      }
+    };
+    fetchHeadDate();
+  }, {});
 
   if (error) {
     return (
@@ -47,7 +88,33 @@ export const HomeView = () => {
               {modelInfo.revision && <p>Revision: {modelInfo.revision}</p>}
               {modelInfo.branch && <p>Branch: {modelInfo.branch}</p>}
               {modelInfo.hash && <p>Current Commit Hash: {modelInfo.hash}</p>}
-              <ModelDiff />
+              {headDate && <p>Date Created: {headDate}</p>}
+              {headTag && <p>Tag: {headTag}</p>}
+              <ModelDiff onRefetch={fetchDiffInfo} hasDiffed={hasDiffed} />
+              {comparedVersionInfo && (
+                <div>
+                  <p>Compared to Version:</p>
+                  {/* <p>
+                    Revision:{' '}
+                    {comparedVersionInfo.metadata.old_revision.revision}
+                  </p> */}
+                  {/* Revision shall be branch in feature versions. */}
+                  {comparedVersionInfo.metadata.old_revision.tag && (
+                    <p>Tag: {comparedVersionInfo.metadata.old_revision.tag}</p>
+                  )}
+                  <p>
+                    Commit Hash:{' '}
+                    {comparedVersionInfo.metadata.old_revision.hash}
+                  </p>
+                  <p>
+                    Date Created:{' '}
+                    {comparedVersionInfo.metadata.old_revision.date.substring(
+                      0,
+                      10
+                    )}
+                  </p>
+                </div>
+              )}
               <div
                 className="hidden md:block"
                 dangerouslySetInnerHTML={{ __html: modelInfo.badge }}></div>

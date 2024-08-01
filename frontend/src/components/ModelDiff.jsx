@@ -5,28 +5,25 @@ import { API_BASE_URL } from '../APIConfig';
 import React, { useState, useEffect } from 'react';
 import { Spinner } from './Spinner';
 
-export const ModelDiff = () => {
+export const ModelDiff = ({ onRefetch, hasDiffed }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [completeLoading, setCompleteLoading] = useState(false);
-  const [prevSelection, setPrevSelection] = useState('');
   const [commitDetails, setCommitDetails] = useState({});
   const [selectionOptions, setSelectionOptions] = useState([]);
   const [isPopupVisible, setIsPopupVisible] = useState(false);
   const [selectedDetails, setSelectedDetails] = useState('');
   const [error, setError] = useState('');
+  const [selectedOption, setSelectedOption] = useState('');
 
   const handleSelectChange = (e) => {
-    const selectedValue = e.target.value;
-    setPrevSelection(selectedValue);
-
-    const selectedDetails = commitDetails.find(
-      (commit) => commit.hash === selectedValue
-    );
-    setSelectedDetails(selectedDetails || {});
+    const option = e.target.value;
+    setSelectedOption(option);
+    const selectedValue = JSON.parse(e.target.value);
+    setSelectedDetails(selectedValue);
   };
 
   const handleGenerateDiff = async () => {
-    if (!commitDetails[0].hash || !prevSelection) {
+    if (!commitDetails[0].hash || !selectedDetails.hash) {
       alert('Please select a version.');
       return;
     }
@@ -36,9 +33,8 @@ export const ModelDiff = () => {
       const url = new URL(API_BASE_URL + '/compare');
       const response = await postData(url, {
         head: commitDetails[0].hash,
-        prev: prevSelection
+        prev: selectedDetails.hash
       });
-      //const response = await fetch(API_BASE_URL + '/data');
       const data = await response.json();
       if (data.error) {
         throw new Error(data.error);
@@ -48,6 +44,7 @@ export const ModelDiff = () => {
     } finally {
       setIsLoading(false);
       setCompleteLoading(true);
+      onRefetch();
     }
   };
 
@@ -62,7 +59,7 @@ export const ModelDiff = () => {
     return response.json();
   };
 
-  async function openModelCompareDialog(){
+  async function openModelCompareDialog() {
     try {
       const response = await fetch(API_BASE_URL + '/commits');
       if (!response.ok) {
@@ -76,8 +73,8 @@ export const ModelDiff = () => {
       }
       setCommitDetails(data);
       const options = data.map((commit) => ({
-        value: commit.hash,
-        label: `${commit.hash.substring(0, 7)} - Created on ${commit.date.substring(0, 10)}`
+        value: JSON.stringify(commit),
+        label: `${commit.tag} - ${commit.hash.substring(0, 7)} - Created on ${commit.date.substring(0, 10)}`
       }));
 
       setSelectionOptions(options);
@@ -85,7 +82,7 @@ export const ModelDiff = () => {
     } catch (err) {
       setError(err.message);
     }
-  };
+  }
 
   return (
     <div className="mb-2 mt-2 flex flex-col items-center">
@@ -93,26 +90,30 @@ export const ModelDiff = () => {
         className="rounded border border-black bg-gray-200 px-4 py-2
          text-gray-700 hover:bg-custom-light dark:bg-custom-dark-2 dark:text-gray-100 dark:hover:bg-custom-dark-4"
         onClick={openModelCompareDialog}>
-        Compare with previous version
+        {hasDiffed
+          ? 'Compare with another version'
+          : 'Compare with previous version'}
       </button>
       {isPopupVisible && (
         <div>
           <div
             className="fixed inset-0 z-10 bg-black bg-opacity-50"
             onClick={() => {
-              setIsPopupVisible(false);
-              setCompleteLoading(false);
+              if (!isLoading) {
+                setIsPopupVisible(false);
+                setCompleteLoading(false);
+              }
             }}></div>
           <div
-            className="absolute left-1/2 top-1/2 z-20 w-1/2 -translate-x-1/2
-            -translate-y-1/2 transform rounded bg-gray-100 p-4 shadow-lg
-            dark:bg-custom-dark-2 dark:text-gray-100"
+            className="absolute left-1/2 top-1/2 z-20 w-1/2 min-w-0
+            -translate-x-1/2 -translate-y-1/2 transform rounded bg-gray-100 p-4
+            shadow-lg dark:bg-custom-dark-2 dark:text-gray-100"
             onClick={(e) => e.stopPropagation()}>
-            <div className="flex flex-col space-y-8 text-lg">
+            <div className="flex flex-col space-y-8 break-words text-lg">
               <div>
                 {error ? (
                   <div>
-                    <p className="text-red-500">
+                    <p className="font-semibald text-red-500">
                       Cannot generate model diff: {error}
                     </p>
                     <p>
@@ -126,24 +127,24 @@ export const ModelDiff = () => {
                       className="mb-2 w-full cursor-not-allowed bg-gray-300 text-gray-500
                       dark:bg-custom-dark-3 dark:text-gray-100"
                       disabled>
-                      {selectionOptions.map((option) => (
-                        <option key={option.value} value={option.value}>
-                          {option.label}
-                        </option>
-                      ))}
+                      <option>{selectionOptions[0].label}</option>
                     </select>
                     <div className="text-left font-semibold">
                       <p>Hash: {commitDetails[0].hash}</p>
+                      {commitDetails[0].tag && (
+                        <p>Tag: {commitDetails[0].tag}</p>
+                      )}
                       <p>Author: {commitDetails[0].author}</p>
                       <p>Description: {commitDetails[0].description}</p>
                       <p>Date: {commitDetails[0].date}</p>
                     </div>
                     <select
                       className="mb-2 mt-2 w-full bg-gray-200 dark:bg-custom-dark-3 dark:text-gray-100"
-                      value={prevSelection}
-                      onChange={handleSelectChange}>
+                      value={selectedOption}
+                      onChange={handleSelectChange}
+                      disabled={isLoading}>
                       <option disabled value="">
-                        Select Commit:{' '}
+                        Select Commit:
                       </option>
                       {selectionOptions.slice(1).map((option) => (
                         <option key={option.value} value={option.value}>
@@ -154,11 +155,10 @@ export const ModelDiff = () => {
                     {selectedDetails && (
                       <div className="text-left">
                         <p>Hash: {selectedDetails.hash}</p>
+                        {selectedDetails.tag && (
+                          <p>Tag: {selectedDetails.tag}</p>
+                        )}
                         <p>Author: {selectedDetails.author}</p>
-                        <div>
-                          <p className='text-bold'>Description</p>
-                          <p className='whitespace-pre-wrap'>{selectedDetails.description}</p>
-                        </div>
                         <p>Description: {selectedDetails.description}</p>
                         <p>Date: {selectedDetails.date.substring(0, 10)}</p>
                       </div>
