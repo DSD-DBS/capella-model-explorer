@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 export const Spinner = () => (
-  <div className="mt-32 flex items-center justify-center">
+  <div className="flex items-center justify-center">
     <div
       className={
         'h-12 w-12 animate-spin-slow rounded-full border-b-4 border-t-4 ' +
