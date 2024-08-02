@@ -249,11 +249,11 @@ class CapellaModelExplorerBackend:
             info = self.model.info
             return {
                 "title": info.title,
-                "revision": info.revision,
-                "hash": info.rev_hash,
+                "revision": getattr(info, "revision", None),
+                "hash": getattr(info, "rev_hash", None),
                 "capella_version": info.capella_version,
-                "branch": info.branch,
-                "badge": self.model.description_badge,
+                "branch": getattr(info, "branch", None),
+                "badge": getattr(self.model, "description_badge", None),
             }
 
         @self.app.get("/metrics")
