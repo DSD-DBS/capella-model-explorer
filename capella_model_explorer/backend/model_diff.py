@@ -10,7 +10,6 @@ import typing as t
 
 import capellambse
 import capellambse.model as m
-import capellambse.model.common as c
 import diff_match_patch
 import typing_extensions as te
 from capellambse.filehandler import git, local
@@ -125,9 +124,9 @@ def populate_commits(model: capellambse.MelodyModel):
 
 
 def _serialize_obj(obj: t.Any) -> t.Any:
-    if isinstance(obj, c.GenericElement):
+    if isinstance(obj, m.ModelElement):
         return {"uuid": obj.uuid, "display_name": _get_name(obj)}
-    elif isinstance(obj, c.ElementList):
+    elif isinstance(obj, m.ElementList):
         return [{"uuid": i.uuid, "display_name": _get_name(i)} for i in obj]
     elif isinstance(obj, (enum.Enum, enum.Flag)):
         return obj.name
@@ -202,7 +201,7 @@ def get_commit_hashes(path: str) -> list[RevisionInfo]:
     return commits
 
 
-def _get_name(obj: m.diagram.Diagram | c.ModelObject) -> str:
+def _get_name(obj: m.ModelObject) -> str:
     """Return the object's name.
 
     If the object doesn't own a name, its type is returned instead.
@@ -242,18 +241,16 @@ def compare_objects(
     children: dict[str, t.Any] = {}
     for attr in dir(type(new_object)):
         acc = getattr(type(new_object), attr, None)
-        if isinstance(acc, c.AttributeProperty):
-            _handle_attribute_property(
-                attr, old_object, new_object, attributes
-            )
+        if isinstance(acc, m.BasePOD):
+            _handle_pod(attr, old_object, new_object, attributes)
         elif isinstance(
-            acc, c.AttrProxyAccessor | c.LinkAccessor | c.ParentAccessor
+            acc, m.AttrProxyAccessor | m.LinkAccessor | m.ParentAccessor
         ):
             _handle_accessors(attr, old_object, new_object, attributes)
         elif (
             # pylint: disable=unidiomatic-typecheck
-            type(acc) is c.RoleTagAccessor
-            or (type(acc) is c.DirectProxyAccessor and not acc.rootelem)
+            type(acc) is m.RoleTagAccessor
+            or (type(acc) is m.DirectProxyAccessor and not acc.rootelem)
         ):
             _handle_direct_accessors(
                 attr, old_object, new_object, children, old_model
@@ -270,7 +267,7 @@ def compare_objects(
     return {}
 
 
-def _handle_attribute_property(attr, old_object, new_object, attributes):
+def _handle_pod(attr, old_object, new_object, attributes):
     if attr != "uuid":
         try:
             old_value = getattr(old_object, attr, None)
@@ -289,8 +286,8 @@ def _handle_attribute_property(attr, old_object, new_object, attributes):
 def _handle_accessors(attr, old_object, new_object, attributes):
     old_value = getattr(old_object, attr, None)
     new_value = getattr(new_object, attr, None)
-    if isinstance(old_value, c.GenericElement | type(None)) and isinstance(
-        new_value, c.GenericElement | type(None)
+    if isinstance(old_value, m.ModelElement | type(None)) and isinstance(
+        new_value, m.ModelElement | type(None)
     ):
         if old_value is new_value is None:
             pass
@@ -309,8 +306,8 @@ def _handle_accessors(attr, old_object, new_object, attributes):
                 "previous": _serialize_obj(old_value),
                 "current": _serialize_obj(new_value),
             }
-    elif isinstance(old_value, c.ElementList | type(None)) and isinstance(
-        new_value, c.ElementList
+    elif isinstance(old_value, m.ElementList | type(None)) and isinstance(
+        new_value, m.ElementList
     ):
         old_value = old_value or []
         if [i.uuid for i in old_value] != [i.uuid for i in new_value]:
@@ -330,8 +327,8 @@ def _handle_direct_accessors(
 ):
     old_value = getattr(old_object, attr, None)
     new_value = getattr(new_object, attr, None)
-    if isinstance(old_value, c.GenericElement | type(None)) and isinstance(
-        new_value, c.GenericElement | type(None)
+    if isinstance(old_value, m.ModelElement | type(None)) and isinstance(
+        new_value, m.ModelElement | type(None)
     ):
         if old_value is new_value is None:
             pass
@@ -357,8 +354,8 @@ def _handle_direct_accessors(
             children[new_value.uuid] = compare_objects(
                 None, new_value, old_model
             )
-    elif isinstance(old_value, c.ElementList | type(None)) and isinstance(
-        new_value, c.ElementList
+    elif isinstance(old_value, m.ElementList | type(None)) and isinstance(
+        new_value, m.ElementList
     ):
         old_value = old_value or []
         for item in new_value:
