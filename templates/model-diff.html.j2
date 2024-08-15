@@ -5,13 +5,13 @@
 
 {% from 'common_macros.html.j2' import linked_name, linked_name_with_icon %}
 
-{%if data.get("metadata")%}
-{% if data["metadata"].get("old_revision") %}
+{% if "metadata" in diff_data %}
+{% if "old_revision" in diff_data["metadata"] %}
 <h1>Model Change Assessment Report</h1>
 <p>This report provides an analysis of changes to the following model repository:</p>
 <p>
-    <b>Repository: </b>{{ data["metadata"]["model"]["path"] | e }} <br/>
-    <b>Entry point: </b>{{ data["metadata"]["model"]["entrypoint"] | e }}
+    <b>Repository: </b>{{ diff_data["metadata"]["model"]["path"] | e }} <br/>
+    <b>Entry point: </b>{{ diff_data["metadata"]["model"]["entrypoint"] | e }}
 </p>
 <p>The review of changes covers the following commits:</p>
 <table>
@@ -25,37 +25,37 @@
     <tbody>
         <tr>
             <th>Author</th>
-            <td>{{ data["metadata"]["old_revision"]["author"] | e }}</td>
-            <td>{{ data["metadata"]["new_revision"]["author"] | e }}</td>
+            <td>{{ diff_data["metadata"]["old_revision"]["author"] | e }}</td>
+            <td>{{ diff_data["metadata"]["new_revision"]["author"] | e }}</td>
         </tr>
         <tr>
             <th>Revision</th>
-            <td>{{ data["metadata"]["old_revision"]["revision"] | e }}</td>
-            <td>{{ data["metadata"]["new_revision"]["revision"] | e }}</td>
+            <td>{{ diff_data["metadata"]["old_revision"]["revision"] | e }}</td>
+            <td>{{ diff_data["metadata"]["new_revision"]["revision"] | e }}</td>
         </tr>
         <tr>
             <th>Date & time of commit</th>
-            <td>{{ data["metadata"]["old_revision"]["date"] | e }}</td>
-            <td>{{ data["metadata"]["new_revision"]["date"] | e }}</td>
+            <td>{{ diff_data["metadata"]["old_revision"]["date"] | e }}</td>
+            <td>{{ diff_data["metadata"]["new_revision"]["date"] | e }}</td>
         </tr>
         <tr>
             <th>Commit message</th>
-            <td>{{ data["metadata"]["old_revision"]["description"] | e }}</td>
-            <td>{{ data["metadata"]["new_revision"]["description"] | e }}</td>
+            <td>{{ diff_data["metadata"]["old_revision"]["description"] | e }}</td>
+            <td>{{ diff_data["metadata"]["new_revision"]["description"] | e }}</td>
         </tr>
         <tr>
             <th>Commit ID (hash)</th>
-            <td>{{ data["metadata"]["old_revision"]["hash"] | e }}</td>
-            <td>{{ data["metadata"]["new_revision"]["hash"] | e }}</td>
+            <td>{{ diff_data["metadata"]["old_revision"]["hash"] | e }}</td>
+            <td>{{ diff_data["metadata"]["new_revision"]["hash"] | e }}</td>
         </tr>
     </tbody>
 </table>
 
 {% macro pretty_stats(stats) %}
 <span style="font-weight: normal;">(
-    {% if stats.created %}<span style="color:green">+{{stats["created"]}}</span> / {% endif %}
-    {% if stats.deleted %}<span style="color:red">-{{stats["deleted"]}}</span> / {% endif %}
-    {% if stats.modified %}<span style="color:blue">Δ{{stats["modified"]}}</span>{% endif %}
+    {% if stats["created"] %}<span style="color:green">+{{stats["created"]}}</span> / {% endif %}
+    {% if stats["deleted"] %}<span style="color:red">-{{stats["deleted"]}}</span> / {% endif %}
+    {% if stats["modified"] %}<span style="color:blue">Δ{{stats["modified"]}}</span>{% endif %}
 )</span>
 {% endmacro %}
 
@@ -95,7 +95,7 @@
                 {% for change in obj["attributes"] %}
                 <li><b>{{ change }}</b>:
                     {% if "diff" in obj["attributes"][change] %}
-                        {{ obj["attributes"][change]["diff"] | safe}}
+                        {{ obj["attributes"][change]["diff"]["display_name"] | safe}}
                     {% else %}
                         {{ obj["attributes"][change]["previous"] | e }} -&gt; {{ obj["attributes"][change]["current"] | e }}
                     {% endif %}
@@ -114,14 +114,39 @@
 
 {% set LAYER = {"oa": "Operational Analysis", "sa": "System Analysis", "la": "Logical Architecture", "pa": "Physical Architecture"}%}
 
+<h1>Object Changes {{ pretty_stats(diff_data["objects"].stats) | safe }}</h1>
+<div class="section">
+{% for layer in LAYER %}
+    {% set layer_data = diff_data["objects"][layer] %}
+    {% if layer_data and layer_data.stats %}
+        <h2>{{LAYER[layer]}} {{ pretty_stats(layer_data.stats) | safe }}</h2>
+    {% macro render_section(diff_data, layer) %}
+    <div class="section">
+        {% for obj_type, obj_type_items in diff_data["objects"][layer].items()
+           if obj_type != "stats" and obj_type_items.stats %}
+            <h3>{{ obj_type }} {{ pretty_stats(obj_type_items.stats) | safe }}</h3>
+            {{ spell_changes_out(obj_type_items) | safe }}
+        {% endfor %}
+    </div>
+    {% endmacro %}
+    {{ render_section(diff_data, layer) | safe }}
+    {% endif %}
+{% endfor %}
+{% endif %}
+</div>
+{% else %}
+<h1 style="color: red">Could not generate model comparison report.</h1>
+<p>Select 'Deep clone' before running the session or select a model that belongs to a git repo for developer mode.</p>
+{% endif %}
+
 <h1>Diagram changes</h1>
 <div class="section">
-    {% for layer in ["oa", "sa", "la", "pa"] %}
-    {% set layer_data = data["diagrams"][layer] %}
+    {% for layer in LAYER %}
+    {% set layer_data = diff_data["diagrams"][layer] %}
     {% if layer_data and layer_data.stats %}
         <h2>{{LAYER[layer]}} {{ pretty_stats(layer_data.stats) | safe }}</h2>
         <div class="section">
-        {% for diag_type, diags in data.diagrams[layer].items() %}
+        {% for diag_type, diags in diff_data.diagrams[layer].items() %}
             {% if diags.stats %}
                 <h3>{{diag_type}} {{pretty_stats(diags.stats) | safe }}</h3>
                 {{ spell_changes_out(diags) | safe }}
@@ -131,30 +156,3 @@
     {% endif %}
     {% endfor %}
 </div>
-
-<h1>Object Changes {{ pretty_stats(data["objects"].stats) | safe }}</h1>
-<div class="section">
-{% for layer in ["oa", "sa", "la", "pa"] %}
-    {% set layer_data = data["objects"][layer] %}
-    {% if layer_data and layer_data.stats %}
-        <h2>{{LAYER[layer]}} {{ pretty_stats(layer_data.stats) | safe }}</h2>
-    {% macro render_section(data, layer) %}
-    <div class="section">
-        {% for obj_type in data["objects"][layer] if obj_type != "stats" %}
-            {% set obj_type_items = data["objects"][layer][obj_type] %}
-            {% if obj_type_items.stats %}
-            <h3>{{ obj_type }} {{ pretty_stats(obj_type_items.stats) | safe }}</h3>
-            {{ spell_changes_out(obj_type_items) | safe }}
-            {% endif %}
-        {% endfor %}
-    </div>
-    {% endmacro %}
-    {{ render_section(data, layer) | safe }}
-    {% endif %}
-{% endfor %}
-{% endif %}
-</div>
-{% else %}
-<h1 style="color: red">Could not generate model comparison report.</h1>
-<p>Select 'Deep clone' before running the session or select a model that belongs to a git repo for developer mode.</p>
-{% endif %}

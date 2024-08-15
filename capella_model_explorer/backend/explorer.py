@@ -147,7 +147,7 @@ class CapellaModelExplorerBackend:
             # render the template with the object
             template = self.env.from_string(template_text)
             rendered = template.render(
-                object=object, model=self.model, data=self.diff
+                object=object, model=self.model, diff_data=self.diff
             )
             return HTMLResponse(content=rendered, status_code=200)
         except TemplateSyntaxError as e:
@@ -289,7 +289,7 @@ class CapellaModelExplorerBackend:
             return {"version": self.app.version}
 
         @self.app.post("/api/compare")
-        async def post_data(commit_range: CommitRange):
+        async def post_compare(commit_range: CommitRange):
             try:
                 self.diff = model_diff.get_data(
                     self.model, commit_range.head, commit_range.prev
@@ -299,12 +299,12 @@ class CapellaModelExplorerBackend:
                 return {"success": False, "error": str(e)}
 
         @self.app.get("/api/commits")
-        async def commits():
+        async def get_commits():
             result = model_diff.populate_commits(self.model)
             return result
 
         @self.app.get("/api/diff")
-        async def retrieve_data():
+        async def get_diff():
             if self.diff:
                 return self.diff
             return {

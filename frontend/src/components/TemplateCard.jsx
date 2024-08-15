@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import React, { useState, useEffect } from 'react';
-import { API_BASE_URL } from '../APIConfig';
 
 import {
   FlaskConical,
@@ -33,24 +32,6 @@ export const TemplateCard = ({
   instanceCount = 0,
   error = false
 }) => {
-  const [modelDiff, setModelDiff] = useState(null);
-  const [errorTest, setError] = useState(null);
-
-  //useEffect(() => {
-  //   const fetchModelDiff = async () => {
-  //     try {
-  //       const response = await fetch(API_BASE_URL + '/model-diff');
-  //       const data = await response.json();
-  //       setModelDiff(data);
-  //     } catch (err) {
-  //       setError('Failed to fetch model info: ' + err.message);
-  //     }
-  //     document.body.style.height = 'auto';
-  //   };
-
-  //   fetchModelDiff();
-  // }, []);
-
   return (
     <div
       onClick={() => onClickCallback(idx)}

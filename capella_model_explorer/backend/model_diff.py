@@ -1,7 +1,6 @@
 # Copyright DB InfraGO AG and contributors
 # SPDX-License-Identifier: Apache-2.0
 
-import copy
 import datetime
 import logging
 import pathlib
@@ -12,6 +11,7 @@ from capella_diff_tools import compare, report, types
 from capellambse.filehandler import git, local
 
 logger = logging.getLogger(__name__)
+NUM_COMMITS = "20"
 
 
 def init_model(model: capellambse.MelodyModel):
@@ -69,7 +69,6 @@ def get_data(model: capellambse.MelodyModel, head: str, prev: str):
         "diagrams": diagrams,
         "objects": objects,
     }
-    data = copy.deepcopy(data)
     report._compute_diff_stats(data)
     model_data = report._traverse_and_diff(data)
     return model_data
@@ -108,14 +107,10 @@ def _get_revision_info(
 
 
 def get_commit_hashes(path: str):
-    commit_hashes = (
-        subprocess.check_output(
-            ["git", "log", "-n", "20", "--format=%H"],
-            cwd=path,
-            encoding="utf-8",
-        )
-        .strip()
-        .split("\n")
-    )
+    commit_hashes = subprocess.check_output(
+        ["git", "log", "-n", NUM_COMMITS, "--format=%H"],
+        cwd=path,
+        encoding="utf-8",
+    ).splitlines()
     commits = [_get_revision_info(path, c) for c in commit_hashes]
     return commits
