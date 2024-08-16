@@ -52,7 +52,7 @@ COPY frontend/fetch-version.py ./frontend/
 RUN python frontend/fetch-version.py
 
 # Pre-install npm dependencies for context diagrams
-RUN python -c "from capellambse_context_diagrams import _elkjs; _elkjs._install_required_npm_pkg_versions()"
+RUN python -c "from capellambse_context_diagrams import install_elk; install_elk()"
 
 # Run as non-root user per default
 RUN chmod -R 777 /home
