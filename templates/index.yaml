@@ -23,3 +23,9 @@ categories:
       description: Template to visualize differences between two model versions
       isExperimental: true
       single: true
+    - idx: object_diff
+      template: object_diff.html.j2
+      name: Object Diff
+      description: Template to visualize differences between two objects
+      isExperimental: true
+      single: true

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { API_BASE_URL } from '../APIConfig';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Spinner } from './Spinner';
 
 export const ModelDiff = ({ onRefetch, hasDiffed }) => {
@@ -49,14 +49,22 @@ export const ModelDiff = ({ onRefetch, hasDiffed }) => {
   };
 
   const postData = async (url = '', data = {}) => {
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(data)
-    });
-    return response.json();
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      });
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response;
+    } catch (error) {
+      console.error('Error in postData:', error);
+      throw error;
+    }
   };
 
   async function openModelCompareDialog() {
@@ -188,6 +196,15 @@ export const ModelDiff = ({ onRefetch, hasDiffed }) => {
                         'Compare versions'
                       )}
                     </button>
+                    {completeLoading && (
+                      <button
+                        className="mt-4 rounded bg-custom-blue px-4 py-2 text-white hover:bg-custom-blue-hover"
+                        onClick={() => {
+                          window.open('/model-comparison', '_blank');
+                        }}>
+                        View model comparison
+                      </button>
+                    )}
                   </>
                 )}
               </div>

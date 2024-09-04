@@ -1,0 +1,64 @@
+{#
+    Copyright DB InfraGO AG and contributors
+    SPDX-License-Identifier: Apache-2.0
+#}
+{% from 'common_macros.html.j2' import show_other_attributes, linked_name, linked_name_with_icon %}
+
+<style>
+    .deleted, del {
+        background-color: red !important;
+    }
+    .created, ins {
+        color: #00aa00;
+    }
+    .text-removed, del > p {
+        background: #ffe6e6;
+        display: inline;
+    }
+    .text-added, ins > p {
+        background: #e6ffe6;
+        text-decoration: none;
+        display: inline;
+    }
+</style>
+{% macro display_modified_changes(object_diff) %}
+    {% for key, value in object_diff["attributes"].items()%}
+        {% if "diff" in value %}
+            <h3>{{key}}</h3>
+            {% if "uuid" in value["current"] %}
+                {% set object = model.by_uuid(value["current"]["uuid"]) %}
+                <p><b>{{ linked_name_with_color(object, value["current"][display_name]) | safe }}</b></p>
+            {% endif %}
+            <p>{{value["diff"] | safe}} </p>
+        {% else %}
+            <h3>{{key}}</h3>
+            <ul>
+                <li><strong>Previous</strong>: {{value["previous"] | safe}}</li>
+                <li><strong>Current</strong>: {{value["current"] | safe}}</li>
+            </ul>
+        {% endif %}
+    {% endfor %}
+{% endmacro %}
+
+{%- macro linked_name_with_color(object, name) -%}<a href="{{ object | make_href }}" target="_blank">{{ name  | trim }}</a>{%- endmacro -%}
+
+
+{% if object %}
+    {% if object.name %}
+        <h1>{{ object.name }} <span style="font-size: 60%">({{ object.__class__.__name__ }})</span></h1>
+    {% else %}
+        <h1>Unnamed ({{ object.__class__.__name__ }})</small></h1>
+    {% endif %}
+    {{show_other_attributes(object) | safe}}
+{% else %}
+<h1> deleted </h1>
+{% endif %}
+
+
+{% if object_diff %}
+    <h1>Changes</h1>
+    <h2>{{object_diff["change"] | capitalize}} </h2>
+    {% if object_diff["change"] == "modified" %}
+        {{ display_modified_changes(object_diff) | safe}}
+    {% endif %}
+{% endif %}

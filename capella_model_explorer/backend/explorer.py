@@ -45,6 +45,13 @@ class CommitRange(BaseModel):
     prev: str
 
 
+class DiffData(BaseModel):
+    display_name: str
+    change: str
+    attributes: dict[str, t.Any]
+    children: dict[str, t.Any]
+
+
 @dataclasses.dataclass
 class CapellaModelExplorerBackend:
     app: FastAPI = dataclasses.field(init=False)
@@ -87,6 +94,7 @@ class CapellaModelExplorerBackend:
             self.templates_path
         )
         self.diff = {}
+        self.object_diff = {}
 
         @self.app.middleware("http")
         async def update_last_interaction_time(request: Request, call_next):
@@ -147,7 +155,10 @@ class CapellaModelExplorerBackend:
             # render the template with the object
             template = self.env.from_string(template_text)
             rendered = template.render(
-                object=object, model=self.model, diff_data=self.diff
+                object=object,
+                model=self.model,
+                diff_data=self.diff,
+                object_diff=self.object_diff,
             )
             return HTMLResponse(content=rendered, status_code=200)
         except TemplateSyntaxError as e:
@@ -291,9 +302,17 @@ class CapellaModelExplorerBackend:
         @self.app.post("/api/compare")
         async def post_compare(commit_range: CommitRange):
             try:
-                self.diff = model_diff.get_data(
+                self.diff = model_diff.get_diff_data(
                     self.model, commit_range.head, commit_range.prev
                 )
+                return {"success": True}
+            except Exception as e:
+                return {"success": False, "error": str(e)}
+
+        @self.app.post("/api/object-diff")
+        async def post_object_diff(diff_data: DiffData):
+            try:
+                self.object_diff = diff_data.model_dump()
                 return {"success": True}
             except Exception as e:
                 return {"success": False, "error": str(e)}

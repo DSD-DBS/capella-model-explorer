@@ -3,57 +3,13 @@
 
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { API_BASE_URL } from '../APIConfig';
 
 export const TemplateDetails = ({ endpoint, onSingleInstance }) => {
-  const [modelDiff, setModelDiff] = useState(null);
   let { templateName, objectID } = useParams();
   const [error, setError] = useState(null);
   const [details, setDetails] = useState([]);
   const navigate = useNavigate();
   const [filterText, setFilterText] = useState('');
-  const createdItems = [];
-  const modifiedItems = [];
-
-  useEffect(() => {
-    const fetchModelDiff = async () => {
-      try {
-        const response = await fetch(API_BASE_URL + '/diff');
-        const data = await response.json();
-        setModelDiff(data);
-      } catch (err) {
-        setModelDiff({});
-      }
-      document.body.style.height = 'auto';
-    };
-
-    fetchModelDiff();
-  }, []);
-
-  function processModelDiffItems(items) {
-    Object.entries(items).forEach(([layerKey, layer]) => {
-      if (layerKey === 'stats') return;
-      Object.values(layer).forEach((item) => {
-        ['created', 'modified'].forEach((action) => {
-          if (Array.isArray(item[action])) {
-            item[action].forEach((detail) => {
-              const targetList =
-                action === 'created' ? createdItems : modifiedItems;
-              targetList.push(detail['uuid']);
-            });
-          }
-        });
-      });
-    });
-  }
-
-  if (modelDiff) {
-    ['diagrams', 'objects'].forEach((key) => {
-      if (modelDiff[key]) {
-        processModelDiffItems(modelDiff[key]);
-      }
-    });
-  }
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -165,21 +121,23 @@ export const TemplateDetails = ({ endpoint, onSingleInstance }) => {
                     onClick={() => {
                       navigate(`/${templateName}/${object.idx}`);
                     }}
-                    className={`${
-                      objectID && object.idx === objectID
-                        ? 'w-full bg-custom-blue text-white dark:bg-custom-blue dark:text-gray-100'
-                        : 'borer-r-8 w-full border-transparent bg-gray-200 text-gray-900 dark:bg-custom-dark-4'
-                    } ${
-                      createdItems.includes(object.idx)
-                        ? 'border-l-8 border-transparent border-l-green-500'
-                        : modifiedItems.includes(object.idx)
-                          ? 'border-l-8 border-transparent border-l-orange-500'
-                          : 'border-l-8 border-transparent'
-                    } dark:bg-dark-quaternary m-2 min-w-0 cursor-pointer rounded-lg
-                    border-2 shadow-md hover:bg-custom-blue hover:text-white
-                    dark:shadow-dark dark:hover:bg-blue-500`}>
-                    <div className="flex items-center justify-between p-2">
-                      <h5 className="text-md break-words font-bold dark:text-gray-100">
+                    className={
+                      (objectID && object.idx === objectID
+                        ? 'w-full bg-custom-blue text-white ' +
+                          'dark:bg-custom-blue dark:text-gray-100'
+                        : 'w-full bg-gray-200 text-gray-900 ' +
+                          'dark:bg-custom-dark-4') +
+                      ' dark:bg-dark-quaternary m-2 min-w-0 cursor-pointer ' +
+                      'rounded-lg shadow-md hover:bg-custom-blue ' +
+                      'hover:text-white dark:border-gray-700 ' +
+                      'dark:shadow-dark dark:hover:bg-blue-500 '
+                    }>
+                    <div className="p-2">
+                      <h5
+                        className={
+                          'text-md break-words font-bold dark:text-gray-100' +
+                          (objectID && object.idx === objectID ? '' : '')
+                        }>
                         {object.name}
                       </h5>
                     </div>

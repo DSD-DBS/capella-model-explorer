@@ -28,6 +28,7 @@ dependencies = [
   "capellambse",
   "capellambse-context-diagrams",
   "capella-diff-tools",
+  "diff-match-patch",
   "jinja2",
   "fastapi",
   "uvicorn",
