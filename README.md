@@ -164,6 +164,11 @@ config:
 Replace the numbers in `compatible_versions` with the version IDs for the
 versions you want to support.
 
+When configured properly, users will be able to start read-only sessions for
+the Capella Model Explorer. More information about read-only sessions is
+available in the
+[Capella Collaboration Manager documentation](https://dsd-dbs.github.io/capella-collab-manager/user/sessions/types/read-only/).
+
 # Contributing
 
 We'd love to see your bug reports and improvement suggestions! Please take a
