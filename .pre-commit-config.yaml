@@ -43,7 +43,7 @@ repos:
     rev: 6.3.0
     hooks:
       - id: pydocstyle
-        exclude: "^tests/"
+        exclude: '^tests/'
         additional_dependencies:
           - pydocstyle[toml]
   - repo: https://github.com/pre-commit/mirrors-mypy
@@ -71,7 +71,7 @@ repos:
           - --license-filepath
           - LICENSES/.license_header.txt
           - --comment-style
-          - "#"
+          - '#'
       - id: insert-license
         name: Insert license headers (XML-style comments)
         files: '\.(?:html|md|xml)$'
@@ -81,7 +81,7 @@ repos:
           - --license-filepath
           - LICENSES/.license_header.txt
           - --comment-style
-          - "<!--| ~| -->"
+          - '<!--| ~| -->'
       - id: insert-license
         name: Insert license headers (C-style comments)
         files: '\.(?:css|js|ts)$'
@@ -91,7 +91,7 @@ repos:
           - --license-filepath
           - LICENSES/.license_header.txt
           - --comment-style
-          - "/*| *| */"
+          - '/*| *| */'
       - id: insert-license
         name: Insert license headers (reST comments)
         files: '\.rst$'
@@ -101,7 +101,7 @@ repos:
           - --license-filepath
           - LICENSES/.license_header.txt
           - --comment-style
-          - "..|  |"
+          - '..|  |'
       - id: insert-license
         name: Insert license headers (JSX files)
         files: '\.jsx$'
@@ -111,7 +111,7 @@ repos:
           - --license-filepath
           - LICENSES/.license_header.txt
           - --comment-style
-          - "//"
+          - '//'
   - repo: https://github.com/fsfe/reuse-tool
     rev: v3.0.1
     hooks:
@@ -121,27 +121,29 @@ repos:
     hooks:
       - id: commitlint
         stages: [commit-msg]
-  - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v3.1.0
+  - repo: local
     hooks:
       - id: prettier
+        name: prettier
+        entry: prettier --write
+        language: node
         types_or: [ts, css, html, markdown]
         additional_dependencies:
-          - "prettier@^3.2.5"
-          - "prettier-plugin-tailwindcss@^0.5.14"
-          - "tailwind-scrollbar@^3.1.0"
+          - 'prettier@^3.2.5'
+          - 'prettier-plugin-tailwindcss@^0.5.14'
+          - 'tailwind-scrollbar@^3.1.0'
   - repo: https://github.com/pre-commit/mirrors-eslint
     rev: v9.2.0
     hooks:
       - id: eslint
         additional_dependencies:
-          - "eslint@^8.57.0"
-          - "eslint-config-prettier@^9.1.0"
-          - "eslint-plugin-import@^2.29.1"
-          - "eslint-plugin-unused-imports@^3.1.0"
-          - "eslint-plugin-deprecation@^2.0.0"
-          - "eslint-plugin-tailwindcss@^3.15.1"
-          - "eslint-plugin-storybook@^0.8.0"
-          - "eslint-plugin-react@^7.34.1"
-          - "eslint-plugin-react-hooks@^4.6.2"
-          - "eslint-plugin-react-refresh@^0.4.5"
+          - 'eslint@^8.57.0'
+          - 'eslint-config-prettier@^9.1.0'
+          - 'eslint-plugin-import@^2.29.1'
+          - 'eslint-plugin-unused-imports@^3.1.0'
+          - 'eslint-plugin-deprecation@^2.0.0'
+          - 'eslint-plugin-tailwindcss@^3.15.1'
+          - 'eslint-plugin-storybook@^0.8.0'
+          - 'eslint-plugin-react@^7.34.1'
+          - 'eslint-plugin-react-hooks@^4.6.2'
+          - 'eslint-plugin-react-refresh@^0.4.5'

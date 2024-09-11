@@ -10,10 +10,10 @@ Thanks for your interest in our project. Contributions are always welcome!
 We are committed to fostering a welcoming, respectful, and harassment-free
 environment. Be kind!
 
-If you have questions, ideas or want to report a bug, feel free to [open an
-issue]. Or go ahead and [open a pull request] to contribute code. In order to
-reduce the burden on our maintainers, please make sure that your code follows
-our style guidelines outlined below.
+If you have questions, ideas or want to report a bug, feel free to [open
+an issue]. Or go ahead and [open a pull request] to contribute code. In order to
+reduce the burden on our maintainers, please make sure that your code follows our
+style guidelines outlined below.
 
 <!-- prettier-ignore -->
 [open an issue]: https://github.com/DSD-DBS/capella-model-explorer/issues
@@ -76,7 +76,8 @@ The key differences are:
 
 - **Docstrings**: The [Numpy style guide] applies here.
 
-  [numpy style guide]: https://numpydoc.readthedocs.io/en/latest/format.html#docstring-standard
+  [numpy style guide]:
+    https://numpydoc.readthedocs.io/en/latest/format.html#docstring-standard
 
   When writing docstrings for functions, use the imperative style, as per
   [PEP-257]). For example, write "Do X and Y" instead of "Does X and Y".
@@ -129,8 +130,7 @@ The key differences are:
     etc.
   - For classes that are not builtin (e.g. `Iterable`),
     `import collections.abc as cabc` and then use them like `cabc.Iterable`.
-  - Use [PEP-604-style unions], e.g. `int | float` instead of
-    `t.Union[int, float]`.
+  - Use [PEP-604-style unions], e.g. `int | float` instead of `t.Union[int, float]`.
   - Use `... | None` (with `None` always as the last union member) instead of
     `t.Optional[...]` and always explicitly annotate where `None` is possible.
 
@@ -140,7 +140,8 @@ The key differences are:
   If you have set up black correctly, you don't need to worry about this though
   :)
 
-  [black code style]: https://black.readthedocs.io/en/stable/the_black_code_style/current_style.html
+  [black code style]:
+    https://black.readthedocs.io/en/stable/the_black_code_style/current_style.html
 
 - When working with `dict`s, consider using `t.TypedDict` instead of a more
   generic `dict[str, float|int|str]`-like annotation where possible, as the
