@@ -10,10 +10,10 @@ Thanks for your interest in our project. Contributions are always welcome!
 We are committed to fostering a welcoming, respectful, and harassment-free
 environment. Be kind!
 
-If you have questions, ideas or want to report a bug, feel free to [open an
-issue]. Or go ahead and [open a pull request] to contribute code. In order to
-reduce the burden on our maintainers, please make sure that your code follows
-our style guidelines outlined below.
+If you have questions, ideas or want to report a bug, feel free to [open
+an issue]. Or go ahead and [open a pull request] to contribute code. In order to
+reduce the burden on our maintainers, please make sure that your code follows our
+style guidelines outlined below.
 
 <!-- prettier-ignore -->
 [open an issue]: https://github.com/DSD-DBS/capella-model-explorer/issues
@@ -129,8 +129,7 @@ The key differences are:
     etc.
   - For classes that are not builtin (e.g. `Iterable`),
     `import collections.abc as cabc` and then use them like `cabc.Iterable`.
-  - Use [PEP-604-style unions], e.g. `int | float` instead of
-    `t.Union[int, float]`.
+  - Use [PEP-604-style unions], e.g. `int | float` instead of `t.Union[int, float]`.
   - Use `... | None` (with `None` always as the last union member) instead of
     `t.Optional[...]` and always explicitly annotate where `None` is possible.
 
