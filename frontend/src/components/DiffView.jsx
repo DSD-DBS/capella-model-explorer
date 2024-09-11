@@ -23,7 +23,7 @@ export const DiffView = ({ objectID, endpoint, diffData }) => {
         .then(() => {
           let url;
           if (diffData.change) {
-            url = `${endpoint}object_diff/${objectID}`;
+            url = `${endpoint}object_comparison/${objectID}`;
           }
           fetch(url, {
             method: 'GET',
