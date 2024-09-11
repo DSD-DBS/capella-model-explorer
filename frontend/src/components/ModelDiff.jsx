@@ -114,8 +114,9 @@ export const ModelDiff = ({ onRefetch, hasDiffed }) => {
             }}></div>
           <div
             className="absolute left-1/2 top-1/2 z-20 w-1/2 min-w-0
-            -translate-x-1/2 -translate-y-1/2 transform rounded bg-gray-100 p-4
-            shadow-lg dark:bg-custom-dark-2 dark:text-gray-100"
+            -translate-x-1/2 -translate-y-1/2 transform overflow-y-auto rounded bg-gray-100
+            p-4 shadow-lg dark:bg-custom-dark-2 dark:text-gray-100"
+            style={{ maxHeight: '66.6%' }}
             onClick={(e) => e.stopPropagation()}>
             <div className="flex flex-col space-y-8 break-words text-lg">
               <div>
@@ -176,8 +177,9 @@ export const ModelDiff = ({ onRefetch, hasDiffed }) => {
                         <Spinner />
                       </div>
                     )}
-                    <button
-                      className={`
+                    <div className="flex flex-col">
+                      <button
+                        className={`
                         mt-4 rounded px-4 py-2 text-white
                         ${
                           isLoading
@@ -186,25 +188,26 @@ export const ModelDiff = ({ onRefetch, hasDiffed }) => {
                               ? 'bg-green-500'
                               : 'bg-custom-blue hover:bg-custom-blue-hover'
                         }`}
-                      onClick={handleGenerateDiff}
-                      disabled={isLoading || completeLoading}>
-                      {isLoading ? (
-                        'Comparing versions...'
-                      ) : completeLoading ? (
-                        <span>Versions compared successfully &#10003;</span>
-                      ) : (
-                        'Compare versions'
-                      )}
-                    </button>
-                    {completeLoading && (
-                      <button
-                        className="mt-4 rounded bg-custom-blue px-4 py-2 text-white hover:bg-custom-blue-hover"
-                        onClick={() => {
-                          window.open('/model-comparison', '_blank');
-                        }}>
-                        View model comparison
+                        onClick={handleGenerateDiff}
+                        disabled={isLoading || completeLoading}>
+                        {isLoading ? (
+                          'Comparing versions...'
+                        ) : completeLoading ? (
+                          <span>Versions compared successfully &#10003;</span>
+                        ) : (
+                          'Compare versions'
+                        )}
                       </button>
-                    )}
+                      {completeLoading && (
+                        <button
+                          className="mt-4 rounded bg-custom-blue px-4 py-2 text-white hover:bg-custom-blue-hover"
+                          onClick={() => {
+                            window.open('/model-comparison', '_blank');
+                          }}>
+                          View model comparison
+                        </button>
+                      )}
+                    </div>
                   </>
                 )}
               </div>

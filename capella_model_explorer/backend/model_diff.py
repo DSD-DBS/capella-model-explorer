@@ -265,6 +265,7 @@ def compare_objects(
     if attributes or children or old_object is None:
         return {
             "display_name": _get_name(new_object),
+            "uuid": getattr(new_object, "uuid", None),
             "change": "created" if old_object is None else "modified",
             "attributes": attributes,
             "children": children,
@@ -446,23 +447,23 @@ def _diff_objects(previous, current):
 
 
 def _diff_lists(previous, current):
-    out = []
+    out = {}
     previous = {item["uuid"]: item for item in previous}
     for item in current:
         if item["uuid"] not in previous:
-            out.append(f"<li><ins>{item['display_name']}</ins></li>")
+            out[item["uuid"]] = f"<ins>{item['display_name']}</ins>"
         elif item["uuid"] in previous:
             if item["display_name"] != previous[item["uuid"]]["display_name"]:
-                out.append(
-                    f"<li>{_diff_objects(previous[item['uuid']], item)}</li>"
+                out[item["uuid"]] = (
+                    f"{_diff_objects(previous[item['uuid']], item)}"
                 )
             else:
-                out.append(f"<li>{item['display_name']}</li>")
+                out[item["uuid"]] = f"{item['display_name']}"
     current = {item["uuid"]: item for item in current}
-    for item in previous:
-        if item not in current:
-            out.append(f"<li><del>{previous[item]['display_name']}</del></li>")
-    return "<ul>" + "".join(out) + "</ul>"
+    for uuid in previous:
+        if uuid not in current:
+            out[uuid] = f"<del>{previous[uuid]['display_name']}</del>"
+    return out
 
 
 def _diff_description(previous, current):

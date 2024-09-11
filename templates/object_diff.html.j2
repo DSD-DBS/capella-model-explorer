@@ -2,7 +2,7 @@
     Copyright DB InfraGO AG and contributors
     SPDX-License-Identifier: Apache-2.0
 #}
-{% from 'common_macros.html.j2' import show_other_attributes, linked_name, linked_name_with_icon %}
+{% from 'common_macros.html.j2' import linked_name_with_icon, show_compliance_to_modeling_rules %}
 
 <style>
     .deleted, del {
@@ -21,26 +21,124 @@
         display: inline;
     }
 </style>
-{% macro display_modified_changes(object_diff) %}
-    {% for key, value in object_diff["attributes"].items()%}
-        {% if "diff" in value %}
-            <h3>{{key}}</h3>
-            {% if "uuid" in value["current"] %}
-                {% set object = model.by_uuid(value["current"]["uuid"]) %}
-                <p><b>{{ linked_name_with_color(object, value["current"][display_name]) | safe }}</b></p>
-            {% endif %}
-            <p>{{value["diff"] | safe}} </p>
-        {% else %}
-            <h3>{{key}}</h3>
+
+{% macro display_modified_changes(attr_diff, attr) %}
+    {% set diff = attr_diff[attr]["diff"] %}
+    {% if "diff" in attr_diff[attr] and diff %}
+        {% if diff is mapping %}
+            {% set seen = [] %}
             <ul>
-                <li><strong>Previous</strong>: {{value["previous"] | safe}}</li>
-                <li><strong>Current</strong>: {{value["current"] | safe}}</li>
+                {% for i in attr_diff[attr]["current"] %}
+                    {% if i["uuid"] in diff %}
+                        {% set object = model.by_uuid(i["uuid"]) %}
+                        {% set seen =  seen.append(i["uuid"]) %}
+                        <li>{{ linked_name_with_color(object, diff[i["uuid"]]) | safe }}</li>
+                    {% endif %}
+                {% endfor %}
+                {% for uuid, name in diff.items() %}
+                    {% if uuid not in seen %}
+                        <li>{{ name | safe}}</li>
+                    {% endif %}
+                {% endfor %}
             </ul>
+        {% else %}
+            <p>{{diff | safe}}</p>
         {% endif %}
-    {% endfor %}
+    {% else %}
+        <ul>
+            <li><strong>Previous</strong>: {{ attr_diff[attr]["previous"] | safe }}</li>
+            <li><strong>Current</strong>: {{ attr_diff[attr]["current"] | safe }}</li>
+        </ul>
+    {% endif %}
 {% endmacro %}
 
-{%- macro linked_name_with_color(object, name) -%}<a href="{{ object | make_href }}" target="_blank">{{ name  | trim }}</a>{%- endmacro -%}
+{%- macro linked_name_with_color(object, name) -%}
+<a href="{{ object | make_href }}" target="_blank">{{ name | trim | safe }}</a>
+{%- endmacro -%}
+
+{% macro show_other_attributes(object, object_diff, excluded=[], hide_rules_check=False, hide_unset_attrs=False) %}
+    {% set empty_attrs = [] %}
+    <table style="width: 100%;">
+    {% if object_diff %}
+        {% set attr_diff = object_diff["attributes"] %}
+        {% set attr_change = object_diff["change"] %}
+        {% set attr_lst = [] %}
+        {% if attr_diff is mapping %}
+            {%for key, val in attr_diff.items() %}
+                {{attr_lst.append(key)}}
+            {% endfor %}
+        {% endif %}
+    {%endif%}
+    <thead>
+        <tr><th>Property</th><th>Value</th></tr>
+    </thead>
+    {%- for attr in object.__dir__()|sort if not attr.startswith("_") and attr not in ["from_model", "pvmt"]+excluded -%}
+    {% if attr in ["validation", "validate"] %}
+    {% else %}
+        {%- set value = object[attr] -%}
+        {% if value %}
+            <tr>
+            {% if attr in attr_diff and attr_change == "modified" %}
+                <td style="word-break:normal; background-color:rgb(255, 218, 148)">
+                    {{ attr }}
+                </td>
+                <td>
+                {%- if value.as_svg -%}
+                    {{ value.as_svg|safe }}
+                {%- else -%}
+                    {{ display_modified_changes(attr_diff, attr) | safe }}
+                {%- endif -%}
+                </td>
+                {{ attr_lst.remove(attr) }}
+            {% else %}
+                <td style="word-break:normal">
+                    {{ attr }}
+                </td>
+                <td>
+                    {%- if value.as_svg -%}
+                        {{ value.as_svg | safe }}
+                    {%- elif value is iterable and value is not string -%}
+                        <ul>
+                            {% for item in value %}
+                                <li>{{ linked_name_with_icon(item) | safe }}</li>
+                            {% endfor %}
+                        </ul>
+                    {%- elif value._short_html_ -%}
+                        <p>{{ linked_name_with_icon(value) | safe }}</p>
+                    {%- else -%}
+                        <p>{{ value }}</p>
+                    {%- endif -%}
+                </td>
+            {% endif %}
+            </tr>
+
+        {% else %}
+            {% set _none = empty_attrs.append(attr) %}
+        {% endif %}
+    {% endif %}
+    {% endfor -%}
+    {% if attr_lst and attr_change == "modified" %}
+        {% for attr in attr_lst %}
+            <td style="word-break:normal; background-color: red">
+            {{ attr }}
+            </td>
+            <td>
+            <p>{{ display_modified_changes(attr_diff, attr) | safe }}</p>
+            </td>
+        {% endfor %}
+    {% endif %}
+
+    </table>
+    {% if empty_attrs %}
+        {% if not hide_unset_attrs %}
+            <h3>Unset attributes</h3>
+            <p>The object has the following attributes in unset state (empty values): {{ ", ".join(empty_attrs) }}</p>
+        {% endif %}
+        {% if not hide_rules_check %}
+            {{ show_compliance_to_modeling_rules(object) | safe }}
+        {% endif %}
+    {% endif %}
+{% endmacro %}
 
 
 {% if object %}
@@ -49,16 +147,7 @@
     {% else %}
         <h1>Unnamed ({{ object.__class__.__name__ }})</small></h1>
     {% endif %}
-    {{show_other_attributes(object) | safe}}
+    {{show_other_attributes(object, object_diff) | safe}}
 {% else %}
 <h1> deleted </h1>
-{% endif %}
-
-
-{% if object_diff %}
-    <h1>Changes</h1>
-    <h2>{{object_diff["change"] | capitalize}} </h2>
-    {% if object_diff["change"] == "modified" %}
-        {{ display_modified_changes(object_diff) | safe}}
-    {% endif %}
 {% endif %}

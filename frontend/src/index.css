@@ -262,16 +262,19 @@ input:checked + .slider:before {
 del {
   color: red;
 }
+
 .created,
 ins {
   color: #00aa00;
 }
+
 .text-removed,
 del > p {
   background: #ffe6e6;
   display: inline;
   text-decoration: none;
 }
+
 .text-added,
 ins > p {
   background: #e6ffe6;
