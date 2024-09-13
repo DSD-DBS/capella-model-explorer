@@ -2,7 +2,7 @@
     Copyright DB InfraGO AG and contributors
     SPDX-License-Identifier: Apache-2.0
 #}
-{% from 'common_macros.html.j2' import linked_name_with_icon, show_compliance_to_modeling_rules %}
+{% from 'common_macros.html.j2' import linked_name_with_icon, draw_icon, show_compliance_to_modeling_rules %}
 
 <style>
     .deleted, del {
@@ -32,7 +32,7 @@
                     {% if i["uuid"] in diff %}
                         {% set object = model.by_uuid(i["uuid"]) %}
                         {% set seen =  seen.append(i["uuid"]) %}
-                        <li>{{ linked_name_with_color(object, diff[i["uuid"]]) | safe }}</li>
+                        <li>{{ linked_name_with_color_and_icon(object, diff[i["uuid"]]) | safe }}</li>
                     {% endif %}
                 {% endfor %}
                 {% for uuid, name in diff.items() %}
@@ -52,9 +52,18 @@
     {% endif %}
 {% endmacro %}
 
-{%- macro linked_name_with_color(object, name) -%}
-<a href="{{ object | make_href }}" target="_blank">{{ name | trim | safe }}</a>
-{%- endmacro -%}
+{% macro linked_name_with_color_and_icon(obj, name) %}
+    {% if obj %}
+        <a href="hlink://{{obj.uuid}}">
+            {% if obj.__class__.__name__ not in [ "Part"]%}
+            {{ draw_icon(obj, 15) | safe }}
+            {% endif %}
+            {{ name | safe}}
+        </a>
+    {% else %}
+        {{ name | safe }}
+    {% endif %}
+{% endmacro %}
 
 {% macro show_other_attributes(object, object_diff, excluded=[], hide_rules_check=False, hide_unset_attrs=False) %}
     {% set empty_attrs = [] %}

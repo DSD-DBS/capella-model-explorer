@@ -30,7 +30,7 @@ export const ModelDiff = ({ onRefetch, hasDiffed }) => {
     setCompleteLoading(false);
     setIsLoading(true);
     try {
-      const url = new URL(API_BASE_URL + '/compare');
+      const url = API_BASE_URL + '/compare';
       const response = await postData(url, {
         head: commitDetails[0].hash,
         prev: selectedDetails.hash
@@ -116,7 +116,7 @@ export const ModelDiff = ({ onRefetch, hasDiffed }) => {
             className="absolute left-1/2 top-1/2 z-20 w-1/2 min-w-0
             -translate-x-1/2 -translate-y-1/2 transform overflow-y-auto rounded bg-gray-100
             p-4 shadow-lg dark:bg-custom-dark-2 dark:text-gray-100"
-            style={{ maxHeight: '66.6%' }}
+            style={{ maxHeight: '75%' }}
             onClick={(e) => e.stopPropagation()}>
             <div className="flex flex-col space-y-8 break-words text-lg">
               <div>
