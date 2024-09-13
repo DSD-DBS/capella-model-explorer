@@ -22,6 +22,15 @@ categories:
       type: ComponentExchange
       below: la
 
+  - template: logical-architecture/FIS.html.j2
+    idx: functional-interface-specification
+    name: Functional Interface Specification
+    description: Defines functional interfaces between logical components (subsystems) and actors
+    isExperimental: true
+    scope:
+      type: ComponentExchange
+      below: la
+
   - template: logical-architecture/logical-function.html.j2
     idx: logical-function
     name: Logical Functions
