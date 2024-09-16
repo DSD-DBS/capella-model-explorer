@@ -8,7 +8,7 @@ export const HomeIcon = () => {
   return (
     <Link to="/">
       <div className="header-button">
-        <Home className="h-6 w-6 text-black dark:text-white" />
+        <Home className="h-6 w-6 text-white" />
       </div>
     </Link>
   );

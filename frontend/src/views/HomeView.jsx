@@ -122,7 +122,7 @@ export const HomeView = () => {
                 </div>
               )}
               <div
-                className="hidden md:block"
+                className="svg-display hidden md:block"
                 dangerouslySetInnerHTML={{ __html: modelInfo.badge }}></div>
             </div>
           </>
