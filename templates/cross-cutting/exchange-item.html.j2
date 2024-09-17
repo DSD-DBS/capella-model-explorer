@@ -26,8 +26,8 @@
     {%- set src = exchange.source.owner.owner if exchange.source.owner.owner else None -%}
     {%- set tgt = exchange.target.owner.owner if exchange.target.owner.owner else None -%}
     <li>
-        {{ linked_name_with_icon(exchange) | safe }}
-        , produced by {{ linked_name_with_icon(exchange.source.owner) | safe }} of {{ linked_name_with_icon(src) | safe if src else "Unassigned" }}
+        {{ linked_name_with_icon(exchange) | safe }},
+        produced by {{ linked_name_with_icon(exchange.source.owner) | safe }} of {{ linked_name_with_icon(src) | safe if src else "Unassigned" }}
         &nbsp;and consumed by {{ linked_name_with_icon(exchange.target.owner) | safe }} of {{ linked_name_with_icon(tgt) | safe if tgt else "Unassigned" }}</li>
 {%- endfor -%}
 </ul>
