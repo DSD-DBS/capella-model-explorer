@@ -42,3 +42,10 @@ categories:
     scope:
       type: ComponentExchange
       below: sa
+  - template: system-analysis/mod-rules-compliance.html.j2
+    idx: mod-rules-compliance
+    name: SA Modeling Rules Compliance Report
+    description: Evaluates compliance of the system analysis model with the modeling rules.
+    single: true
+    isExperimental: true
+    isDocument: true

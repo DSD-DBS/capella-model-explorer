@@ -12,5 +12,5 @@
 {{ object.context_diagram.render("svg", display_derived_interfaces=True) | safe }}
 
 <h2>Other properties of "{{ object.name }}"</h2>
-{% set excluded = [] %}
+{% set excluded = ["context_diagram", "description"] %}
 {{ show_other_attributes(object, excluded) | safe}}

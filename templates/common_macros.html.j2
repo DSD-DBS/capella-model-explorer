@@ -130,14 +130,23 @@
     {% endif %}
 {% endmacro %}
 
-{% macro req_rels(rels) %}
+{% macro req_rels(rels, scope=None) %}
 {% if rels %}
 <ul>
 {% for rel in rels %}
-    <li>
-        <a href="{{ rel.type | make_href }}">{{rel.type.long_name }}</a>
-        {{ linked_name_with_icon(rel.target) | safe}}
-    </li>
+    {% if scope %}
+        {% if rel.target == scope or rel.source == scope %}
+        <li>
+            <a href="{{ rel.type | make_href }}">{{rel.type.long_name }}</a>
+            {{ linked_name_with_icon(rel.target) | safe}}
+        </li>
+        {% endif %}
+    {% else %}
+        <li>
+            <a href="{{ rel.type | make_href }}">{{rel.type.long_name }}</a>
+            {{ linked_name_with_icon(rel.target) | safe}}
+        </li>
+    {% endif %}
 {% endfor %}
 </ul>
 {% else %}
@@ -145,7 +154,7 @@
 {% endif%}
 {% endmacro %}
 
-{% macro render_requirements_table(reqs) %}
+{% macro render_requirements_table(reqs, scope=None) %}
     <table>
     {% for req in reqs %}
         <tr>
@@ -156,7 +165,7 @@
             </td>
             <td>
                 {{ req.text if req.text else req.long_name }}
-                {{req_rels(req.relations) | safe}}
+                {{req_rels(req.relations, scope=scope) | safe}}
                 {{show_other_attributes(req, excluded=["related", "relations", "requirements", "text", "owner", "validate", "xtype"], hide_rules_check=True, hide_unset_attrs=True) | safe}}
             </td>
         </div>
@@ -213,7 +222,7 @@
     {% endif %}
 {% endmacro %}
 
-{%- macro display_traceability(object, complain=False) -%}
+{%- macro display_traceability(object, show_upper=True) -%}
     {%- set realized_attrs = [] -%}
     {%- set realizing_attrs = [] -%}
     {%- for attr in object.__dir__() -%}
@@ -223,29 +232,31 @@
             {% set _none = realizing_attrs.append(attr) %}
         {%- endif-%}
     {%- endfor -%}
-    {%- set realized_objects = object[realized_attrs | first] if realized_attrs else None -%}
-    {%- set realizing_objects = object[realizing_attrs | first] if realizing_attrs else None -%}
+    {%- set realized_objects = object[realized_attrs | first] if realized_attrs else [] -%}
+    {%- set realizing_objects = object[realizing_attrs | first] if realizing_attrs else [] -%}
 
     <h2>Traceability</h2>
-    {% if "realization_view" in object.__dir__() %}
-    <p>The figure below provides an overview of objects that "{{ object.name}}" realizes but also those that realize "{{ object.name }}"</p>
-    {{ object.realization_view.as_svg | safe }}
+    {% if (realized_objects | length > 0 or realizing_objects | length > 0) and "realization_view" in object.__dir__() %}
+        <p>The figure below provides an overview of objects that "{{ object.name}}" realizes but also those that realize "{{ object.name }}"</p>
+        {{ object.realization_view.as_svg | safe }}
     {% endif %}
-    {% if realized_objects %}
-    <p>{{ object.name }} realizes the following objects:<p>
-    <ul>
-    {%- for obj in realized_objects -%}<li style="display: block;">{{ linked_name_with_icon(obj) | safe}}</li>{%- endfor -%}
-    </ul>
-    {%- else -%}
-        <p style="color: red;">{{ first_upper(object.name) }} doesn't seem to realize any object</p>
-    {%- endif -%}
+    {% if show_upper %}
+        {% if realized_objects %}
+        <p>{{ object.name }} realizes the following objects:<p>
+        <ul>
+        {%- for obj in realized_objects -%}<li style="display: block;">{{ linked_name_with_icon(obj) | safe}}</li>{%- endfor -%}
+        </ul>
+        {%- else -%}
+            <p style="color: red;">{{ first_upper(object.name) }} doesn't seem to realize any object</p>
+        {%- endif -%}
+    {% endif %}
     {% if realizing_objects %}
-    <p>{{ object.name }} is realized by the following objects:</p>
-    <ul>
-    {%- for obj in realizing_objects -%}<li style="display: block;">{{ linked_name_with_icon(obj) | safe}}</li>{%- endfor -%}
-    </ul>
-    {%- else -%}
-        <p style="color: red;">{{ first_upper(object.name) }} doesn't seem to be realized by any object</p>
+        <p>{{ object.name }} is realized by the following objects:</p>
+        <ul>
+        {%- for obj in realizing_objects -%}<li style="display: block;">{{ linked_name_with_icon(obj) | safe}}</li>{%- endfor -%}
+        </ul>
+        {%- else -%}
+            <p style="color: red;">{{ first_upper(object.name) }} doesn't seem to be realized by any object</p>
     {% endif %}
 {%- endmacro -%}
 

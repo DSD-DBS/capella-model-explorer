@@ -81,7 +81,7 @@ This interface control document defines functional interactions between the foll
             {% set _none = items.append(item) %}
         {% endfor %}
     {% endfor %}
-    {% for item in items | unique %}
+    {% for item in items | unique(attribute="uuid") %}
         <li>{{ linked_name_with_icon(item) | safe }}</li>
     {% endfor %}
 </ul>

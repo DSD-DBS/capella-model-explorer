@@ -125,7 +125,9 @@ config:
     methods:
       - id: f51872a8-1a4f-4a4d-b4f4-b39cbd31a75b
         type: http
-        name: default
+        name: Direct Browser connection
+        sharing:
+          enabled: true
         ports:
           metrics: 8000
           http: 8000
@@ -161,6 +163,11 @@ config:
 
 Replace the numbers in `compatible_versions` with the version IDs for the
 versions you want to support.
+
+When configured properly, users will be able to start read-only sessions for
+the Capella Model Explorer. More information about read-only sessions is
+available in the
+[Capella Collaboration Manager documentation](https://dsd-dbs.github.io/capella-collab-manager/user/sessions/types/read-only/).
 
 # Contributing
 
