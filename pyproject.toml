@@ -26,7 +26,7 @@ classifiers = [
 ]
 dependencies = [
   "capellambse>=0.6.6,<0.7",
-  "capellambse-context-diagrams>=0.4.0",
+  "capellambse-context-diagrams>=0.4.1",
   "capella-diff-tools",
   "diff-match-patch",
   "jinja2",
