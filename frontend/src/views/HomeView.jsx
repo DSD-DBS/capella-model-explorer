@@ -56,8 +56,14 @@ export const HomeView = () => {
       try {
         const response = await fetch(API_BASE_URL + '/commits');
         const data = await response.json();
-        setHeadDate(data[0].date.substring(0, 10));
-        setHeadTag(data[0].tag);
+        if (data && data.length > 0) {
+          setHeadDate(data[0].date.substring(0, 10));
+          setHeadTag(data[0].tag);
+        } else {
+          console.log('No commits found');
+          setHeadDate('');
+          setHeadTag('');
+        }
       } catch (err) {
         console.log('Failed to fetch head date: ' + err.message);
         setHeadDate('');
@@ -65,7 +71,7 @@ export const HomeView = () => {
       }
     };
     fetchHeadDate();
-  }, {});
+  }, []);
 
   if (error) {
     return (
@@ -94,11 +100,6 @@ export const HomeView = () => {
               {comparedVersionInfo && (
                 <div>
                   <p>Compared to Version:</p>
-                  {/* <p>
-                    Revision:{' '}
-                    {comparedVersionInfo.metadata.old_revision.revision}
-                  </p> */}
-                  {/* Revision shall be branch in feature versions. */}
                   {comparedVersionInfo.metadata.old_revision.tag && (
                     <p>Tag: {comparedVersionInfo.metadata.old_revision.tag}</p>
                   )}

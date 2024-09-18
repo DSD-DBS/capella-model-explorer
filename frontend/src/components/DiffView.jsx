@@ -5,67 +5,80 @@ import { SVGDisplay } from './SVGDisplay';
 import { API_BASE_URL } from '../APIConfig';
 import { Spinner } from './Spinner';
 
-export const DiffView = ({ objectID, endpoint, diffData }) => {
+export const DiffView = ({ objectID, endpoint }) => {
   const [details, setDetails] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    const fetchTemplate = () => {
+    const fetchTemplate = async () => {
       setIsLoading(true);
-      fetch(`${API_BASE_URL}/object-diff`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(diffData)
-      })
-        .then((response) => response.json())
-        .then(() => {
-          let url;
-          if (diffData.change) {
-            url = `${endpoint}object_comparison/${objectID}`;
-          }
-          fetch(url, {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'text/html'
-            }
-          })
-            .then((response) => response.text())
-            .then((data) => {
-              const parser = new DOMParser();
-              const doc = parser.parseFromString(data, 'text/html');
-              const contentItems = [];
 
-              doc.body.childNodes.forEach((node) => {
-                if (node.nodeType === Node.ELEMENT_NODE) {
-                  if (node.tagName === 'svg') {
-                    contentItems.push({
-                      type: 'SVGDisplay',
-                      content: node.outerHTML
-                    });
-                  } else {
-                    contentItems.push({
-                      type: 'HTML',
-                      content: node.outerHTML
-                    });
-                  }
-                }
-              });
-              setDetails(contentItems);
-              setIsLoading(false);
-            })
-            .catch((error) => {
-              setDetails([
-                { type: 'Error', content: `Error fetching data: ${error}` }
-              ]);
-              setIsLoading(false);
-            });
-        })
-        .catch((error) => {
-          console.error('Error posting diff data:', error);
-          setIsLoading(false);
+      try {
+        const postResponse = await fetch(`${API_BASE_URL}/object-diff`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ uuid: objectID })
         });
+
+        if (!postResponse.ok) {
+          throw new Error(
+            `Failed to post diff data: ${postResponse.statusText}`
+          );
+        }
+
+        let url;
+        if (objectID) {
+          url = `${endpoint}object_comparison/${objectID}`;
+        } else {
+          throw new Error('Object ID is missing or invalid');
+        }
+
+        const getResponse = await fetch(url, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'text/html'
+          }
+        });
+
+        if (!getResponse.ok) {
+          throw new Error(
+            `Failed to fetch object comparison: ${getResponse.statusText}`
+          );
+        }
+
+        const data = await getResponse.text();
+
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(data, 'text/html');
+        const contentItems = [];
+
+        doc.body.childNodes.forEach((node) => {
+          if (node.nodeType === Node.ELEMENT_NODE) {
+            if (node.tagName === 'svg') {
+              contentItems.push({
+                type: 'SVGDisplay',
+                content: node.outerHTML
+              });
+            } else {
+              contentItems.push({
+                type: 'HTML',
+                content: node.outerHTML
+              });
+            }
+          }
+        });
+
+        setDetails(contentItems);
+      } catch (error) {
+        console.error('Error fetching template:', error);
+        setDetails([
+          { type: 'Error', content: `Error fetching data: ${error.message}` }
+        ]);
+      } finally {
+        setIsLoading(false);
+      }
     };
 
     if (objectID) {

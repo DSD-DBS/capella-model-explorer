@@ -15,7 +15,7 @@ import fastapi
 import markupsafe
 import prometheus_client
 import yaml
-from fastapi import APIRouter, FastAPI, Request
+from fastapi import APIRouter, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
@@ -45,11 +45,8 @@ class CommitRange(BaseModel):
     prev: str
 
 
-class DiffData(BaseModel):
-    display_name: str
-    change: str
-    attributes: dict[str, t.Any]
-    children: dict[str, t.Any]
+class ObjectDiffID(BaseModel):
+    uuid: str
 
 
 @dataclasses.dataclass
@@ -305,17 +302,18 @@ class CapellaModelExplorerBackend:
                 self.diff = model_diff.get_diff_data(
                     self.model, commit_range.head, commit_range.prev
                 )
+                self.diff["lookup"] = create_diff_lookup(self.diff["objects"])
                 return {"success": True}
             except Exception as e:
                 return {"success": False, "error": str(e)}
 
         @self.app.post("/api/object-diff")
-        async def post_object_diff(diff_data: DiffData):
-            try:
-                self.object_diff = diff_data.model_dump()
-                return {"success": True}
-            except Exception as e:
-                return {"success": False, "error": str(e)}
+        async def post_object_diff(object_id: ObjectDiffID):
+            if object_id.uuid not in self.diff["lookup"]:
+                raise HTTPException(status_code=404, detail="Object not found")
+
+            self.object_diff = self.diff["lookup"][object_id.uuid]
+            return {"success": True}
 
         @self.app.get("/api/commits")
         async def get_commits():
@@ -360,3 +358,24 @@ def index_templates(
                 template, templates, templates_grouped, filename=idx
             )
     return templates_grouped, templates
+
+
+def create_diff_lookup(data, lookup=None):
+    if lookup is None:
+        lookup = {}
+    try:
+        if isinstance(data, dict):
+            for _, obj in data.items():
+                if "uuid" in obj:
+                    lookup[obj["uuid"]] = {
+                        "uuid": obj["uuid"],
+                        "display_name": obj["display_name"],
+                        "change": obj["change"],
+                        "attributes": obj["attributes"],
+                    }
+                if "children" in obj:
+                    if obj["children"]:
+                        create_diff_lookup(obj["children"], lookup)
+    except Exception:
+        pass
+    return lookup

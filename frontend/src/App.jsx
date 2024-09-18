@@ -21,7 +21,10 @@ function App() {
           path="/:templateName/:objectID"
           element={<TemplateView endpoint={`${API_BASE_URL}/views/`} />}
         />
-        <Route path="/model-comparison" element={<ModelComparisonView />} />
+        <Route
+          path="/model-comparison"
+          element={<ModelComparisonView endpoint={`${API_BASE_URL}/views/`} />}
+        />
       </Routes>
     </Router>
   );

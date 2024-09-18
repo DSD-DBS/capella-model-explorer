@@ -11,7 +11,7 @@ import typing as t
 import capellambse
 import capellambse.model as m
 import capellambse.model.common as c
-import diff_match_patch  # type: ignore
+import diff_match_patch
 import typing_extensions as te
 from capellambse.filehandler import git, local
 
@@ -30,6 +30,8 @@ class RevisionInfo(te.TypedDict, total=False):
     """The time and date of the revision."""
     description: str
     """The description of the revision, i.e. the commit message."""
+    subject: str
+    """The subject of the commit."""
     tag: str | None
     """The tag of the commit."""
 
@@ -97,40 +99,28 @@ class ChangeSummaryDocument(te.TypedDict):
     objects: ObjectChanges
 
 
-def init_model(model: capellambse.MelodyModel):
+def init_model(model: capellambse.MelodyModel) -> t.Optional[str]:
+    """Initialize the model and return the path if it's a git repository."""
     file_handler = model.resources["\x00"]
-    path = str(file_handler.path)
-    model_data: dict = {
-        "metadata": {"model": {"path": path, "entrypoint": None}},
-        "diagrams": {
-            "created": {},
-            "modified": {},
-            "deleted": {},
-        },
-        "objects": {
-            "created": {},
-            "modified": {},
-            "deleted": {},
-        },
-    }
+    path = file_handler.path
 
     if isinstance(file_handler, git.GitFileHandler):
-        path = str(file_handler.cache_dir)
+        path = file_handler.cache_dir
     elif (
         isinstance(file_handler, local.LocalFileHandler)
         and file_handler.rootdir.joinpath(".git").is_dir()
     ):
         pass
     else:
-        return {"error": "Not a git repo"}, model_data
-    return path, model_data
+        return None
+    return str(path)
 
 
 def populate_commits(model: capellambse.MelodyModel):
-    result, _ = init_model(model)
-    if "error" in result:
-        return result
-    commits = get_commit_hashes(result)
+    path = init_model(model)
+    if not path:
+        return path
+    commits = get_commit_hashes(path)
     return commits
 
 
@@ -145,8 +135,10 @@ def _serialize_obj(obj: t.Any) -> t.Any:
 
 
 def get_diff_data(model: capellambse.MelodyModel, head: str, prev: str):
-    path, _ = init_model(model)
-    path = pathlib.Path(path).resolve()
+    path = init_model(model)
+    if not path:
+        return None
+    path = str(pathlib.Path(path).resolve())
     old_model = capellambse.MelodyModel(path=f"git+{path}", revision=prev)
 
     metadata: Metadata = {
@@ -177,25 +169,30 @@ def _get_revision_info(
         .strip()
         .split("\x00")
     )
+    subject = description.splitlines()[0]
     try:
         tag = subprocess.check_output(
-            ["git", "describe", "--tags", revision],
+            ["git", "tag", "--points-at", revision],
             cwd=repo_path,
             encoding="utf-8",
+            stderr=subprocess.DEVNULL,
         ).strip()
     except subprocess.CalledProcessError:
         tag = None
+
     return {
         "hash": revision,
         "revision": revision,
         "author": author,
         "date": datetime.datetime.fromisoformat(date_str),
         "description": description.rstrip(),
-        "tag": tag,
+        "subject": subject,
+        "tag": tag if tag else None,
     }
 
 
-def get_commit_hashes(path: str):
+def get_commit_hashes(path: str) -> list[RevisionInfo]:
+    """Return the commit hashes of the given model."""
     commit_hashes = subprocess.check_output(
         ["git", "log", "-n", NUM_COMMITS, "--format=%H"],
         cwd=path,
@@ -386,7 +383,7 @@ def _handle_direct_accessors(
                 }
 
 
-def _traverse_and_diff(data):
+def _traverse_and_diff(data) -> dict[str, t.Any]:
     """Traverse the data and perform diff on text fields.
 
     This function recursively traverses the data and performs an HTML
@@ -433,14 +430,14 @@ def _traverse_and_diff(data):
     return data
 
 
-def _diff_text(previous, current):
+def _diff_text(previous, current) -> str:
     dmp = diff_match_patch.diff_match_patch()
     diff = dmp.diff_main("\n".join(previous), "\n".join(current))
     dmp.diff_cleanupSemantic(diff)
     return dmp.diff_prettyHtml(diff)
 
 
-def _diff_objects(previous, current):
+def _diff_objects(previous, current) -> str:
     return (
         f"<del>{previous['display_name']}</del> → " if previous else ""
     ) + f"<ins>{current['display_name']}</ins>"
@@ -466,7 +463,9 @@ def _diff_lists(previous, current):
     return out
 
 
-def _diff_description(previous, current):
+def _diff_description(
+    previous, current
+) -> t.Tuple[str, str] | t.Tuple[None, None]:
     if previous == current == None:
         return None, None
     dmp = diff_match_patch.diff_match_patch()

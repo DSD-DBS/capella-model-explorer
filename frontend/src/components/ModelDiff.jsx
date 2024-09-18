@@ -1,7 +1,7 @@
 // Copyright DB InfraGO AG and contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { API_BASE_URL } from '../APIConfig';
+import { API_BASE_URL, ROUTE_PREFIX } from '../APIConfig';
 import React, { useState } from 'react';
 import { Spinner } from './Spinner';
 
@@ -76,13 +76,14 @@ export const ModelDiff = ({ onRefetch, hasDiffed }) => {
         );
       }
       const data = await response.json();
-      if (data.error) {
-        throw new Error(data.error);
+      if (data === null) {
+        alert('No commits found.');
+        throw new Error('No commits found.');
       }
       setCommitDetails(data);
       const options = data.map((commit) => ({
         value: JSON.stringify(commit),
-        label: `${commit.tag} - ${commit.hash.substring(0, 7)} - Created on ${commit.date.substring(0, 10)}`
+        label: `${commit.hash.substring(0, 7)} ${commit.tag ? `(${commit.tag})` : ''} - ${commit.subject} - Created on ${commit.date.substring(0, 10)}`
       }));
 
       setSelectionOptions(options);
@@ -122,7 +123,7 @@ export const ModelDiff = ({ onRefetch, hasDiffed }) => {
               <div>
                 {error ? (
                   <div>
-                    <p className="font-semibald text-red-500">
+                    <p className="font-semibold text-red-500">
                       Cannot generate model diff: {error}
                     </p>
                     <p>
@@ -156,7 +157,10 @@ export const ModelDiff = ({ onRefetch, hasDiffed }) => {
                         Select Commit:
                       </option>
                       {selectionOptions.slice(1).map((option) => (
-                        <option key={option.value} value={option.value}>
+                        <option
+                          key={option.value}
+                          value={option.value}
+                          className="font-mono">
                           {option.label}
                         </option>
                       ))}
@@ -202,7 +206,10 @@ export const ModelDiff = ({ onRefetch, hasDiffed }) => {
                         <button
                           className="mt-4 rounded bg-custom-blue px-4 py-2 text-white hover:bg-custom-blue-hover"
                           onClick={() => {
-                            window.open('/model-comparison', '_blank');
+                            window.open(
+                              `${ROUTE_PREFIX}/model-comparison`,
+                              '_blank'
+                            );
                           }}>
                           View model comparison
                         </button>

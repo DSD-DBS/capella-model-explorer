@@ -2,52 +2,33 @@
     Copyright DB InfraGO AG and contributors
     SPDX-License-Identifier: Apache-2.0
 #}
-{% from 'common_macros.html.j2' import linked_name_with_icon, draw_icon, show_compliance_to_modeling_rules %}
+{% from 'common_macros.html.j2' import linked_name_with_icon, show_other_attributes, draw_icon, show_compliance_to_modeling_rules %}
 
-<style>
-    .deleted, del {
-        background-color: red !important;
-    }
-    .created, ins {
-        color: #00aa00;
-    }
-    .text-removed, del > p {
-        background: #ffe6e6;
-        display: inline;
-    }
-    .text-added, ins > p {
-        background: #e6ffe6;
-        text-decoration: none;
-        display: inline;
-    }
-</style>
 
-{% macro display_modified_changes(attr_diff, attr) %}
-    {% set diff = attr_diff[attr]["diff"] %}
-    {% if "diff" in attr_diff[attr] and diff %}
-        {% if diff is mapping %}
-            {% set seen = [] %}
-            <ul>
-                {% for i in attr_diff[attr]["current"] %}
-                    {% if i["uuid"] in diff %}
-                        {% set object = model.by_uuid(i["uuid"]) %}
-                        {% set seen =  seen.append(i["uuid"]) %}
-                        <li>{{ linked_name_with_color_and_icon(object, diff[i["uuid"]]) | safe }}</li>
-                    {% endif %}
-                {% endfor %}
-                {% for uuid, name in diff.items() %}
-                    {% if uuid not in seen %}
-                        <li>{{ name | safe}}</li>
-                    {% endif %}
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p>{{diff | safe}}</p>
-        {% endif %}
+{% macro display_modified_changes(attr_diff) %}
+    {% set diff = attr_diff["diff"] %}
+    {% if diff is mapping %}
+        {% set seen = [] %}
+        <ul>
+            {% for i in attr_diff["current"] %}
+                {% if i["uuid"] in diff %}
+                    {% set object = model.by_uuid(i["uuid"]) %}
+                    {% set seen =  seen.append(i["uuid"]) %}
+                    <li>{{ linked_name_with_color_and_icon(object, diff[i["uuid"]]) | safe }}</li>
+                {% endif %}
+            {% endfor %}
+            {% for uuid, name in diff.items() %}
+                {% if uuid not in seen %}
+                    <li>{{ name | safe}}</li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    {% elif diff %}
+        <p>{{diff | safe}}</p>
     {% else %}
         <ul>
-            <li><strong>Previous</strong>: {{ attr_diff[attr]["previous"] | safe }}</li>
-            <li><strong>Current</strong>: {{ attr_diff[attr]["current"] | safe }}</li>
+            <li><strong>Previous</strong>: {{ attr_diff["previous"] | safe }}</li>
+            <li><strong>Current</strong>: {{ attr_diff["current"] | safe }}</li>
         </ul>
     {% endif %}
 {% endmacro %}
@@ -55,97 +36,13 @@
 {% macro linked_name_with_color_and_icon(obj, name) %}
     {% if obj %}
         <a href="hlink://{{obj.uuid}}">
-            {% if obj.__class__.__name__ not in [ "Part"]%}
+            {% if obj.__class__.__name__ != "Part"%}
             {{ draw_icon(obj, 15) | safe }}
             {% endif %}
             {{ name | safe}}
         </a>
     {% else %}
         {{ name | safe }}
-    {% endif %}
-{% endmacro %}
-
-{% macro show_other_attributes(object, object_diff, excluded=[], hide_rules_check=False, hide_unset_attrs=False) %}
-    {% set empty_attrs = [] %}
-    <table style="width: 100%;">
-    {% if object_diff %}
-        {% set attr_diff = object_diff["attributes"] %}
-        {% set attr_change = object_diff["change"] %}
-        {% set attr_lst = [] %}
-        {% if attr_diff is mapping %}
-            {%for key, val in attr_diff.items() %}
-                {{attr_lst.append(key)}}
-            {% endfor %}
-        {% endif %}
-    {%endif%}
-    <thead>
-        <tr><th>Property</th><th>Value</th></tr>
-    </thead>
-    {%- for attr in object.__dir__()|sort if not attr.startswith("_") and attr not in ["from_model", "pvmt"]+excluded -%}
-    {% if attr in ["validation", "validate"] %}
-    {% else %}
-        {%- set value = object[attr] -%}
-        {% if value %}
-            <tr>
-            {% if attr in attr_diff and attr_change == "modified" %}
-                <td style="word-break:normal; background-color:rgb(255, 218, 148)">
-                    {{ attr }}
-                </td>
-                <td>
-                {%- if value.as_svg -%}
-                    {{ value.as_svg|safe }}
-                {%- else -%}
-                    {{ display_modified_changes(attr_diff, attr) | safe }}
-                {%- endif -%}
-                </td>
-                {{ attr_lst.remove(attr) }}
-            {% else %}
-                <td style="word-break:normal">
-                    {{ attr }}
-                </td>
-                <td>
-                    {%- if value.as_svg -%}
-                        {{ value.as_svg | safe }}
-                    {%- elif value is iterable and value is not string -%}
-                        <ul>
-                            {% for item in value %}
-                                <li>{{ linked_name_with_icon(item) | safe }}</li>
-                            {% endfor %}
-                        </ul>
-                    {%- elif value._short_html_ -%}
-                        <p>{{ linked_name_with_icon(value) | safe }}</p>
-                    {%- else -%}
-                        <p>{{ value }}</p>
-                    {%- endif -%}
-                </td>
-            {% endif %}
-            </tr>
-
-        {% else %}
-            {% set _none = empty_attrs.append(attr) %}
-        {% endif %}
-    {% endif %}
-    {% endfor -%}
-    {% if attr_lst and attr_change == "modified" %}
-        {% for attr in attr_lst %}
-            <td style="word-break:normal; background-color: red">
-            {{ attr }}
-            </td>
-            <td>
-            <p>{{ display_modified_changes(attr_diff, attr) | safe }}</p>
-            </td>
-        {% endfor %}
-    {% endif %}
-
-    </table>
-    {% if empty_attrs %}
-        {% if not hide_unset_attrs %}
-            <h3>Unset attributes</h3>
-            <p>The object has the following attributes in unset state (empty values): {{ ", ".join(empty_attrs) }}</p>
-        {% endif %}
-        {% if not hide_rules_check %}
-            {{ show_compliance_to_modeling_rules(object) | safe }}
-        {% endif %}
     {% endif %}
 {% endmacro %}
 
@@ -156,7 +53,7 @@
     {% else %}
         <h1>Unnamed ({{ object.__class__.__name__ }})</small></h1>
     {% endif %}
-    {{show_other_attributes(object, object_diff) | safe}}
+    {{show_other_attributes(object, object_diff, display_modified_changes=display_modified_changes) | safe}}
 {% else %}
 <h1 style="color: red">Object not found</h1>
 {% endif %}

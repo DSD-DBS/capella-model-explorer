@@ -9,11 +9,9 @@ import { DiffView } from '../components/DiffView';
 import { API_BASE_URL } from '../APIConfig';
 import { useMediaQuery } from 'react-responsive';
 
-export const ModelComparisonView = () => {
+export const ModelComparisonView = ({ endpoint }) => {
   const [modelDiff, setModelDiff] = useState(null);
   const [objectID, setObjectID] = useState(null);
-  const endpoint = `${API_BASE_URL}/views/`;
-  const [diffData, setDiffData] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const isSmallScreen = useMediaQuery({ query: '(max-width: 1080px)' });
@@ -52,7 +50,6 @@ export const ModelComparisonView = () => {
   }, []);
 
   useEffect(() => {}, [objectID]);
-  useEffect(() => {}, [diffData]);
   useEffect(() => {
     setIsSidebarVisible(!isSmallScreen);
   }, [isSmallScreen]);
@@ -120,7 +117,6 @@ export const ModelComparisonView = () => {
                   <DiffExplorer
                     node={modelDiff.objects[layer]}
                     setObjectID={setObjectID}
-                    setDiffData={setDiffData}
                     searchTerm={searchTerm}
                     filterStatus={filterStatus}
                   />
@@ -132,13 +128,7 @@ export const ModelComparisonView = () => {
             isSmallScreen ? (isSidebarVisible ? 'pl-96' : '') : 'pl-96'
           }`}>
           <div className="relative flex flex-1">
-            {objectID && (
-              <DiffView
-                objectID={objectID}
-                endpoint={endpoint}
-                diffData={diffData}
-              />
-            )}
+            {objectID && <DiffView objectID={objectID} endpoint={endpoint} />}
           </div>
         </div>
       </div>

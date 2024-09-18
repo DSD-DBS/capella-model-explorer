@@ -86,7 +86,7 @@ allow_untyped_defs = true
 [[tool.mypy.overrides]]
 # Untyped third party libraries
 module = [
-  # ...
+  "diff_match_patch",
 ]
 ignore_missing_imports = true
 

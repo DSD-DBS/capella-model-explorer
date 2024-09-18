@@ -46,9 +46,19 @@
 {% endif %}
 {% endmacro %}
 
-{% macro show_other_attributes(object, excluded=[], hide_rules_check=False, hide_unset_attrs=False) %}
+{% macro show_other_attributes(object, object_diff={}, display_modified_changes=None, excluded=[], hide_rules_check=False, hide_unset_attrs=False) %}
     {% set empty_attrs = [] %}
     <table style="width: 100%;">
+    {% if object_diff %}
+        {% set attr_diff = object_diff["attributes"] %}
+        {% set attr_change = object_diff["change"] %}
+        {% set attr_lst = [] %}
+        {% if attr_diff is mapping %}
+            {%for key, val in attr_diff.items() %}
+                {{attr_lst.append(key)}}
+            {% endfor %}
+        {% endif %}
+    {%endif%}
     <thead>
         <tr><th>Property</th><th>Value</th></tr>
     </thead>
@@ -58,39 +68,65 @@
         {%- set value = object[attr] -%}
         {% if value %}
             <tr>
-            <td style="word-break:normal">
-            {{ attr }}
-            </td>
-            <td>
-            {%- if value.as_svg -%}
-            {{ value.as_svg|safe }}
-            {%- elif value is iterable and value is not string -%}
-            <ul>
-            {% for item in value %}
-                <li>{{ linked_name_with_icon(item) | safe }}</li>
-            {% endfor %}
-            </ul>
-            {%- elif value._short_html_ -%}
-            <p>{{ linked_name_with_icon(value) | safe }}</p>
-            {%- else -%}
-            <p>{{ value }}</p>
-            {%- endif -%}
-            </td>
+            {% if attr in attr_diff and attr_change == "modified" %}
+                <td style="word-break:normal; background-color:rgb(255, 218, 148)">
+                    {{ attr }}
+                </td>
+                <td>
+                {%- if value.as_svg -%}
+                    {{ value.as_svg|safe }}
+                {%- else -%}
+                    {{ display_modified_changes(attr_diff[attr]) | safe }}
+                {%- endif -%}
+                </td>
+                {{ attr_lst.remove(attr) }}
+            {% else %}
+                <td style="word-break:normal">
+                    {{ attr }}
+                </td>
+                <td>
+                    {%- if value.as_svg -%}
+                        {{ value.as_svg | safe }}
+                    {%- elif value is iterable and value is not string -%}
+                        <ul>
+                            {% for item in value %}
+                                <li>{{ linked_name_with_icon(item) | safe }}</li>
+                            {% endfor %}
+                        </ul>
+                    {%- elif value._short_html_ -%}
+                        <p>{{ linked_name_with_icon(value) | safe }}</p>
+                    {%- else -%}
+                        <p>{{ value }}</p>
+                    {%- endif -%}
+                </td>
+            {% endif %}
             </tr>
+
         {% else %}
             {% set _none = empty_attrs.append(attr) %}
         {% endif %}
     {% endif %}
     {% endfor -%}
+    {% if attr_lst and attr_change == "modified" %}
+        {% for attr in attr_lst %}
+            <td style="word-break:normal; background-color: red">
+            {{ attr }}
+            </td>
+            <td>
+            <p>{{ display_modified_changes(attr_diff[attr]) | safe }}</p>
+            </td>
+        {% endfor %}
+    {% endif %}
+
     </table>
     {% if empty_attrs %}
-    {% if not hide_unset_attrs %}
-    <h3>Unset attributes</h3>
-    <p>The object has the following attributes in unset state (empty values): {{ ", ".join(empty_attrs) }}</p>
-    {% endif %}
-    {% if not hide_rules_check %}
-    {{ show_compliance_to_modeling_rules(object) | safe }}
-    {% endif %}
+        {% if not hide_unset_attrs %}
+            <h3>Unset attributes</h3>
+            <p>The object has the following attributes in unset state (empty values): {{ ", ".join(empty_attrs) }}</p>
+        {% endif %}
+        {% if not hide_rules_check %}
+            {{ show_compliance_to_modeling_rules(object) | safe }}
+        {% endif %}
     {% endif %}
 {% endmacro %}
 

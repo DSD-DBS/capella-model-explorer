@@ -17,7 +17,6 @@ import {
 export const DiffExplorer = ({
   node,
   setObjectID,
-  setDiffData,
   searchTerm,
   filterStatus
 }) => {
@@ -70,7 +69,6 @@ export const DiffExplorer = ({
 
   const handleLeafClick = (node) => {
     setObjectID(node.uuid);
-    setDiffData(node);
   };
 
   const flattenNodes = (node) => {
@@ -142,7 +140,6 @@ export const DiffExplorer = ({
                 key={childId}
                 node={node.children[childId]}
                 setObjectID={setObjectID}
-                setDiffData={setDiffData}
                 searchTerm={searchTerm}
                 filterStatus={filterStatus}
               />
