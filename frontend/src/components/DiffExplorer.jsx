@@ -1,7 +1,7 @@
 // Copyright DB InfraGO AG and contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   CirclePlus,
   CircleX,
@@ -123,13 +123,15 @@ export const DiffExplorer = ({
             )}
             <span
               onClick={() => handleLeafClick(node)}
-              className={`flex-1 cursor-pointer truncate ${node.change === 'deleted' ? 'pointer-events-none' : ''}`}
+              className={`flex-1 cursor-pointer truncate
+                ${node.change === 'deleted' ? 'pointer-events-none' : ''}`}
               title={node.display_name}>
               {node.display_name}
             </span>
           </div>
           <span
-            className={`flex h-6 w-6 items-center justify-center rounded-full ${getNodeClass(node.change, node.attributes)}`}>
+            className={`flex h-6 w-6 items-center justify-center rounded-full
+              ${getNodeClass(node.change, node.attributes)}`}>
             {getIcon(node.change, node.attributes)}
           </span>
         </div>

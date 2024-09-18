@@ -26,7 +26,9 @@ export const AppInfo = () => {
         className="flex items-center space-x-2 hover:underline"
         target="_blank">
         <span>Contribute on GitHub</span>
-        <div className="flex h-6 w-6 items-center justify-center rounded-full bg-custom-light">
+        <div
+          className="flex h-6 w-6 items-center justify-center rounded-full
+            bg-custom-light">
           <SiGithub className="h-5 w-5 text-black" />
         </div>
       </a>

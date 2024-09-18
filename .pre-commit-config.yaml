@@ -127,10 +127,12 @@ repos:
         name: prettier
         entry: prettier --write
         language: node
-        types_or: [ts, css, html, markdown]
+        types_or: [javascript, jsx, ts, css, html, markdown]
         additional_dependencies:
           - 'prettier@^3.3.3'
           - 'prettier-plugin-tailwindcss@^0.6.6'
+          - 'prettier-plugin-classnames@^0.7.2'
+          - 'prettier-plugin-merge@^0.7.1'
           - 'tailwind-scrollbar@^3.1.0'
   - repo: https://github.com/pre-commit/mirrors-eslint
     rev: v9.10.0
@@ -147,3 +149,6 @@ repos:
           - 'eslint-plugin-react@^7.34.1'
           - 'eslint-plugin-react-hooks@^4.6.2'
           - 'eslint-plugin-react-refresh@^0.4.5'
+        args: ['--fix']
+        types: []
+        files: '^frontend/.*\.(js|jsx)$'
