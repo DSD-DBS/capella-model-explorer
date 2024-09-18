@@ -107,10 +107,12 @@ export const TemplateDetails = ({ endpoint, onSingleInstance }) => {
             ) : (
               details.instanceList &&
               details.instanceList
-                .filter((object) =>
-                  object.name && object.name
-                    .toLowerCase()
-                    .includes(filterText.toLowerCase())
+                .filter(
+                  (object) =>
+                    object.name &&
+                    object.name
+                      .toLowerCase()
+                      .includes(filterText.toLowerCase())
                 )
                 .sort((a, b) => a.name.localeCompare(b.name))
                 .map((object) => (

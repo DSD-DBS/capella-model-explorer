@@ -11,7 +11,7 @@ dynamic = ["version"]
 name = "capella-model-explorer"
 description = "A webapp for exploring Capella models"
 readme = "README.md"
-requires-python = ">=3.10, <3.13"
+requires-python = ">=3.11, <3.13"
 license = { text = "Apache-2.0" }
 authors = [{ name = "DB InfraGO AG" }]
 keywords = []
@@ -21,13 +21,14 @@ classifiers = [
   "Natural Language :: English",
   "Operating System :: OS Independent",
   "Programming Language :: Python :: 3 :: Only",
-  "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
 ]
 dependencies = [
-  "capellambse>=0.5.70,<0.6",
+  "capellambse>=0.5.72,<0.6",
   "capellambse-context-diagrams",
+  "capella-diff-tools",
+  "diff-match-patch",
   "jinja2",
   "fastapi",
   "uvicorn",
@@ -45,7 +46,7 @@ test = ["pytest", "pytest-cov"]
 
 [tool.black]
 line-length = 79
-target-version = ["py310"]
+target-version = ["py311"]
 
 [tool.coverage.run]
 branch = true
@@ -75,7 +76,7 @@ no_implicit_optional = true
 show_error_codes = true
 warn_redundant_casts = true
 warn_unreachable = true
-python_version = "3.10"
+python_version = "3.11"
 
 [[tool.mypy.overrides]]
 module = ["tests.*"]
@@ -85,7 +86,7 @@ allow_untyped_defs = true
 [[tool.mypy.overrides]]
 # Untyped third party libraries
 module = [
-  # ...
+  "diff_match_patch",
 ]
 ignore_missing_imports = true
 
