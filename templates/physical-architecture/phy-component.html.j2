@@ -9,7 +9,7 @@
 
 <h2>Context</h2>
 <p>The context of {{ object.name }} is summarized by the diagram below:</p>
-{{ object.context_diagram.render("svg", display_derived_interfaces=True) | safe }}
+{{ object.context_diagram.render("svg", display_derived_interfaces=True, display_port_labels=True) | safe }}
 
 <h2>Other properties of "{{ object.name }}"</h2>
 {% set excluded = [] %}
