@@ -42,7 +42,7 @@
 <p>This section provides a summary of what functions are required from the
     System and the actors to enable the system Capability.</p>
 
-{% set real_entities = object.involved_functions | selectattr("owner") | map(attribute="owner") | unique %}
+{% set real_entities = object.involved_functions | selectattr("owner") | map(attribute="owner") | unique(attribute="uuid") %}
 
 {% for entity in real_entities %}
 <h3>{{ entity.name }}</h3>

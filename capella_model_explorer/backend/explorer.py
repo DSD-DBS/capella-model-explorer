@@ -16,7 +16,7 @@ import fastapi
 import markupsafe
 import prometheus_client
 import yaml
-from fastapi import APIRouter, FastAPI, Request
+from fastapi import APIRouter, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
@@ -27,7 +27,9 @@ from jinja2 import (
     TemplateSyntaxError,
     is_undefined,
 )
+from pydantic import BaseModel
 
+from capella_model_explorer.backend import model_diff
 from capella_model_explorer.backend import templates as tl
 
 from . import __version__
@@ -37,6 +39,15 @@ esc = markupsafe.escape
 PATH_TO_FRONTEND = Path("./frontend/dist")
 ROUTE_PREFIX = os.getenv("ROUTE_PREFIX", "")
 LOGGER = logging.getLogger(__name__)
+
+
+class CommitRange(BaseModel):
+    head: str
+    prev: str
+
+
+class ObjectDiffID(BaseModel):
+    uuid: str
 
 
 @dataclasses.dataclass
@@ -80,6 +91,8 @@ class CapellaModelExplorerBackend:
         self.templates_index = self.templates_loader.index_path(
             self.templates_path
         )
+        self.diff = {}
+        self.object_diff = {}
 
         @self.app.middleware("http")
         async def update_last_interaction_time(request: Request, call_next):
@@ -139,7 +152,12 @@ class CapellaModelExplorerBackend:
         try:
             # render the template with the object
             template = self.env.from_string(template_text)
-            rendered = template.render(object=object, model=self.model)
+            rendered = template.render(
+                object=object,
+                model=self.model,
+                diff_data=self.diff,
+                object_diff=self.object_diff,
+            )
             return HTMLResponse(content=rendered, status_code=200)
         except TemplateSyntaxError as e:
             error_message = markupsafe.Markup(
@@ -276,6 +294,38 @@ class CapellaModelExplorerBackend:
         async def version():
             return {"version": self.app.version}
 
+        @self.app.post("/api/compare")
+        async def post_compare(commit_range: CommitRange):
+            try:
+                self.diff = model_diff.get_diff_data(
+                    self.model, commit_range.head, commit_range.prev
+                )
+                self.diff["lookup"] = create_diff_lookup(self.diff["objects"])
+                return {"success": True}
+            except Exception as e:
+                return {"success": False, "error": str(e)}
+
+        @self.app.post("/api/object-diff")
+        async def post_object_diff(object_id: ObjectDiffID):
+            if object_id.uuid not in self.diff["lookup"]:
+                raise HTTPException(status_code=404, detail="Object not found")
+
+            self.object_diff = self.diff["lookup"][object_id.uuid]
+            return {"success": True}
+
+        @self.app.get("/api/commits")
+        async def get_commits():
+            result = model_diff.populate_commits(self.model)
+            return result
+
+        @self.app.get("/api/diff")
+        async def get_diff():
+            if self.diff:
+                return self.diff
+            return {
+                "error": "No data available. Please compare two commits first."
+            }
+
 
 def index_template(template, templates, templates_grouped, filename=None):
     idx = filename if filename else template["idx"]
@@ -306,3 +356,24 @@ def index_templates(
                 template, templates, templates_grouped, filename=idx
             )
     return templates_grouped, templates
+
+
+def create_diff_lookup(data, lookup=None):
+    if lookup is None:
+        lookup = {}
+    try:
+        if isinstance(data, dict):
+            for _, obj in data.items():
+                if "uuid" in obj:
+                    lookup[obj["uuid"]] = {
+                        "uuid": obj["uuid"],
+                        "display_name": obj["display_name"],
+                        "change": obj["change"],
+                        "attributes": obj["attributes"],
+                    }
+                if "children" in obj:
+                    if obj["children"]:
+                        create_diff_lookup(obj["children"], lookup)
+    except Exception:
+        pass
+    return lookup

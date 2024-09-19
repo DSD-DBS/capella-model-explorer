@@ -17,3 +17,9 @@ categories:
       scope:
         name: object
         type: CapellaModule
+    - idx: object_comparison
+      template: object_comparison.html.j2
+      name: Object Comparison
+      description: Template to visualize differences between two objects
+      isExperimental: true
+      single: true

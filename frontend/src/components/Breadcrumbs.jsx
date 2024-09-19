@@ -49,7 +49,6 @@ export const Breadcrumbs = () => {
           labels[to] = pathnames[i];
         }
       }
-      console.log(labels);
 
       setBreadcrumbLabels(labels);
     };
@@ -81,9 +80,7 @@ export const Breadcrumbs = () => {
           const label = breadcrumbLabels[to] || value;
 
           return (
-            <li
-              className="flex items-center truncate md:items-start"
-              key={to}>
+            <li className="flex items-center truncate md:items-start" key={to}>
               {!last && (
                 <Link
                   to={to}

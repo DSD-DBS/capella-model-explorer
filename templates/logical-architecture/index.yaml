@@ -40,7 +40,7 @@ categories:
       below: la
 
   - template: logical-architecture/logical-state.html.j2
-    idx: logical-state-mode
+    idx: logical-component-mode
     name: Logical Component Modes
     description: Defines states and modes of a system component or an actor
     isExperimental: true
@@ -49,7 +49,7 @@ categories:
       below: la
 
   - template: logical-architecture/logical-state.html.j2
-    idx: logical-state-mode
+    idx: logical-component-state
     name: Logical Component States
     description: Defines states and modes of a system component or an actor
     isExperimental: true

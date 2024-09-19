@@ -25,6 +25,3 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-
-# Package
-package-lock.json

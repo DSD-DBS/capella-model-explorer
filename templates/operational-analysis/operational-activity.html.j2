@@ -50,7 +50,7 @@
 {%- if object.owner -%}
     {% set partners = partners | rejectattr("uuid", "equalto", object.owner.uuid) | list %}
 {%- endif -%}
-{%- for partner in partners | unique -%} {{ linked_name_with_icon(partner) | safe }},&nbsp;{%- endfor -%}</p>
+{%- for partner in partners | unique(attribute="uuid") -%} {{ linked_name_with_icon(partner) | safe }},&nbsp;{%- endfor -%}</p>
 
 
 

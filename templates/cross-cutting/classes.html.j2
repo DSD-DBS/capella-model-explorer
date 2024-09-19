@@ -46,7 +46,7 @@
                         {% for val in property.type.literals %}
                             <tr>
                                 <td>{{ val.name }}</td>
-                                <td>{{ val.value if val.value else "0" }}</td>
+                                <td>{{ val.value.value or "0" }}</td>
                             </tr>
                         {% endfor %}
                     </tbody>

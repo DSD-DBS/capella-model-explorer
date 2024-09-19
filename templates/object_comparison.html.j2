@@ -1,0 +1,59 @@
+{#
+    Copyright DB InfraGO AG and contributors
+    SPDX-License-Identifier: Apache-2.0
+#}
+{% from 'common_macros.html.j2' import linked_name_with_icon, show_other_attributes, draw_icon, show_compliance_to_modeling_rules %}
+
+
+{% macro display_modified_changes(attr_diff) %}
+    {% set diff = attr_diff["diff"] %}
+    {% if diff is mapping %}
+        {% set seen = [] %}
+        <ul>
+            {% for i in attr_diff["current"] %}
+                {% if i["uuid"] in diff %}
+                    {% set object = model.by_uuid(i["uuid"]) %}
+                    {% set seen =  seen.append(i["uuid"]) %}
+                    <li>{{ linked_name_with_color_and_icon(object, diff[i["uuid"]]) | safe }}</li>
+                {% endif %}
+            {% endfor %}
+            {% for uuid, name in diff.items() %}
+                {% if uuid not in seen %}
+                    <li>{{ name | safe}}</li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    {% elif diff %}
+        <p>{{diff | safe}}</p>
+    {% else %}
+        <ul>
+            <li><strong>Previous</strong>: {{ attr_diff["previous"] | safe }}</li>
+            <li><strong>Current</strong>: {{ attr_diff["current"] | safe }}</li>
+        </ul>
+    {% endif %}
+{% endmacro %}
+
+{% macro linked_name_with_color_and_icon(obj, name) %}
+    {% if obj %}
+        <a href="hlink://{{obj.uuid}}">
+            {% if obj.__class__.__name__ != "Part"%}
+            {{ draw_icon(obj, 15) | safe }}
+            {% endif %}
+            {{ name | safe}}
+        </a>
+    {% else %}
+        {{ name | safe }}
+    {% endif %}
+{% endmacro %}
+
+
+{% if object %}
+    {% if object.name %}
+        <h1>{{ object.name }} <span style="font-size: 60%">({{ object.__class__.__name__ }})</span></h1>
+    {% else %}
+        <h1>Unnamed ({{ object.__class__.__name__ }})</small></h1>
+    {% endif %}
+    {{show_other_attributes(object, object_diff, display_modified_changes=display_modified_changes) | safe}}
+{% else %}
+<h1 style="color: red">Object not found</h1>
+{% endif %}

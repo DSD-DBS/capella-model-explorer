@@ -47,10 +47,10 @@
 
 <h2>Involved entities and activities</h2>
 To enable the Capability, the following entities and activities are involved:
-{%- set entities = object.involved_entities | list + object.involved_activities | map(attribute="owner") | unique | list -%}
+{%- set entities = object.involved_entities | list + object.involved_activities | map(attribute="owner") | unique(attribute="uuid") | list -%}
 {%- if entities -%}
     <ul>
-    {%- for entity in entities | unique -%}
+    {%- for entity in entities -%}
         {%- set activities = object.involved_activities | selectattr("owner", "equalto", entity) | list -%}
         {%- if activities -%}
             <li>
