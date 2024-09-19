@@ -14,12 +14,15 @@ export const ModelDiff = ({ onRefetch, hasDiffed }) => {
   const [selectedDetails, setSelectedDetails] = useState('');
   const [error, setError] = useState('');
   const [selectedOption, setSelectedOption] = useState('');
+  const [isExpandedHead, setIsExpandedHead] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const handleSelectChange = (e) => {
     const option = e.target.value;
     setSelectedOption(option);
     const selectedValue = JSON.parse(e.target.value);
     setSelectedDetails(selectedValue);
+    setIsExpanded(false);
   };
 
   const handleGenerateDiff = async () => {
@@ -93,11 +96,18 @@ export const ModelDiff = ({ onRefetch, hasDiffed }) => {
     }
   }
 
+  const toggleExpand = () => {
+    setIsExpanded(!isExpanded);
+  };
+
+  const toggleExpandHead = () => {
+    setIsExpandedHead(!isExpandedHead);
+  };
+
   return (
     <div className="mb-2 mt-2 flex flex-col items-center">
       <button
-        className="rounded border border-black bg-gray-200 px-4 py-2
-         text-gray-700 hover:bg-custom-light dark:bg-custom-dark-2 dark:text-gray-100 dark:hover:bg-custom-dark-4"
+        className="rounded border border-black bg-gray-200 px-4 py-2 text-gray-700 hover:bg-custom-light dark:bg-custom-dark-2 dark:text-gray-100 dark:hover:bg-custom-dark-4"
         onClick={openModelCompareDialog}>
         {hasDiffed
           ? 'Compare with another version'
@@ -114,9 +124,7 @@ export const ModelDiff = ({ onRefetch, hasDiffed }) => {
               }
             }}></div>
           <div
-            className="absolute left-1/2 top-1/2 z-20 w-1/2 min-w-0
-            -translate-x-1/2 -translate-y-1/2 transform overflow-y-auto rounded bg-gray-100
-            p-4 shadow-lg dark:bg-custom-dark-2 dark:text-gray-100"
+            className="absolute left-1/2 top-1/2 z-20 w-1/2 min-w-0 -translate-x-1/2 -translate-y-1/2 transform overflow-y-auto rounded bg-gray-100 p-4 shadow-lg dark:bg-custom-dark-2 dark:text-gray-100"
             style={{ maxHeight: '75%' }}
             onClick={(e) => e.stopPropagation()}>
             <div className="flex flex-col space-y-8 break-words text-lg">
@@ -134,19 +142,44 @@ export const ModelDiff = ({ onRefetch, hasDiffed }) => {
                 ) : (
                   <>
                     <select
-                      className="mb-2 w-full cursor-not-allowed bg-gray-300 text-gray-500
-                      dark:bg-custom-dark-3 dark:text-gray-100"
+                      className="mb-2 w-full cursor-not-allowed bg-gray-300 text-gray-500 dark:bg-custom-dark-3 dark:text-gray-100"
                       disabled>
                       <option>{selectionOptions[0].label}</option>
                     </select>
-                    <div className="text-left font-semibold">
-                      <p>Hash: {commitDetails[0].hash}</p>
+                    <div className="text-left">
+                      <p>
+                        <span className="font-semibold">Hash:</span>{' '}
+                        {commitDetails[0].hash}
+                      </p>
                       {commitDetails[0].tag && (
-                        <p>Tag: {commitDetails[0].tag}</p>
+                        <p>
+                          <span className="font-semibold">Tag:</span>{' '}
+                          {commitDetails[0].tag}
+                        </p>
                       )}
-                      <p>Author: {commitDetails[0].author}</p>
-                      <p>Description: {commitDetails[0].description}</p>
-                      <p>Date: {commitDetails[0].date}</p>
+                      <p>
+                        <span className="font-semibold">Author:</span>{' '}
+                        {commitDetails[0].author}
+                      </p>
+                      <p style={{ whiteSpace: 'pre-wrap' }}>
+                        <span className="font-semibold">Description:</span>{' '}
+                        {isExpandedHead
+                          ? commitDetails[0].description
+                          : `${commitDetails[0].description.split('\n')[0]}${commitDetails[0].description.includes('\n') ? '' : ''}`}
+                      </p>
+                      {commitDetails[0].description.includes('\n') && (
+                        <button
+                          className="mb-4 mt-2 font-normal text-custom-blue hover:text-custom-blue-hover"
+                          onClick={toggleExpandHead}>
+                          {isExpandedHead
+                            ? 'Show Less'
+                            : 'Show Full Description'}
+                        </button>
+                      )}
+                      <p>
+                        <span className="font-semibold">Date:</span>{' '}
+                        {commitDetails[0].date}
+                      </p>
                     </div>
                     <select
                       className="mb-2 mt-2 w-full bg-gray-200 dark:bg-custom-dark-3 dark:text-gray-100"
@@ -167,13 +200,43 @@ export const ModelDiff = ({ onRefetch, hasDiffed }) => {
                     </select>
                     {selectedDetails && (
                       <div className="text-left">
-                        <p>Hash: {selectedDetails.hash}</p>
+                        <p>
+                          <span className="font-semibold">Hash:</span>{' '}
+                          {selectedDetails.hash}
+                        </p>
                         {selectedDetails.tag && (
-                          <p>Tag: {selectedDetails.tag}</p>
+                          <p>
+                            <span className="font-semibold">Tag:</span>{' '}
+                            {selectedDetails.tag}
+                          </p>
                         )}
-                        <p>Author: {selectedDetails.author}</p>
-                        <p>Description: {selectedDetails.description}</p>
-                        <p>Date: {selectedDetails.date.substring(0, 10)}</p>
+                        <p>
+                          <span className="font-semibold">Author:</span>{' '}
+                          {selectedDetails.author}
+                        </p>
+                        <p style={{ whiteSpace: 'pre-wrap' }}>
+                          <span className="font-semibold">Description:</span>{' '}
+                          {isExpanded
+                            ? selectedDetails.description
+                            : `${selectedDetails.description.split('\n')[0]}${
+                                selectedDetails.description.includes('\n')
+                                  ? ''
+                                  : ''
+                              }`}
+                        </p>
+                        {selectedDetails.description.includes('\n') && (
+                          <button
+                            className="mb-4 mt-2 font-normal text-custom-blue hover:text-custom-blue-hover"
+                            onClick={toggleExpand}>
+                            {isExpanded
+                              ? 'Show Less'
+                              : 'Show Full Description'}
+                          </button>
+                        )}
+                        <p>
+                          <span className="font-semibold">Date:</span>{' '}
+                          {selectedDetails.date.substring(0, 10)}
+                        </p>
                       </div>
                     )}
                     {isLoading && (
@@ -183,11 +246,9 @@ export const ModelDiff = ({ onRefetch, hasDiffed }) => {
                     )}
                     <div className="flex flex-col">
                       <button
-                        className={`
-                        mt-4 rounded px-4 py-2 text-white
-                        ${
+                        className={`mt-4 rounded px-4 py-2 text-white ${
                           isLoading
-                            ? 'bg-gray-500 '
+                            ? 'bg-gray-500'
                             : completeLoading
                               ? 'bg-green-500'
                               : 'bg-custom-blue hover:bg-custom-blue-hover'
