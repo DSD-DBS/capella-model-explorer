@@ -283,18 +283,11 @@ class CapellaModelExplorerBackend:
                 media_type="text/plain",
             )
 
-        @self.router.get("/{rest_of_path:path}")
-        async def catch_all(request: Request, rest_of_path: str):
-            del rest_of_path
-            return self.app.state.templates.TemplateResponse(
-                "index.html", {"request": request}
-            )
-
-        @self.app.get(f"{ROUTE_PREFIX}/api/metadata")
+        @self.router.get("/api/metadata")
         async def version():
             return {"version": self.app.version}
 
-        @self.app.post("/api/compare")
+        @self.router.post("/api/compare")
         async def post_compare(commit_range: CommitRange):
             try:
                 self.diff = model_diff.get_diff_data(
@@ -305,7 +298,7 @@ class CapellaModelExplorerBackend:
             except Exception as e:
                 return {"success": False, "error": str(e)}
 
-        @self.app.post("/api/object-diff")
+        @self.router.post("/api/object-diff")
         async def post_object_diff(object_id: ObjectDiffID):
             if object_id.uuid not in self.diff["lookup"]:
                 raise HTTPException(status_code=404, detail="Object not found")
@@ -313,18 +306,25 @@ class CapellaModelExplorerBackend:
             self.object_diff = self.diff["lookup"][object_id.uuid]
             return {"success": True}
 
-        @self.app.get("/api/commits")
+        @self.router.get("/api/commits")
         async def get_commits():
             result = model_diff.populate_commits(self.model)
             return result
 
-        @self.app.get("/api/diff")
+        @self.router.get("/api/diff")
         async def get_diff():
             if self.diff:
                 return self.diff
             return {
                 "error": "No data available. Please compare two commits first."
             }
+
+        @self.router.get("/{rest_of_path:path}")
+        async def catch_all(request: Request, rest_of_path: str):
+            del rest_of_path
+            return self.app.state.templates.TemplateResponse(
+                "index.html", {"request": request}
+            )
 
 
 def index_template(template, templates, templates_grouped, filename=None):
