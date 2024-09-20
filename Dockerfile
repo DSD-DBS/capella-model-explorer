@@ -58,4 +58,7 @@ RUN python -c "from capellambse_context_diagrams import _elkjs; _elkjs._install_
 RUN chmod -R 777 /home
 USER 1000
 
+RUN git config --global --add safe.directory /model && \
+    git config --global --add safe.directory /model/.git
+
 ENTRYPOINT ["/entrypoint.sh"]
