@@ -267,7 +267,7 @@ def compare_objects(
             "attributes": attributes,
             "children": children,
         }
-    return None
+    return {}
 
 
 def _handle_attribute_property(attr, old_object, new_object, attributes):

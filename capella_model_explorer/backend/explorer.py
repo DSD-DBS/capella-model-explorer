@@ -296,6 +296,7 @@ class CapellaModelExplorerBackend:
                 self.diff["lookup"] = create_diff_lookup(self.diff["objects"])
                 return {"success": True}
             except Exception as e:
+                LOGGER.exception("Failed to compare versions")
                 return {"success": False, "error": str(e)}
 
         @self.router.post("/api/object-diff")
@@ -375,5 +376,5 @@ def create_diff_lookup(data, lookup=None):
                     if obj["children"]:
                         create_diff_lookup(obj["children"], lookup)
     except Exception:
-        pass
+        LOGGER.exception("Cannot create diff lookup")
     return lookup

@@ -39,8 +39,6 @@ EXPOSE 8000
 
 COPY ./templates /views
 
-# Cache directory has to be writable
-RUN chmod -R 777 /home
 ENV HOME=/home
 
 COPY entrypoint.sh /entrypoint.sh
@@ -53,10 +51,11 @@ ENV MODE=production
 COPY frontend/fetch-version.py ./frontend/
 RUN python frontend/fetch-version.py
 
-# Run as non-root user per default
-USER 1000
-
 # Pre-install npm dependencies for context diagrams
 RUN python -c "from capellambse_context_diagrams import _elkjs; _elkjs._install_required_npm_pkg_versions()"
+
+# Run as non-root user per default
+RUN chmod -R 777 /home
+USER 1000
 
 ENTRYPOINT ["/entrypoint.sh"]
