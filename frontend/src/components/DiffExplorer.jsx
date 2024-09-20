@@ -119,7 +119,7 @@ export const DiffExplorer = ({
                 )}
               </button>
             ) : (
-              <File className="ml-2 dark:text-gray-200" />
+              <File className="ml-5 dark:text-gray-200" />
             )}
             <span
               onClick={() => handleLeafClick(node)}
