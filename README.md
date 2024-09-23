@@ -81,17 +81,44 @@ pip install -e '.[docs,test]'
 pre-commit install
 ```
 
-# Front-end development
+# Development
 
-To develop the frontend:
+This repo contains a Makefile with recipes for a few commonly needed tasks
+during development. Run `make help` for more details.
+
+## Developing the frontend
+
+To develop frontend components, run:
 
 ```bash
-cd frontend
-npm install
+make storybook
 ```
 
-then, to develop components `npm run storybook` and to develop the whole app
-`npm run dev`
+To develop the app as a whole, run:
+
+```bash
+make dev-frontend
+```
+
+Note that this requires a running backend server, see the next section.
+
+## Backend development
+
+To run the backend, use the following command:
+
+```bash
+make run MODEL=../path/to/model.aird
+```
+
+This will start the API server on <http://localhost:8000>, where it will serve
+the frontend in production mode. These static files can be rebuilt with `make
+build-frontend`, although it is usually more convenient to run the frontend in
+development mode with `make dev-frontend` (see above).
+
+The MODEL parameter can be set to anything that
+[`capellambse.loadcli`](https://dsd-dbs.github.io/py-capellambse/start/specifying-models.html)
+understands, but some functionality requires a Git-backed model (e.g. using a
+`git+https://` URL).
 
 # Integration in the Capella Collaboration Manager
 
