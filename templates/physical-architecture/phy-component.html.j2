@@ -2,7 +2,7 @@
     Copyright DB InfraGO AG and contributors
     SPDX-License-Identifier: Apache-2.0
 #}
-{% from 'common_macros.html.j2' import show_other_attributes, description %}
+{% from 'common_macros.html.j2' import show_other_attributes, description, display_property_values %}
 
 <h1>{{ object.name }}</h1>
 {{ description(object) | safe }}
@@ -10,6 +10,20 @@
 <h2>Context</h2>
 <p>The context of {{ object.name }} is summarized by the diagram below:</p>
 {{ object.context_diagram.render("svg", display_derived_interfaces=True, display_port_labels=True) | safe }}
+
+<h2>Interfaces of {{ object.name }}</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>Port</th>
+            <th>Wire ID</th>
+            <th>Target</th>
+            <th>Target Port</th>
+        </tr>
+</table>
+
+{{ display_property_values(object) }}
 
 <h2>Other properties of "{{ object.name }}"</h2>
 {% set excluded = ["context_diagram", "description"] %}
