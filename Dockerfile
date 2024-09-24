@@ -12,9 +12,6 @@ RUN npm run build
 # Build backend
 FROM python:3.12-slim-bookworm
 WORKDIR /app
-COPY ./capella_model_explorer ./capella_model_explorer
-COPY ./pyproject.toml ./
-COPY ./.git ./.git
 
 USER root
 
@@ -30,6 +27,10 @@ RUN apt-get update && \
     npm && \
     rm -rf /var/lib/apt/lists/*
 
+COPY ./capella_model_explorer ./capella_model_explorer
+COPY ./pyproject.toml ./
+COPY ./.git ./.git
+
 RUN pip install .
 COPY --from=build-frontend /app/dist/ ./frontend/dist/
 
@@ -38,8 +39,6 @@ EXPOSE 8000
 
 COPY ./templates /views
 
-# Cache directory has to be writable
-RUN chmod -R 777 /home
 ENV HOME=/home
 
 COPY entrypoint.sh /entrypoint.sh
@@ -52,10 +51,14 @@ ENV MODE=production
 COPY frontend/fetch-version.py ./frontend/
 RUN python frontend/fetch-version.py
 
-# Run as non-root user per default
-USER 1001
-
 # Pre-install npm dependencies for context diagrams
-RUN python -c "from capellambse_context_diagrams import _elkjs; _elkjs._install_required_npm_pkg_versions()"
+RUN python -c "from capellambse_context_diagrams import install_elk; install_elk()"
+
+# Run as non-root user per default
+RUN chmod -R 777 /home
+USER 1000
+
+RUN git config --global --add safe.directory /model && \
+    git config --global --add safe.directory /model/.git
 
 ENTRYPOINT ["/entrypoint.sh"]

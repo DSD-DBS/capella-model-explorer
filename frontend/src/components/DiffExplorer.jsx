@@ -108,18 +108,18 @@ export const DiffExplorer = ({
                 className="flex items-center">
                 {isExpanded ? (
                   <>
-                    <SquareChevronRightIcon className="mr-2 dark:text-gray-200" />
+                    <SquareChevronDown className="mr-2 dark:text-gray-200" />
                     <FolderOpen className="dark:text-gray-200" />
                   </>
                 ) : (
                   <>
-                    <SquareChevronDown className="mr-2 dark:text-gray-200" />
+                    <SquareChevronRightIcon className="mr-2 dark:text-gray-200" />
                     <FolderClosed className="dark:text-gray-200" />
                   </>
                 )}
               </button>
             ) : (
-              <File className="ml-2 dark:text-gray-200" />
+              <File className="ml-5 dark:text-gray-200" />
             )}
             <span
               onClick={() => handleLeafClick(node)}

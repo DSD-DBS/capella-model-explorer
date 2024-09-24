@@ -113,7 +113,7 @@ export const ModelComparisonView = ({ endpoint }) => {
             modelDiff.objects &&
             Object.keys(modelDiff.objects).map(
               (layer) =>
-                modelDiff.objects[layer] && (
+                Object.keys(modelDiff.objects[layer]).length > 0 && (
                   <DiffExplorer
                     node={modelDiff.objects[layer]}
                     setObjectID={setObjectID}

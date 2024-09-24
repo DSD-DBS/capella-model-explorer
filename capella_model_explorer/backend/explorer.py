@@ -12,6 +12,7 @@ import urllib.parse as urlparse
 from pathlib import Path
 
 import capellambse
+import capellambse.model as m
 import fastapi
 import markupsafe
 import prometheus_client
@@ -113,15 +114,9 @@ class CapellaModelExplorerBackend:
         if is_undefined(obj) or obj is None:
             return "#"
 
-        if isinstance(obj, capellambse.model.ElementList):
+        if isinstance(obj, m.ElementList):
             raise TypeError("Cannot make an href to a list of elements")
-        if not isinstance(
-            obj,
-            (
-                capellambse.model.GenericElement,
-                capellambse.model.diagram.AbstractDiagram,
-            ),
-        ):
+        if not isinstance(obj, (m.ModelElement, m.AbstractDiagram)):
             raise TypeError(f"Expected a model object, got {obj!r}")
 
         try:
@@ -132,11 +127,7 @@ class CapellaModelExplorerBackend:
         return self.__make_href(obj)
 
     def __make_href(
-        self,
-        obj: (
-            capellambse.model.GenericElement
-            | capellambse.model.diagram.AbstractDiagram
-        ),
+        self, obj: m.ModelElement | m.AbstractDiagram
     ) -> str | None:
         if self.templates_index is None:
             return None
@@ -265,12 +256,13 @@ class CapellaModelExplorerBackend:
         @self.router.get("/api/model-info")
         def model_info():
             info = self.model.info
+            resinfo = info.resources["\x00"]
             return {
                 "title": info.title,
-                "revision": info.revision,
-                "hash": info.rev_hash,
+                "revision": resinfo.revision,
+                "hash": resinfo.rev_hash,
                 "capella_version": info.capella_version,
-                "branch": info.branch,
+                "branch": resinfo.branch,
                 "badge": self.model.description_badge,
             }
 
@@ -283,18 +275,11 @@ class CapellaModelExplorerBackend:
                 media_type="text/plain",
             )
 
-        @self.router.get("/{rest_of_path:path}")
-        async def catch_all(request: Request, rest_of_path: str):
-            del rest_of_path
-            return self.app.state.templates.TemplateResponse(
-                "index.html", {"request": request}
-            )
-
-        @self.app.get(f"{ROUTE_PREFIX}/api/metadata")
+        @self.router.get("/api/metadata")
         async def version():
             return {"version": self.app.version}
 
-        @self.app.post("/api/compare")
+        @self.router.post("/api/compare")
         async def post_compare(commit_range: CommitRange):
             try:
                 self.diff = model_diff.get_diff_data(
@@ -303,9 +288,10 @@ class CapellaModelExplorerBackend:
                 self.diff["lookup"] = create_diff_lookup(self.diff["objects"])
                 return {"success": True}
             except Exception as e:
+                LOGGER.exception("Failed to compare versions")
                 return {"success": False, "error": str(e)}
 
-        @self.app.post("/api/object-diff")
+        @self.router.post("/api/object-diff")
         async def post_object_diff(object_id: ObjectDiffID):
             if object_id.uuid not in self.diff["lookup"]:
                 raise HTTPException(status_code=404, detail="Object not found")
@@ -313,18 +299,25 @@ class CapellaModelExplorerBackend:
             self.object_diff = self.diff["lookup"][object_id.uuid]
             return {"success": True}
 
-        @self.app.get("/api/commits")
+        @self.router.get("/api/commits")
         async def get_commits():
             result = model_diff.populate_commits(self.model)
             return result
 
-        @self.app.get("/api/diff")
+        @self.router.get("/api/diff")
         async def get_diff():
             if self.diff:
                 return self.diff
             return {
                 "error": "No data available. Please compare two commits first."
             }
+
+        @self.router.get("/{rest_of_path:path}")
+        async def catch_all(request: Request, rest_of_path: str):
+            del rest_of_path
+            return self.app.state.templates.TemplateResponse(
+                "index.html", {"request": request}
+            )
 
 
 def index_template(template, templates, templates_grouped, filename=None):
@@ -375,5 +368,5 @@ def create_diff_lookup(data, lookup=None):
                     if obj["children"]:
                         create_diff_lookup(obj["children"], lookup)
     except Exception:
-        pass
+        LOGGER.exception("Cannot create diff lookup")
     return lookup

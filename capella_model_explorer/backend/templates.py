@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import capellambse
+import capellambse.model as m
 import yaml
 from pydantic import BaseModel, Field
 
@@ -28,7 +29,7 @@ def find_objects(model, obj_type=None, below=None, attr=None, filters=None):
         objects = getter(model)
         if hasattr(objects, "_element"):
             objects = [objects]
-        elif not isinstance(objects, capellambse.model.ElementList):
+        elif not isinstance(objects, m.ElementList):
             raise ValueError(
                 f"Expected a list of model objects or a single model object"
                 f" for {attr!r} of the model, got {objects!r}"
