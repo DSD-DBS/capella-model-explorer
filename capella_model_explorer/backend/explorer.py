@@ -12,6 +12,7 @@ import urllib.parse as urlparse
 from pathlib import Path
 
 import capellambse
+import capellambse.model as m
 import fastapi
 import markupsafe
 import prometheus_client
@@ -113,15 +114,9 @@ class CapellaModelExplorerBackend:
         if is_undefined(obj) or obj is None:
             return "#"
 
-        if isinstance(obj, capellambse.model.ElementList):
+        if isinstance(obj, m.ElementList):
             raise TypeError("Cannot make an href to a list of elements")
-        if not isinstance(
-            obj,
-            (
-                capellambse.model.GenericElement,
-                capellambse.model.diagram.AbstractDiagram,
-            ),
-        ):
+        if not isinstance(obj, (m.ModelElement, m.AbstractDiagram)):
             raise TypeError(f"Expected a model object, got {obj!r}")
 
         try:
@@ -132,11 +127,7 @@ class CapellaModelExplorerBackend:
         return self.__make_href(obj)
 
     def __make_href(
-        self,
-        obj: (
-            capellambse.model.GenericElement
-            | capellambse.model.diagram.AbstractDiagram
-        ),
+        self, obj: m.ModelElement | m.AbstractDiagram
     ) -> str | None:
         if self.templates_index is None:
             return None
@@ -265,12 +256,13 @@ class CapellaModelExplorerBackend:
         @self.router.get("/api/model-info")
         def model_info():
             info = self.model.info
+            resinfo = info.resources["\x00"]
             return {
                 "title": info.title,
-                "revision": info.revision,
-                "hash": info.rev_hash,
+                "revision": resinfo.revision,
+                "hash": resinfo.rev_hash,
                 "capella_version": info.capella_version,
-                "branch": info.branch,
+                "branch": resinfo.branch,
                 "badge": self.model.description_badge,
             }
 
