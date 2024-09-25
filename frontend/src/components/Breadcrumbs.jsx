@@ -51,10 +51,12 @@ export const Breadcrumbs = () => {
       }
 
       setBreadcrumbLabels(labels);
+      const modelName = Object.values(labels)[0];
+      const instanceName = Object.values(labels).pop();
+      document.title = `${instanceName} - ${modelName} - Model Explorer`;
     };
-
     updateLabels();
-  }, [location]);
+  }, [location, document.title]);
 
   const visible_pathnames = [
     breadcrumbLabels['/'],
