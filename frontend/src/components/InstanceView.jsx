@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import { SVGDisplay } from './SVGDisplay';
 import { Spinner } from './Spinner';
 import { Printer } from 'lucide-react';
-import { SoftwareVersion } from './SoftwareVersion';
+import { AppInfo } from './AppInfo';
 
 export const InstanceView = ({ templateName, objectID, endpoint }) => {
   const [details, setDetails] = useState([]);
@@ -112,7 +112,7 @@ export const InstanceView = ({ templateName, objectID, endpoint }) => {
         })}
       </div>
       <div className="my-8 text-center 3xl:hidden">
-        <SoftwareVersion />
+        <AppInfo />
       </div>
     </>
   );
