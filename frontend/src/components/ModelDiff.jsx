@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { API_BASE_URL, ROUTE_PREFIX } from '../APIConfig';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Spinner } from './Spinner';
 
 export const ModelDiff = ({ onRefetch, hasDiffed }) => {
@@ -86,7 +86,9 @@ export const ModelDiff = ({ onRefetch, hasDiffed }) => {
       setCommitDetails(data);
       const options = data.map((commit) => ({
         value: JSON.stringify(commit),
-        label: `${commit.hash.substring(0, 7)} ${commit.tag ? `(${commit.tag})` : ''} - ${commit.subject} - Created on ${commit.date.substring(0, 10)}`
+        label: `${commit.hash.substring(0, 7)} ${
+          commit.tag ? `(${commit.tag})` : ''
+        } - ${commit.subject} - Created on ${commit.date.substring(0, 10)}`
       }));
 
       setSelectionOptions(options);
@@ -107,7 +109,9 @@ export const ModelDiff = ({ onRefetch, hasDiffed }) => {
   return (
     <div className="mb-2 mt-2 flex flex-col items-center">
       <button
-        className="rounded border border-black bg-gray-200 px-4 py-2 text-gray-700 hover:bg-custom-light dark:bg-custom-dark-2 dark:text-gray-100 dark:hover:bg-custom-dark-4"
+        className="rounded border border-black bg-gray-200 px-4 py-2
+          text-gray-700 hover:bg-custom-light dark:bg-custom-dark-2
+          dark:text-gray-100 dark:hover:bg-custom-dark-4"
         onClick={openModelCompareDialog}>
         {hasDiffed
           ? 'Compare with another version'
@@ -124,7 +128,10 @@ export const ModelDiff = ({ onRefetch, hasDiffed }) => {
               }
             }}></div>
           <div
-            className="absolute left-1/2 top-1/2 z-20 w-1/2 min-w-0 -translate-x-1/2 -translate-y-1/2 transform overflow-y-auto rounded bg-gray-100 p-4 shadow-lg dark:bg-custom-dark-2 dark:text-gray-100"
+            className="absolute left-1/2 top-1/2 z-20 w-1/2 min-w-0
+              -translate-x-1/2 -translate-y-1/2 transform overflow-y-auto
+              rounded bg-gray-100 p-4 shadow-lg dark:bg-custom-dark-2
+              dark:text-gray-100"
             style={{ maxHeight: '75%' }}
             onClick={(e) => e.stopPropagation()}>
             <div className="flex flex-col space-y-8 break-words text-lg">
@@ -134,15 +141,12 @@ export const ModelDiff = ({ onRefetch, hasDiffed }) => {
                     <p className="font-semibold text-red-500">
                       Cannot generate model diff: {error}
                     </p>
-                    <p>
-                      Select 'Deep clone' before running the session or run
-                      model within git repo.
-                    </p>
                   </div>
                 ) : (
                   <>
                     <select
-                      className="mb-2 w-full cursor-not-allowed bg-gray-300 text-gray-500 dark:bg-custom-dark-3 dark:text-gray-100"
+                      className="mb-2 w-full cursor-not-allowed bg-gray-300
+                        text-gray-500 dark:bg-custom-dark-3 dark:text-gray-100"
                       disabled>
                       <option>{selectionOptions[0].label}</option>
                     </select>
@@ -169,7 +173,8 @@ export const ModelDiff = ({ onRefetch, hasDiffed }) => {
                       </p>
                       {commitDetails[0].description.includes('\n') && (
                         <button
-                          className="mb-4 mt-2 font-normal text-custom-blue hover:text-custom-blue-hover"
+                          className="mb-4 mt-2 font-normal text-custom-blue
+                            hover:text-custom-blue-hover"
                           onClick={toggleExpandHead}>
                           {isExpandedHead
                             ? 'Show Less'
@@ -182,7 +187,8 @@ export const ModelDiff = ({ onRefetch, hasDiffed }) => {
                       </p>
                     </div>
                     <select
-                      className="mb-2 mt-2 w-full bg-gray-200 dark:bg-custom-dark-3 dark:text-gray-100"
+                      className="mb-2 mt-2 w-full bg-gray-200
+                        dark:bg-custom-dark-3 dark:text-gray-100"
                       value={selectedOption}
                       onChange={handleSelectChange}
                       disabled={isLoading}>
@@ -222,11 +228,12 @@ export const ModelDiff = ({ onRefetch, hasDiffed }) => {
                                 selectedDetails.description.includes('\n')
                                   ? ''
                                   : ''
-                              }`}
+                                }`}
                         </p>
                         {selectedDetails.description.includes('\n') && (
                           <button
-                            className="mb-4 mt-2 font-normal text-custom-blue hover:text-custom-blue-hover"
+                            className="mb-4 mt-2 font-normal text-custom-blue
+                              hover:text-custom-blue-hover"
                             onClick={toggleExpand}>
                             {isExpanded
                               ? 'Show Less'
@@ -265,7 +272,8 @@ export const ModelDiff = ({ onRefetch, hasDiffed }) => {
                       </button>
                       {completeLoading && (
                         <button
-                          className="mt-4 rounded bg-custom-blue px-4 py-2 text-white hover:bg-custom-blue-hover"
+                          className="mt-4 rounded bg-custom-blue px-4 py-2
+                            text-white hover:bg-custom-blue-hover"
                           onClick={() => {
                             window.open(
                               `${ROUTE_PREFIX}/model-comparison`,

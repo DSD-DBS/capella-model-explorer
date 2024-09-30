@@ -33,19 +33,14 @@ export const SettingsMenu = () => {
       </div>
       {isOpen && (
         <div
-          className={
-            'absolute right-0 mt-2 w-48 divide-y divide-gray-100 ' +
-            'rounded-lg border border-gray-200 bg-white shadow-xl'
-          }>
+          className="absolute right-0 mt-2 w-48 divide-y divide-gray-100
+            rounded-lg border border-gray-200 bg-white shadow-xl">
           <button
             onClick={handlePrint}
-            className={
-              'block w-full px-4 py-2 text-left text-sm ' +
-              'text-gray-700 hover:bg-blue-100 hover:text-blue-700'
-            }>
+            className="block w-full px-4 py-2 text-left text-sm text-gray-700
+              hover:bg-blue-100 hover:text-blue-700">
             Print page
           </button>
-          {/* Add more options here as needed, following the same pattern */}
         </div>
       )}
     </div>

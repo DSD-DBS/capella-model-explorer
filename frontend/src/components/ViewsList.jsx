@@ -15,30 +15,22 @@ export const ViewsList = ({ templates, cardClickCallback }) => {
 
   return (
     <div
-      className={
-        'rounded-lg bg-gray-100 pb-2 pl-4 pr-4 pt-8 shadow-lg ' +
-        'dark:bg-custom-dark-3'
-      }>
+      className="rounded-lg bg-gray-100 pb-2 pl-4 pr-4 pt-8 shadow-lg
+        dark:bg-custom-dark-3">
       {Object.keys(categories).map((cat) => {
         if (cat in templates && templates[cat].length > 0) {
           return (
             <div key={cat} className="mb-8 p-4">
               <h2
-                className={
-                  'border-b border-gray-900 pb-2 text-2xl font-bold ' +
-                  'dark:border-gray-300'
-                }>
-                <span
-                  className={
-                    'px-4 py-2 text-gray-900 dark:text-gray-100'
-                  }>
+                className="border-b border-gray-900 pb-2 text-2xl font-bold
+                  dark:border-gray-300">
+                <span className="px-4 py-2 text-gray-900 dark:text-gray-100">
                   {categories[cat]}
                 </span>
               </h2>
               <div
-                className={
-                  'mt-2 block gap-4 md:flex md:flex-wrap md:justify-center'
-                }>
+                className="mt-2 block gap-4 md:flex md:flex-wrap
+                  md:justify-center">
                 {templates[cat].map((template) => (
                   <TemplateCard
                     key={template.idx}

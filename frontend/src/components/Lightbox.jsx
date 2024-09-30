@@ -59,10 +59,8 @@ export const Lightbox = ({ onClose, imageSource }) => {
       <div className="z-50 flex flex-col items-center justify-center">
         <div
           id="control-bar"
-          className={`
-            fixed top-0 z-50 flex w-screen justify-center bg-black py-4
-             print:hidden
-          `}>
+          className="fixed top-0 z-50 flex w-screen justify-center bg-black
+            py-4 print:hidden">
           <LightboxButton onClick={() => window.print()} className="mr-4">
             <Printer />
           </LightboxButton>
@@ -78,10 +76,8 @@ export const Lightbox = ({ onClose, imageSource }) => {
                   dangerouslySetInnerHTML={{
                     __html: setHeightAndWeightOfSVG(imageSource)
                   }}
-                  className={
-                    'select-text overflow-visible ' +
-                    (isClicked ? 'cursor-grabbing' : 'cursor-grab')
-                  }
+                  className={`select-text overflow-visible
+                  ${isClicked ? 'cursor-grabbing' : 'cursor-grab'}`}
                   onMouseDown={() => setIsClicked(true)}></div>
               </TransformComponent>
             </TransformWrapper>

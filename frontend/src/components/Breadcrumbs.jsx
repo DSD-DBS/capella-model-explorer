@@ -67,9 +67,7 @@ export const Breadcrumbs = () => {
   return (
     <nav
       aria-label="breadcrumb"
-      className={
-        'flex items-center font-medium text-black dark:text-gray-200'
-      }>
+      className="flex items-center font-medium text-black dark:text-gray-200">
       <ol className="flex items-center">
         <li className="hidden items-center truncate lg:block">
           <Link to={'/'}>{breadcrumbLabels['/']}</Link>
@@ -86,19 +84,16 @@ export const Breadcrumbs = () => {
               {!last && (
                 <Link
                   to={to}
-                  className={
-                    'hidden max-w-64 truncate whitespace-nowrap md:block'
-                  }>
+                  className="hidden max-w-64 truncate whitespace-nowrap
+                    md:block">
                   {label}
                 </Link>
               )}
               {last && (
                 <span
-                  className={
-                    'hidden w-full truncate whitespace-nowrap ' +
-                    'text-custom-blue custom-phone-width:block ' +
-                    'custom-phone-width:max-w-60 md:max-w-full'
-                  }
+                  className="hidden w-full truncate whitespace-nowrap
+                    text-custom-blue custom-phone-width:block
+                    custom-phone-width:max-w-60 md:max-w-full"
                   title={label}>
                   {label}
                 </span>
