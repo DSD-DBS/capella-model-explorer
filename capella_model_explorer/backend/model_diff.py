@@ -168,7 +168,7 @@ def _get_revision_info(
         .strip()
         .split("\x00")
     )
-    subject = description.splitlines()[0]
+    subject = description.splitlines()[0] if description.splitlines() else ""
     try:
         tag = subprocess.check_output(
             ["git", "tag", "--points-at", revision],

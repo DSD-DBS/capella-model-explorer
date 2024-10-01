@@ -286,7 +286,9 @@ class CapellaModelExplorerBackend:
                     self.model, commit_range.head, commit_range.prev
                 )
                 self.diff["lookup"] = create_diff_lookup(self.diff["objects"])
-                return {"success": True}
+                if self.diff["lookup"]:
+                    return {"success": True}
+                return {"success": False, "error": "No model changes to show"}
             except Exception as e:
                 LOGGER.exception("Failed to compare versions")
                 return {"success": False, "error": str(e)}
@@ -301,8 +303,11 @@ class CapellaModelExplorerBackend:
 
         @self.router.get("/api/commits")
         async def get_commits():
-            result = model_diff.populate_commits(self.model)
-            return result
+            try:
+                result = model_diff.populate_commits(self.model)
+                return result
+            except Exception as e:
+                return {"error": str(e)}
 
         @self.router.get("/api/diff")
         async def get_diff():
