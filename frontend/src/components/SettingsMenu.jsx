@@ -29,7 +29,7 @@ export const SettingsMenu = () => {
   return (
     <div className="relative" ref={menuRef}>
       <div onClick={toggleMenu} className="header-button">
-        <Settings className="h-6 w-6 text-black dark:text-white" />
+        <Settings className="h-6 w-6 text-white" />
       </div>
       {isOpen && (
         <div

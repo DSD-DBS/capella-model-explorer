@@ -24,7 +24,7 @@ export const SVGDisplay = ({ content }) => {
   return (
     <>
       <div
-        className="group relative"
+        className="svg-display group relative"
         style={{ maxWidth: '100%', height: 'auto' }}
         onClick={handleSvgClick}>
         <div

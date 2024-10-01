@@ -25,13 +25,13 @@ export default {
       },
       colors: {
         'custom-light': '#dee4e7',
-        'custom-dark-1': '#24273a',
-        'custom-dark-2': '#363a4f',
-        'custom-dark-3': '#6e738d',
-        'custom-dark-4': '#5b6078',
+        'custom-dark-1': '#121212',
+        'custom-dark-2': '#282828',
+        'custom-dark-3': '#3f3f3f',
+        'custom-dark-4': '#575757',
         'custom-dark-error': '#ed8796',
         'custom-blue': '#2196f3',
-        'custom-blue-hover': '#1976d2'
+        'custom-blue-hover': '#0b5ea1'
       }
     }
   },

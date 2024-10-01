@@ -241,21 +241,13 @@ input:checked + .slider:before {
   justify-content: center;
   border-radius: 9999px;
   border: 2px solid transparent;
-  background-color: var(--custom-light);
+  background-color: var(--custom-blue);
   padding: 0.5rem;
   transition: all 0.5s ease-in-out;
 }
 
 .header-button:hover {
-  background-color: var(--custom-dark-4);
-}
-
-.dark .header-button {
-  background-color: var(--custom-dark-1);
-}
-
-.dark .header-button:hover {
-  background-color: var(--custom-light);
+  background-color: var(--custom-blue-hover);
 }
 
 .deleted,

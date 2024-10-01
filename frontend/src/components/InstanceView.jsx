@@ -85,9 +85,7 @@ export const InstanceView = ({ templateName, objectID, endpoint }) => {
               onClick={() => window.print()}
               className="flex cursor-pointer items-center justify-center
                 rounded-full bg-custom-blue p-2 text-white transition-colors
-                duration-700 ease-in-out hover:bg-custom-dark-4
-                dark:bg-custom-blue dark:text-gray-100
-                dark:hover:bg-custom-light">
+                duration-700 ease-in-out hover:bg-custom-blue-hover">
               <Printer></Printer>
             </div>
           </div>
