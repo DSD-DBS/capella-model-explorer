@@ -1,9 +1,9 @@
 // Copyright DB InfraGO AG and contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { useEffect, useState } from 'react';
-import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 import { Printer, XIcon } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { TransformComponent, TransformWrapper } from 'react-zoom-pan-pinch';
 import { LightboxButton } from './LightboxButton';
 
 export const Lightbox = ({ onClose, imageSource }) => {
@@ -59,8 +59,8 @@ export const Lightbox = ({ onClose, imageSource }) => {
       <div className="z-50 flex flex-col items-center justify-center">
         <div
           id="control-bar"
-          className="fixed top-0 z-50 flex w-screen justify-center bg-black
-            py-4 print:hidden">
+          className="icon fixed top-0 z-50 flex w-screen justify-center
+            bg-black py-4 print:hidden">
           <LightboxButton onClick={() => window.print()} className="mr-4">
             <Printer />
           </LightboxButton>
