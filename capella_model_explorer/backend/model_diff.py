@@ -98,7 +98,7 @@ class ChangeSummaryDocument(te.TypedDict):
     objects: ObjectChanges
 
 
-def init_model(model: capellambse.MelodyModel) -> t.Optional[str]:
+def init_model(model: capellambse.MelodyModel) -> str | None:
     """Initialize the model and return the path if it's a git repository."""
     file_handler = model.resources["\x00"]
     path = file_handler.path
@@ -119,16 +119,15 @@ def populate_commits(model: capellambse.MelodyModel):
     path = init_model(model)
     if not path:
         return path
-    commits = get_commit_hashes(path)
-    return commits
+    return get_commit_hashes(path)
 
 
 def _serialize_obj(obj: t.Any) -> t.Any:
     if isinstance(obj, m.ModelElement):
         return {"uuid": obj.uuid, "display_name": _get_name(obj)}
-    elif isinstance(obj, m.ElementList):
+    if isinstance(obj, m.ElementList):
         return [{"uuid": i.uuid, "display_name": _get_name(i)} for i in obj]
-    elif isinstance(obj, (enum.Enum, enum.Flag)):
+    if isinstance(obj, enum.Enum | enum.Flag):
         return obj.name
     return obj
 
@@ -197,8 +196,7 @@ def get_commit_hashes(path: str) -> list[RevisionInfo]:
         cwd=path,
         encoding="utf-8",
     ).splitlines()
-    commits = [_get_revision_info(path, c) for c in commit_hashes]
-    return commits
+    return [_get_revision_info(path, c) for c in commit_hashes]
 
 
 def _get_name(obj: m.ModelObject) -> str:
@@ -232,7 +230,6 @@ def compare_objects(
     new_object: capellambse.ModelObject,
     old_model: capellambse.MelodyModel,
 ):
-
     assert old_object is None or type(old_object) is type(
         new_object
     ), f"{type(old_object).__name__} != {type(new_object).__name__}"
@@ -396,16 +393,16 @@ def _traverse_and_diff(data) -> dict[str, t.Any]:
             and "current" in value
         ):
             curr_type = type(value["current"])
-            if curr_type == str:
+            if curr_type is str:
                 diff = _diff_text(
                     (value["previous"] or "").splitlines(),
                     value["current"].splitlines(),
                 )
                 updates[key] = {"diff": diff}
-            elif curr_type == dict:
+            elif curr_type is dict:
                 diff = _diff_objects(value["previous"], value["current"])
                 updates[key] = {"diff": diff}
-            elif curr_type == list:
+            elif curr_type is list:
                 diff = _diff_lists(value["previous"], value["current"])
                 updates[key] = {"diff": diff}
             elif key == "description":
@@ -413,7 +410,7 @@ def _traverse_and_diff(data) -> dict[str, t.Any]:
                     (value["previous"] or "").splitlines(),
                     value["current"].splitlines(),
                 )
-                if prev == curr == None:
+                if prev is curr is None:
                     continue
                 updates[key] = {"diff": ""}
                 value.update({"previous": prev, "current": curr})
@@ -462,8 +459,8 @@ def _diff_lists(previous, current):
 
 def _diff_description(
     previous, current
-) -> t.Tuple[str, str] | t.Tuple[None, None]:
-    if previous == current == None:
+) -> tuple[str, str] | tuple[None, None]:
+    if previous is current is None:
         return None, None
     dmp = diff_match_patch.diff_match_patch()
     diff = dmp.diff_main("\n".join(previous), "\n".join(current))

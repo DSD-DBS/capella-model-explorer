@@ -25,7 +25,6 @@ PATH_TO_TEMPLATES = Path("./templates")
     default=PATH_TO_TEMPLATES,
 )
 def run(model: capellambse.MelodyModel, templates: Path):
-
     backend = explorer.CapellaModelExplorerBackend(
         Path(templates),
         model,

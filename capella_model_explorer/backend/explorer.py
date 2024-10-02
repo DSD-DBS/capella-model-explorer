@@ -63,7 +63,7 @@ class CapellaModelExplorerBackend:
     templates_path: Path
     model: capellambse.MelodyModel
 
-    templates_index: t.Optional[tl.TemplateCategories] = dataclasses.field(
+    templates_index: tl.TemplateCategories | None = dataclasses.field(
         init=False
     )
 
@@ -97,10 +97,7 @@ class CapellaModelExplorerBackend:
 
         @self.app.middleware("http")
         async def update_last_interaction_time(request: Request, call_next):
-            if (
-                not request.url.path == "/metrics"
-                and not request.url.path == "/favicon.ico"
-            ):
+            if request.url.path not in ("/metrics", "/favicon.ico"):
                 self.last_interaction = time.time()
             return await call_next(request)
 
@@ -116,7 +113,7 @@ class CapellaModelExplorerBackend:
 
         if isinstance(obj, m.ElementList):
             raise TypeError("Cannot make an href to a list of elements")
-        if not isinstance(obj, (m.ModelElement, m.AbstractDiagram)):
+        if not isinstance(obj, m.ModelElement | m.AbstractDiagram):
             raise TypeError(f"Expected a model object, got {obj!r}")
 
         try:
@@ -162,15 +159,15 @@ class CapellaModelExplorerBackend:
             trace = markupsafe.escape(traceback.format_exc())
             error_message = markupsafe.Markup(
                 '<p style="color:red">'
-                f"Unexpected error: {type(e).__name__}: {str(e)}"
+                f"Unexpected error: {type(e).__name__}: {e}"
                 '</p><pre style="font-size:80%;overflow:scroll">'
-                f"object={repr(object)}\nmodel={repr(self.model)}"
+                f"object={object!r}\nmodel={self.model!r}"
                 f"\n\n{trace}"
                 "</pre>"
             )
             return HTMLResponse(content=error_message)
 
-    def configure_routes(self):
+    def configure_routes(self):  # noqa: C901
         self.app.mount(
             f"{ROUTE_PREFIX}/assets",
             StaticFiles(
@@ -206,12 +203,12 @@ class CapellaModelExplorerBackend:
             template_name = urlparse.unquote(template_name)
             if (
                 self.templates_index is None
-                or not template_name in self.templates_index.flat
+                or template_name not in self.templates_index.flat
             ):
                 return {
                     "error": (
-                        f"Template {template_name} not found or"
-                        + " templates index not initialized"
+                        f"Template {template_name} not found"
+                        " or templates index not initialized"
                     )
                 }
             base = self.templates_index.flat[template_name]
@@ -226,7 +223,7 @@ class CapellaModelExplorerBackend:
                 template_name = urlparse.unquote(template_name)
                 if (
                     self.templates_index is None
-                    or not template_name in self.templates_index.flat
+                    or template_name not in self.templates_index.flat
                 ):
                     return {"error": f"Template {template_name} not found"}
                 base = self.templates_index.flat[template_name]
@@ -304,8 +301,7 @@ class CapellaModelExplorerBackend:
         @self.router.get("/api/commits")
         async def get_commits():
             try:
-                result = model_diff.populate_commits(self.model)
-                return result
+                return model_diff.populate_commits(self.model)
             except Exception as e:
                 return {"error": str(e)}
 
@@ -369,9 +365,8 @@ def create_diff_lookup(data, lookup=None):
                         "change": obj["change"],
                         "attributes": obj["attributes"],
                     }
-                if "children" in obj:
-                    if obj["children"]:
-                        create_diff_lookup(obj["children"], lookup)
+                if children := obj.get("children"):
+                    create_diff_lookup(children, lookup)
     except Exception:
         LOGGER.exception("Cannot create diff lookup")
     return lookup
