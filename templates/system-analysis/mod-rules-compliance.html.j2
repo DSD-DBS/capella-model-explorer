@@ -86,7 +86,7 @@
   <tbody>
     {% for obj_type in object_types %}<tr>
       {% set total = model.sa.validation.search(obj_type) | count %}
-      <th><a href="#{{ obj_type }}">{{ obj_type }}</a></th>
+      <th>{{ obj_type }}</th>
       <td>{{ total }}</td>
       {% for category in CATEGORIES %}<td>
         {{ show_compliance_score(results.by_category(category).by_type(obj_type)) | safe }}
