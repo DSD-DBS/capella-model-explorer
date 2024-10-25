@@ -1,8 +1,6 @@
 // Copyright DB InfraGO AG and contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import React, { useState, useEffect } from 'react';
-
 import {
   FlaskConical,
   TriangleAlert,
@@ -35,17 +33,14 @@ export const TemplateCard = ({
   return (
     <div
       onClick={() => onClickCallback(idx)}
-      className={
-        'm-2 mt-6 max-w-sm cursor-pointer rounded-lg bg-gray-200 shadow-md ' +
-        'hover:bg-custom-light dark:bg-custom-dark-2 dark:shadow-dark ' +
-        'dark:hover:bg-custom-dark-4'
-      }>
+      className="m-2 mt-6 max-w-sm cursor-pointer rounded-lg bg-gray-200
+        shadow-md hover:bg-custom-light dark:bg-custom-dark-2 dark:shadow-dark
+        dark:hover:bg-custom-dark-4">
       <div className="p-5">
         <div className="flex flex-row justify-between">
           <h5
-            className={
-              'mb-2 text-left text-2xl font-normal text-gray-900 dark:text-gray-100'
-            }
+            className="mb-2 text-left text-2xl font-normal text-gray-900
+              dark:text-gray-100"
             style={{ overflowWrap: 'break-word' }}>
             {name}
           </h5>
@@ -61,7 +56,9 @@ export const TemplateCard = ({
             </span>
           )}
         </div>
-        <p className="mb-3 text-left font-normal text-gray-700 dark:text-gray-300">
+        <p
+          className="mb-3 text-left font-normal text-gray-700
+            dark:text-gray-300">
           {description}
         </p>
         <div className={'text-left'}>

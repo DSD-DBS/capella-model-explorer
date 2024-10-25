@@ -32,17 +32,13 @@ export const ThemeSwitcher = () => {
     <div onClick={toggleTheme} className="header-button">
       {theme === 'dark' ? (
         <Sun
-          className={
-            'transform text-orange-500 transition-transform duration-500 ' +
-            'ease-in-out'
-          }
+          className="transform text-white transition-transform duration-500
+            ease-in-out"
         />
       ) : (
         <Moon
-          className={
-            'transform text-black transition-transform duration-500 ' +
-            'ease-in-out'
-          }
+          className="transform text-white transition-transform duration-500
+            ease-in-out"
         />
       )}
     </div>

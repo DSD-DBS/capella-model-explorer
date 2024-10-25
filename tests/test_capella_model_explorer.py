@@ -57,7 +57,7 @@ def test_index_templates():
 
 
 @pytest.mark.parametrize(
-    "params,expected_uuids",
+    ("params", "expected_uuids"),
     [
         pytest.param(
             {"obj_type": "SystemComponent", "below": "sa"},

@@ -33,13 +33,11 @@ export const WiredTemplatesList = () => {
     return (
       <div
         className={
-          'dark:bg-custom-dark-error rounded bg-red-500 p-4 text-2xl ' +
-          'text-white'
+          'rounded bg-red-500 p-4 text-2xl text-white dark:bg-custom-dark-error'
         }>
         {error === 'Failed to fetch'
-          ? "Can't connect to the server. Maybe your session was inactive " +
-            "for too long? If that's the case, request a new session / " +
-            'restart the app.'
+          ? `Can't connect to the server. Maybe your session was inactive for
+          too long? If that's the case, request a new session / restart the app.`
           : error}
       </div>
     );
@@ -47,9 +45,7 @@ export const WiredTemplatesList = () => {
   return (
     <ViewsList
       templates={templates}
-      cardClickCallback={(idx) =>
-        navigate(`/${idx}`, { state: { idx: idx } })
-      }
+      cardClickCallback={(idx) => navigate(`/${idx}`, { state: { idx: idx } })}
     />
   );
 };

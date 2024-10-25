@@ -4,7 +4,7 @@
 import operator
 import traceback
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import capellambse
 import capellambse.model as m
@@ -12,7 +12,7 @@ import yaml
 from pydantic import BaseModel, Field
 
 
-def simple_object(obj) -> Dict[str, Any]:
+def simple_object(obj) -> dict[str, Any]:
     if not obj:
         return {}
     if obj.name:
@@ -50,9 +50,8 @@ def find_objects(model, obj_type=None, below=None, attr=None, filters=None):
                 if filter == "not_empty":
                     if attr:
                         filtered.append(object)
-                else:
-                    if attr == filter:
-                        filtered.append(object)
+                elif attr == filter:
+                    filtered.append(object)
         objects = filtered
     return objects
 
@@ -63,11 +62,11 @@ class InstanceDetails(BaseModel):
 
 
 class TemplateScope(BaseModel):
-    type: Optional[str] = Field(None, title="Model Element Type")
-    below: Optional[str] = Field(
+    type: str | None = Field(None, title="Model Element Type")
+    below: str | None = Field(
         None, title="Model element to search below, scope limiter"
     )
-    filters: Optional[Dict[str, Any]] = Field(
+    filters: dict[str, Any] | None = Field(
         {}, title="Filters to apply to the search"
     )
 
@@ -78,19 +77,19 @@ class Template(BaseModel):
     template: Path = Field(..., title="Template File Path")
     description: str = Field(..., title="Template Description")
 
-    scope: Optional[TemplateScope] = Field(
+    scope: TemplateScope | None = Field(
         default_factory=dict, title="Template Scope"
     )
-    single: Optional[bool] = Field(None, title="Single Instance Flag")
-    isStable: Optional[bool] = Field(None, title="Stable Template Flag")
-    isDocument: Optional[bool] = Field(None, title="Document Template Flag")
-    isExperimental: Optional[bool] = Field(
+    single: bool | None = Field(None, title="Single Instance Flag")
+    isStable: bool | None = Field(None, title="Stable Template Flag")
+    isDocument: bool | None = Field(None, title="Document Template Flag")
+    isExperimental: bool | None = Field(
         None, title="Experimental Template Flag"
     )
-    error: Optional[str] = Field(None, title="Broken Template Flag")
-    traceback: Optional[str] = Field(None, title="Template Error Traceback")
-    instanceCount: Optional[int] = Field(None, title="Number of Instances")
-    instanceList: Optional[List[Dict]] = Field(None, title="List of Instances")
+    error: str | None = Field(None, title="Broken Template Flag")
+    traceback: str | None = Field(None, title="Template Error Traceback")
+    instanceCount: int | None = Field(None, title="Number of Instances")
+    instanceList: list[dict] | None = Field(None, title="List of Instances")
 
     def find_instances(self, model: capellambse.MelodyModel):
         if self.single:
@@ -106,8 +105,7 @@ class Template(BaseModel):
                     attr=None,
                     filters=self.scope.filters,
                 )
-            else:
-                return []
+            return []
         except Exception as e:
             self.error = f"Template scope error: {e}"
             self.traceback = traceback.format_exc()
@@ -124,7 +122,7 @@ class Template(BaseModel):
 
 class TemplateCategory(BaseModel):
     idx: str = Field(..., title="Category Identifier")
-    templates: List[Template] = Field(
+    templates: list[Template] = Field(
         default_factory=list, title="Templates in this category"
     )
 
@@ -137,7 +135,7 @@ class TemplateCategory(BaseModel):
 
 
 class TemplateCategories(BaseModel):
-    categories: List[TemplateCategory] = Field(
+    categories: list[TemplateCategory] = Field(
         default_factory=list, title="Template Categories"
     )
 

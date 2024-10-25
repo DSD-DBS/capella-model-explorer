@@ -9,11 +9,9 @@ import { HomeIcon } from './HomeIcon';
 export const Header = () => {
   return (
     <header
-      className={
-        'fixed left-0 top-0 z-50 w-screen items-center justify-between ' +
-        'rounded-b-lg bg-gray-100 p-6 text-lg text-white shadow-lg ' +
-        'dark:bg-custom-dark-2 dark:shadow-dark print:hidden'
-      }>
+      className="fixed left-0 top-0 z-50 w-screen items-center justify-between
+        rounded-b-lg bg-gray-100 p-6 text-lg text-white shadow-lg
+        dark:bg-custom-dark-2 dark:shadow-dark print:hidden">
       {' '}
       <div className="flex w-full items-center justify-between">
         <div className="flex flex-1">

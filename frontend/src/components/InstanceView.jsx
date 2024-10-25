@@ -1,11 +1,11 @@
 // Copyright DB InfraGO AG and contributors
 // SPDX-License-Identifier: Apache-2.0
 
+import { Printer } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { AppInfo } from './AppInfo';
 import { SVGDisplay } from './SVGDisplay';
 import { Spinner } from './Spinner';
-import { Printer } from 'lucide-react';
-import { SoftwareVersion } from './SoftwareVersion';
 
 export const InstanceView = ({ templateName, objectID, endpoint }) => {
   const [details, setDetails] = useState([]);
@@ -70,28 +70,22 @@ export const InstanceView = ({ templateName, objectID, endpoint }) => {
     <>
       <div
         ref={contentRef}
-        className={`
-        html-content mb-4 rounded-lg border-4 border-transparent
-        bg-gray-100 p-8 text-gray-700 shadow-lg scrollbar
-        scrollbar-track-gray-200 scrollbar-thumb-gray-400
-        hover:border-gray-300 hover:shadow-md dark:bg-custom-dark-2
-        dark:text-gray-100  dark:shadow-dark
-        dark:scrollbar-track-custom-dark-3 dark:scrollbar-thumb-slate-600
-        md:w-[210mm] print:m-0 print:bg-transparent print:p-0 print:shadow-none
-      `}
+        className="html-content scrollbar scrollbar-track-gray-200
+          scrollbar-thumb-gray-400 dark:scrollbar-track-custom-dark-3
+          dark:scrollbar-thumb-slate-600 svg-display mb-4 rounded-lg border-4
+          border-transparent bg-gray-100 p-8 text-gray-700 shadow-lg
+          hover:border-gray-300 hover:shadow-md dark:bg-custom-dark-2
+          dark:text-gray-100 dark:shadow-dark md:w-[210mm] print:m-0
+          print:bg-transparent print:p-0 print:shadow-none"
         onMouseEnter={() => setIsHovering(true)}
         onMouseLeave={() => setIsHovering(false)}>
         {isHovering && (
           <div className="fixed hidden md:-ml-14 md:-mt-6 md:block">
             <div
               onClick={() => window.print()}
-              className={`
-              flex cursor-pointer items-center justify-center
-              rounded-full bg-custom-blue p-2 text-white
-              transition-colors duration-700 ease-in-out
-              hover:bg-custom-dark-4 dark:bg-custom-blue
-              dark:text-gray-100 dark:hover:bg-custom-light
-            `}>
+              className="icon flex cursor-pointer items-center justify-center
+                rounded-full bg-custom-blue p-2 text-white transition-colors
+                duration-700 ease-in-out hover:bg-custom-blue-hover">
               <Printer></Printer>
             </div>
           </div>
@@ -112,7 +106,7 @@ export const InstanceView = ({ templateName, objectID, endpoint }) => {
         })}
       </div>
       <div className="my-8 text-center 3xl:hidden">
-        <SoftwareVersion />
+        <AppInfo />
       </div>
     </>
   );

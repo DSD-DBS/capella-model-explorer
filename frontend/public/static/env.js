@@ -4,6 +4,6 @@
  */
 
 window.env = {
-    ROUTE_PREFIX: "__ROUTE_PREFIX__",
-    API_BASE_URL: "__ROUTE_PREFIX__/api",
+  ROUTE_PREFIX: '__ROUTE_PREFIX__',
+  API_BASE_URL: '__ROUTE_PREFIX__/api'
 };

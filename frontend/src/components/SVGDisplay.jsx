@@ -24,20 +24,17 @@ export const SVGDisplay = ({ content }) => {
   return (
     <>
       <div
-        className="group relative"
+        className="svg-display group relative"
         style={{ maxWidth: '100%', height: 'auto' }}
         onClick={handleSvgClick}>
         <div
-          className={
-            'absolute inset-0 flex items-center justify-center rounded ' +
-            'bg-black bg-opacity-0 duration-200 group-hover:bg-opacity-50 ' +
-            'cursor-pointer'
-          }
+          className="absolute inset-0 flex cursor-pointer items-center
+            justify-center rounded bg-black bg-opacity-0 duration-200
+            group-hover:bg-opacity-50"
           style={{ pointerEvents: 'none' }}>
           <div
-            className={
-              'text-2xl font-bold text-transparent group-hover:text-white'
-            }>
+            className="text-2xl font-bold text-transparent
+              group-hover:text-white">
             Click to enlarge
           </div>
         </div>
