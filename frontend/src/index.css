@@ -99,6 +99,10 @@ h1 {
   @apply mb-3 mt-5 text-2xl;
 }
 
+.html-content h4 {
+  @apply mb-3 mt-5 text-xl;
+}
+
 .html-content table {
   @apply min-w-full divide-y divide-gray-400;
 }

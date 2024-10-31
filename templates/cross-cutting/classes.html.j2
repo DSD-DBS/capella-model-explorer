@@ -86,6 +86,8 @@
 {% endmacro %}
 
 <h1><span style="font-weight: normal">{{ object.__class__.__name__ }}</span> <b>{{ object.name }}</b></h1>
+<small style="color: #aaa">UUID: {{ object.uuid }}</small>
+
 <p>Parent: {{ linked_name_with_icon(object.parent) | safe }}</p><br>
 {% if object.description %}
 <p>{{ object.description }}</p>
@@ -113,7 +115,7 @@
 {% endif %}
 
 
-{% set handled_attrs = ["from_model", "pvmt", "owned_properties", "properties", "parent", "generalizations", "super", "tree_view", "xtype", "name"]%}
+{% set handled_attrs = ["from_model", "pvmt", "owned_properties", "properties", "parent", "generalizations", "super", "tree_view", "xtype", "name", "uuid", "description"]%}
 
 <h2>Other Object Attributes</h2>
-{{ show_other_attributes(object, handled_attrs) | safe }}
+{{ show_other_attributes(object, excluded=handled_attrs) | safe }}
