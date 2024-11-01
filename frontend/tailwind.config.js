@@ -2,6 +2,7 @@
  * Copyright DB InfraGO AG and contributors
  * SPDX-License-Identifier: Apache-2.0
  */
+import tailwindScrollbar from 'tailwind-scrollbar';
 
 /** @type {import('tailwindcss').Config} */
 export default {
@@ -35,5 +36,5 @@ export default {
       }
     }
   },
-  plugins: ['tailwind-scrollbar']
+  plugins: [tailwindScrollbar()]
 };
