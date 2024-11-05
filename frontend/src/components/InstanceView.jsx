@@ -70,9 +70,7 @@ export const InstanceView = ({ templateName, objectID, endpoint }) => {
     <>
       <div
         ref={contentRef}
-        className="html-content scrollbar scrollbar-track-gray-200
-          scrollbar-thumb-gray-400 dark:scrollbar-track-custom-dark-3
-          dark:scrollbar-thumb-slate-600 svg-display mb-4 rounded-lg border-4
+        className="html-content svg-display mb-4 rounded-lg border-4
           border-transparent bg-gray-100 p-8 text-gray-700 shadow-lg
           hover:border-gray-300 hover:shadow-md dark:bg-custom-dark-2
           dark:text-gray-100 dark:shadow-dark md:w-[210mm] print:m-0

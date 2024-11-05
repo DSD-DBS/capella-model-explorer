@@ -79,7 +79,10 @@ export const TemplateView = ({ endpoint }) => {
         </div>
 
         <main>
-          <div className="overflow-y-auto md:w-screen">
+          <div
+            className="overflow-y-auto scrollbar scrollbar-track-gray-200
+              scrollbar-thumb-gray-400 dark:scrollbar-track-custom-dark-3
+              dark:scrollbar-thumb-slate-600">
             {!objectID && !singleObjectID && (
               <p
                 className={`absolute left-1/2 top-1/2 -translate-x-1/2
