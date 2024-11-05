@@ -2,15 +2,15 @@
 # SPDX-License-Identifier: CC0-1.0
 
 default_install_hook_types: [commit-msg, pre-commit]
-default_stages: [commit, merge-commit]
+default_stages: [pre-commit, pre-merge-commit]
 minimum_pre_commit_version: 3.2.0
 repos:
   - repo: https://github.com/gitleaks/gitleaks.git
-    rev: v8.19.3
+    rev: v8.21.2
     hooks:
       - id: gitleaks
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.6.0
+    rev: v5.0.0
     hooks:
       - id: check-added-large-files
       - id: check-ast
@@ -88,23 +88,23 @@ repos:
     hooks:
       - id: isort
   - repo: https://github.com/PyCQA/docformatter
-    rev: v1.7.5
+    rev: eb1df347edd128b30cd3368dddc3aa65edcfac38
     hooks:
       - id: docformatter
         additional_dependencies:
           - docformatter[tomli]
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.6.8
+    rev: v0.7.2
     hooks:
       - id: ruff-format
       - id: ruff
         args: [--extend-ignore=FIX]
   - repo: https://github.com/rhysd/actionlint
-    rev: v1.7.3
+    rev: v1.7.4
     hooks:
       - id: actionlint-docker
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.11.2
+    rev: v1.13.0
     hooks:
       - id: mypy
         additional_dependencies:
@@ -133,7 +133,7 @@ repos:
           - 'prettier-plugin-merge@^0.7.1'
           - 'tailwind-scrollbar@^3.1.0'
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v9.10.0
+    rev: v9.14.0
     hooks:
       - id: eslint
         additional_dependencies:

@@ -64,13 +64,13 @@ export const ModelComparisonView = ({ endpoint }) => {
       )}
       <div className="flex min-h-screen pt-28">
         <div
-          className={`scrollbar scrollbar-track-gray-200
-            scrollbar-thumb-gray-400 dark:scrollbar-track-custom-dark-3
-            dark:scrollbar-thumb-slate-600 fixed left-0 h-[calc(100vh-8rem)]
-            w-96 flex-none overflow-auto overflow-y-scroll rounded-md
-            border-b-4 border-t-4 border-gray-300 bg-gray-100 p-4 shadow-lg
-            dark:border-custom-dark-3 dark:bg-custom-dark-2 dark:shadow-dark ${
-            isSidebarVisible ? 'translate-x-0' : '-translate-x-full' }`}
+          className={`fixed left-0 h-[calc(100vh-8rem)] w-96 flex-none
+            overflow-auto overflow-y-scroll rounded-md border-b-4 border-t-4
+            border-gray-300 bg-gray-100 p-4 shadow-lg scrollbar
+            scrollbar-track-gray-200 scrollbar-thumb-gray-400
+            dark:border-custom-dark-3 dark:bg-custom-dark-2 dark:shadow-dark
+            dark:scrollbar-track-custom-dark-3 dark:scrollbar-thumb-slate-600
+            ${isSidebarVisible ? 'translate-x-0' : '-translate-x-full'}`}
           style={{ minWidth: '25%' }}>
           <div className="mb-4">
             <input

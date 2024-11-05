@@ -94,13 +94,14 @@ export const DiffView = ({ objectID, endpoint }) => {
         <Spinner />
       ) : (
         <div
-          className="html-content scrollbar scrollbar-track-gray-200
-            scrollbar-thumb-gray-400 dark:scrollbar-track-custom-dark-3
-            dark:scrollbar-thumb-slate-600 mb-4 rounded-lg border-4
-            border-transparent bg-gray-100 p-8 text-gray-700 shadow-lg
+          className="html-content mb-4 rounded-lg border-4 border-transparent
+            bg-gray-100 p-8 text-gray-700 shadow-lg scrollbar
+            scrollbar-track-gray-200 scrollbar-thumb-gray-400
             hover:border-gray-300 hover:shadow-md dark:bg-custom-dark-2
-            dark:text-gray-100 dark:shadow-dark md:w-[210mm] print:m-0
-            print:bg-transparent print:p-0 print:shadow-none">
+            dark:text-gray-100 dark:shadow-dark
+            dark:scrollbar-track-custom-dark-3 dark:scrollbar-thumb-slate-600
+            md:w-[210mm] print:m-0 print:bg-transparent print:p-0
+            print:shadow-none">
           {details.map((item, idx) => {
             if (item.type === 'SVGDisplay') {
               return <SVGDisplay key={idx} content={item.content} />;
