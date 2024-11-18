@@ -263,26 +263,29 @@
 {% macro display_property_values(object) %}
 {% if object.property_value_groups  %}
 <h2>Other properties (PVMT)</h2>
-    <p>The following properties were additionally assigned to {{ object.name }} via PVMT extension</p>
-    {% for group in object.property_value_groups %}
-        <p><b>{{ group.name | safe}}</b></p>
-        <table>
-            <thead>
-                <tr>
-                    <th><b>Property</b></th>
-                    <th><b>Value</b></th>
-                </tr>
-            </thead>
-            <tbody>
-            {% for prop in group.property_values %}
+    <p>The following properties were additionally assigned to {{ object.name }}:</p>
+    {# <p><b>{{ group.name | safe}}</b></p> #}
+    <table>
+        <thead>
             <tr>
-                <td>{{ prop.name }}</td>
-                <td>{{ prop.value.name | safe if prop.value.name else prop.value }}</td>
+                <th><b>Property</b></th>
+                <th><b>Value</b></th>
+            </tr>
+        </thead>
+        <tbody>
+    {% for group in object.property_value_groups %}
+            {% for prop in group.property_values %}
+            {%- set prop_def = prop.applied_property_values | first -%}
+            {%- set unit_def = prop_def.property_values | selectattr("name", "equalto", "__UNIT__") | first -%}
+            {%- set unit = unit_def.value if unit_def else "" -%}
+            <tr>
+                <td>{{ linked_name_with_icon(prop) | safe }}</td>
+                <td>{{ prop.value.name | safe if prop.value.name else prop.value }} {{ unit }}</td>
             </tr>
             {% endfor %}
-            </tbody>
-        </table>
     {% endfor %}
+        </tbody>
+    </table>
 {% endif %}
 {% endmacro %}
 
