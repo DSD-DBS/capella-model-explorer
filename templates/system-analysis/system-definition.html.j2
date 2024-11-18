@@ -132,142 +132,151 @@
     </table>
 {% endmacro %}
 
+{% macro decorate_own_source(exchange) %}
+{{ linked_name_with_icon(exchange.source.owner) | safe }} (own function)
+{% endmacro %}
+
+{% macro decorate_actor_source(exchange) %}
+{{ linked_name_with_icon(exchange.source.owner) | safe }}, a function of {{ linked_name_with_icon(exchange.source.owner.owner) | safe }}
+{% endmacro %}
+
+{% macro decorate_actor_target(exchange) %}
+{{ linked_name_with_icon(exchange.target.owner) | safe }}, a function of {{ linked_name_with_icon(exchange.target.owner.owner) | safe }}
+{% endmacro %}
+
+{% macro decorate_own_target(exchange) %}
+{{ linked_name_with_icon(exchange.target.owner) | safe }} (own function)
+{% endmacro %}
+
 {% if object.allocated_functions %}
 {% for function in object.allocated_functions %}
     <h3>5.{{ loop.index }} {{ linked_name_with_icon(function) | safe }}</h3>
     {{ description(function) | safe }}
+
+    {# Classify Functional IO #}
+    {%- set internal_inputs = [] -%}
+    {%- set external_inputs = [] -%}
+    {%- set undefined_owner_inputs = [] -%}
+    {%- set input_ports_with_no_exchanges = [] -%}
+    {%- set internal_outputs = [] -%}
+    {%- set external_outputs = [] -%}
+    {%- set undefined_owner_outputs = [] -%}
+    {%- set output_ports_with_no_exchanges = [] -%}
+
+    {%- if function.inputs -%}
+        {%- for input in function.inputs -%}
+            {%- if input.exchanges -%}
+                {%- for exchange in input.exchanges -%}
+                    {%- set partner = exchange.source.owner.owner -%}
+                    {%- if partner and partner != object -%}
+                        {%- set none_ = external_inputs.append(exchange) -%}
+                    {%- elif partner == object -%}
+                        {%- set none_ = internal_inputs.append(exchange) -%}
+                    {%- else -%}
+                        {%- set none_ = undefined_owner_inputs.append(exchange) -%}
+                    {%- endif -%}
+                {%- endfor -%}
+            {%- else -%}
+                {%- set none_ = input_ports_with_no_exchanges.append(input) -%}
+            {%- endif -%}
+        {%- endfor -%}
+    {%- endif -%}
+
+    {%- if function.outputs -%}
+        {%- for output in function.outputs -%}
+            {%- if output.exchanges -%}
+                {%- for exchange in output.exchanges -%}
+                    {%- set partner = exchange.target.owner.owner -%}
+                    {%- if partner and partner != object -%}
+                        {%- set none_ = external_outputs.append(exchange) -%}
+                    {%- elif partner == object -%}
+                        {%- set none_ = internal_outputs.append(exchange) -%}
+                    {%- else -%}
+                        {%- set none_ = undefined_owner_outputs.append(exchange) -%}
+                    {%- endif -%}
+                {%- endfor -%}
+            {%- else -%}
+                {%- set none_ = output_ports_with_no_exchanges.append(output) -%}
+            {%- endif -%}
+        {%- endfor -%}
+    {%- endif -%}
+
+    {# Visualize Functional IO #}
+
     {% if function.inputs %}
-    <h4>5.{{ loop.index }}.1 Inputs</h4>
-    <p>The function <i>{{ function.name }}</i> may need the following inputs:</p>
-    {% set internal_inputs = [] %}
-    {% set external_inputs = [] %}
-    {% set undefined_owner_inputs = [] %}
-    {% set ports_with_no_exchanges = [] %}
-
-    {% for input in function.inputs %}
-        {% if input.exchanges %}
-            {% for exchange in input.exchanges %}
-                {% set partner = exchange.source.owner.owner %}
-                {% if partner and partner != object %}
-                    {% set external_inputs = external_inputs.append(exchange) %}
-                {% elif partner == object %}
-                    {% set internal_inputs = internal_inputs.append(exchange) %}
-                {% else %}
-                    {% set undefined_owner_inputs = undefined_owner_inputs.append(exchange) %}
-                {% endif %}
-            {% endfor %}
-        {% else %}
-            {% set ports_with_no_exchanges = ports_with_no_exchanges.append(input) %}
+        <h4>5.{{ loop.index }}.1 Inputs</h4>
+        <p>The function <i>{{ function.name }}</i> may need the following inputs:</p>
+    
+        {% if external_inputs %}
+            <p><b>Inputs from activities of external actors:</b></p>
+            {{ functional_exchanges_table("Input", "Source", external_inputs, decorate_actor_source) | safe }}
         {% endif %}
-    {% endfor %}
 
+        {% if internal_inputs %}
+            <p><b>Inputs from internal activities of {{ object.name }}</b></p>
+            <p>To <i>{{ function.name }}</i> {{object.name}} may need:</p>
+            {{ functional_exchanges_table("Input", "Source", internal_inputs, decorate_own_source) | safe }}
+        {% endif %}
 
+        {% if undefined_owner_inputs %}
+            <p style="color:red">The following exchanges come from functions that are not allocated to any entity:</p>
+            <ul>
+                {%- for exchange in undefined_owner_inputs -%}
+                <li>{{ linked_name_with_icon(exchange) | safe }}, an output of {{linked_name_with_icon(exchange.source.owner) | safe }}</li>
+                {%- endfor -%}
+            </ul>
+        {% endif %}
 
-    {% macro decorate_own_source(exchange) %}
-    {{ linked_name_with_icon(exchange.source.owner) | safe }} (own function)
-    {% endmacro %}
-
-    {% macro decorate_actor_source(exchange) %}
-    {{ linked_name_with_icon(exchange.source.owner) | safe }}, a function of {{ linked_name_with_icon(exchange.source.owner.owner) | safe }}
-    {% endmacro %}
-
-    {% if external_inputs %}
-    <p><b>Inputs from activities of external actors:</b></p>
-    {{ functional_exchanges_table("Input", "Source", external_inputs, decorate_actor_source) | safe }}
-    {% endif %}
-
-    {% if internal_inputs %}
-    <p><b>Inputs from internal activities of {{ object.name }}</b></p>
-    <p>To <i>{{ function.name }}</i> {{object.name}} may need:</p>
-    {{ functional_exchanges_table("Input", "Source", internal_inputs, decorate_own_source) | safe }}
-    {% endif %}
-
-    {% if undefined_owner_inputs %}
-    <p style="color:red">The following exchanges come from functions that are not allocated to any entity:</p>
-    <ul>
-        {%- for exchange in undefined_owner_inputs -%}
-        <li>{{ linked_name_with_icon(exchange) | safe }}, an output of {{linked_name_with_icon(exchange.source.owner) | safe }}</li>
-        {%- endfor -%}
-    </ul>
-    {% endif %}
-
-    {% if ports_with_no_exchanges %}
-    <p style="color:red">The following input ports have no incoming exchanges defined:</p>
-    <ul>
-        {%- for port in ports_with_no_exchanges -%}
-        <li>{{ linked_name_with_icon(port) | safe }}</li>
-        {%- endfor -%}
-    </ul>
-    {% endif %}
-
+        {% if input_ports_with_no_exchanges %}
+            <p style="color:red">The following input ports have no incoming exchanges defined:</p>
+            <ul>
+                {%- for port in input_ports_with_no_exchanges -%}
+                <li>{{ linked_name_with_icon(port) | safe }}</li>
+                {%- endfor -%}
+            </ul>
+        {% endif %}
     {% else %}
-    <p style="color:red">{{object.name}} seems to require no inputs to {{function.name}}.</p>
+        <p style="color:red">{{object.name}} seems to require no inputs to {{function.name}}.</p>
     {% endif %}
 
     {% if function.outputs %}
-    <h4>5.{{ loop.index }}.2 Outputs</h4>
-    <p>The function <i>{{ function.name }}</i> may produce the following outputs:</p>
-    {% set internal_outputs = [] %}
-    {% set external_outputs = [] %}
-    {% set undefined_owner_outputs = [] %}
-    {% set ports_with_no_exchanges = [] %}
-
-    {% for output in function.outputs %}
-        {% if output.exchanges %}
-            {% for exchange in output.exchanges %}
-                {% set partner = exchange.target.owner.owner %}
-                {% if partner and partner != object %}
-                    {% set external_outputs = external_outputs.append(exchange) %}
-                {% elif partner == object %}
-                    {% set internal_outputs = internal_outputs.append(exchange) %}
-                {% else %}
-                    {% set undefined_owner_outputs = undefined_owner_outputs.append(exchange) %}
-                {% endif %}
-            {% endfor %}
-        {% else %}
-            {% set ports_with_no_exchanges = ports_with_no_exchanges.append(output) %}
+        <h4>5.{{ loop.index }}.2 Outputs</h4>
+        <p>The function <i>{{ function.name }}</i> may produce the following outputs:</p>
+        
+        {% if external_outputs %}
+            <p><b>Outputs to activities of external actors:</b></p>
+            {{ functional_exchanges_table("Output", "Target", external_outputs, decorate_actor_target) | safe }}
         {% endif %}
-    {% endfor %}
 
-    {% macro decorate_actor_target(exchange) %}
-    {{ linked_name_with_icon(exchange.target.owner) | safe }}, a function of {{ linked_name_with_icon(exchange.target.owner.owner) | safe }}
-    {% endmacro %}
+        {% if internal_outputs %}
+            <p><b>Outputs to internal activities of {{ object.name }}</b></p>
+            <p>From <i>{{ function.name }}</i> {{object.name}} may produce:</p>
+            {{ functional_exchanges_table("Output", "Target", internal_outputs, decorate_own_target) | safe }}
+        {% endif %}
 
-    {% macro decorate_own_target(exchange) %}
-    {{ linked_name_with_icon(exchange.target.owner) | safe }} (own function)
-    {% endmacro %}
+        {% if undefined_owner_outputs %}
+            <p style="color:red">The following exchanges go to functions that are not allocated to any entity:</p>
+            <ul>
+                {%- for exchange in undefined_owner_outputs -%}
+                <li>{{ linked_name_with_icon(exchange) | safe }}, an input of {{linked_name_with_icon(exchange.target.owner) | safe }}</li>
+                {%- endfor -%}
+            </ul>
+        {% endif %}
 
-    {% if external_outputs %}
-    <p><b>Outputs to activities of external actors:</b></p>
-    {{ functional_exchanges_table("Output", "Target", external_outputs, decorate_actor_target) | safe }}
-    {% endif %}
-
-    {% if internal_outputs %}
-    <p><b>Outputs to internal activities of {{ object.name }}</b></p>
-    <p>From <i>{{ function.name }}</i> {{object.name}} may produce:</p>
-    {{ functional_exchanges_table("Output", "Target", internal_outputs, decorate_own_target) | safe }}
-    {% endif %}
-
-    {% if undefined_owner_outputs %}
-    <p style="color:red">The following exchanges go to functions that are not allocated to any entity:</p>
-    <ul>
-        {%- for exchange in undefined_owner_outputs -%}
-        <li>{{ linked_name_with_icon(exchange) | safe }}, an input of {{linked_name_with_icon(exchange.target.owner) | safe }}</li>
-        {%- endfor -%}
-    </ul>
-    {% endif %}
-
-    {% if ports_with_no_exchanges %}
-    <p style="color:red">The following output ports have no outgoing exchanges defined:</p>
-    <ul>
-        {%- for port in ports_with_no_exchanges -%}
-        <li>{{ linked_name_with_icon(port) | safe }}</li>
-        {%- endfor -%}
-    </ul>
-
-    {% endif %}
+        {% if output_ports_with_no_exchanges %}
+            <p style="color:red">The following output ports have no outgoing exchanges defined:</p>
+            <ul>
+                {%- for port in output_ports_with_no_exchanges -%}
+                <li>{{ linked_name_with_icon(port) | safe }}</li>
+                {%- endfor -%}
+            </ul>
+        {% endif %}
     {% else %}
-    <p style="color:red">{{object.name}} seems to produce no outputs from {{function.name}}.</p>
+        <p style="color:red">{{object.name}} seems to produce no outputs from {{function.name}}.</p>
+    {% endif %}
+
+    {% if not function.inputs and not function.outputs %}
+    <p style="color:red">{{ object.name }} seem to require no inputs and provide no outputs while performing "{{ function.name }}" which doesn't seem correct. A function should consume inputs and produce observable outputs unless it is a source or sink function.</p>
     {% endif %}
 
 
