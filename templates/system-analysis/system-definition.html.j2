@@ -40,7 +40,7 @@
 <h2>3 System Capabilities</h2>
 {% set capabilities = model.sa.all_capabilities %}
 {% if capabilities %}
-    <p>This chater provides an overview of the capabilities that the <i>{{ object.name }}</i> system enables.</p>
+    <p>This chapter provides an overview of the capabilities that the <i>{{ object.name }}</i> system enables.</p>
     {% for cap in capabilities %}
         <h3>3.{{ loop.index }} {{ linked_name_with_icon(cap) | safe }}</h3>
         {{ cap.description }}
@@ -64,8 +64,8 @@
 {% endif %}
 
 <h2>4 System Boundary</h2>
-<p>The figure below provides an overview of the system boundary and depicts all the Actors that the <i>{{ object.name }}</i> intearcts with.</p>
-{{ object.context_diagram.as_svg | safe}}
+<p>The figure below provides an overview of the system boundary and depicts all the Actors that the <i>{{ object.name }}</i> interacts with.</p>
+{{ object.context_diagram.render("svg", display_derived_interfaces=True) | safe}}
 
 <p>The <i>{{object.name}}</i> interacts with the actors described below.</p>
 
@@ -313,8 +313,8 @@ The {{ linked_name_with_icon(source) | safe }} shall provide {{ linked_name_with
     {% endif %}
 
     {% if interface.allocated_functional_exchanges %}
-    <p>The figure below provides an overviow of the functional interactions enabled by this interface.</p>
-    {{ interface.context_diagram.as_svg | safe }}
+    <p>The figure below provides an overview of the functional interactions enabled by this interface.</p>
+    {{ interface.context_diagram | safe }}
 
     <p>The interface may be used for the following functional interactions:</p>
     <table>
