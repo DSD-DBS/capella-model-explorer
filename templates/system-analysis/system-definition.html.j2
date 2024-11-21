@@ -3,21 +3,22 @@
     SPDX-License-Identifier: Apache-2.0
 #}
 
-{% from 'common_macros.html.j2' import show_other_attributes, linked_name_with_icon %}
+{% from 'common_macros.html.j2' import show_other_attributes, linked_name_with_icon, display_property_label, description %}
 
 {% set object = model.sa.root_component%}
 <h1>System Definition</h1>
+<small>Template version: 0.1</small>
 
-<h2>Introduction</h2>
-<h3>Purpose</h3>
+<h2>1 Introduction</h2>
+<h3>1.1 Document Purpose</h3>
 <p>The purpose of this document is the following:</p>
 <ul>
-    <li>Definition of the system objectives (capabilities)</li>
+    <li>Definition of the purpose of the system, system capabilities</li>
     <li>System description, including the following aspects
         <ul>
-            <li>the system boundary and the actors interacting with the system</li>
-            <li>the system and actor functions which are necessary to achieve the system capabilities</li>
-            <li>how the system functions are used to achieve the system capabilities</li>
+            <li>Definition of the system functions</li>
+            <li>The system boundary and the actors interacting with the system</li>
+            <li>Definition of the interfaces between the system and the actors</li>
         </ul>
     </li>
     <li>Application conditions and limitations</li>
@@ -33,32 +34,358 @@
     <li>IVV, to provide basic understanding about the system</li>
 </ul>
 
-<h2>System boundary</h2>
-<p>The system boundary is defined by the following:</p>
-{{ object.context_diagram.as_svg | safe}}
+<h2>2 System Description</h2>
+{{ description(object) | safe }}
 
-<h2>System Functions</h2>
-{% if object.allocated_functions | length > 0 %}
-    <p>The system is expected to perform the following functions:</p>
-    <ul>
-        {% for fnc in object.allocated_functions %}
-            <li><a href="{{ fnc | make_href }}">{{ linked_name_with_icon(fnc) | safe }}</a></li>
-        {% endfor %}
-    </ul>
+<h2>3 System Capabilities</h2>
+{% set capabilities = model.sa.all_capabilities %}
+{% if capabilities %}
+    <p>This chapter provides an overview of the capabilities that the <i>{{ object.name }}</i> system enables.</p>
+    {% for cap in capabilities %}
+        <h3>3.{{ loop.index }} {{ linked_name_with_icon(cap) | safe }}</h3>
+        {{ cap.description }}
+
+        {% if cap.precondition %}
+        <p><b>Pre-condition</b>:
+        {{ cap.precondition.specification['capella:linkedText']|safe }}</p>
+        {% else %}
+        <p style="color:red">No pre-condition defined for system capability {{ cap.name }}</p>
+        {% endif %}
+
+        {% if cap.postcondition %}
+        <p><b>Post-condition</b>:
+        {{ cap.postcondition.specification['capella:linkedText']|safe }}</p>
+        {% else %}
+        <p style="color:red">No post-condition defined for system capability {{ cap.name }}</p>
+        {% endif %}
+    {% endfor %}
+{% else %}
+    <p style="color:red">The system is not involved in any Capability.</p>
+{% endif %}
+
+<h2>4 System Boundary</h2>
+<p>The figure below provides an overview of the system boundary and depicts all the Actors that the <i>{{ object.name }}</i> interacts with.</p>
+{{ object.context_diagram.render("svg", display_derived_interfaces=True) | safe}}
+
+<p>The <i>{{object.name}}</i> interacts with the actors described below.</p>
+
+{% set actors = model.sa.all_actors %}
+{% set caps = model.sa.all_capabilities %}
+{% if actors %}
+    {% for actor in actors %}
+        <h3>4.{{ loop.index }} {{ linked_name_with_icon(actor) | safe }}</h3>
+        <p>{{ actor.description }}</p>
+
+        {%- set involving_caps = [] -%}
+        {%- for cap in caps -%}
+        {%- set _none = involving_caps.append(cap) if actor in cap.involved_components else "" %}
+        {%- endfor -%}
+
+        {% if involving_caps %}
+        <p><i>{{ actor.name }}</i> is involved in the following system capabilities:&nbsp;
+            {%- for cap in involving_caps -%}
+            {{ linked_name_with_icon(cap) | safe }}{% if not loop.last %}, {% endif %}
+            {%- endfor -%}
+        </p>
+        {% endif %}
+
+        {% set related_src_exchanges = actor.related_exchanges | selectattr("source.owner", "equalto", object) | list %}
+        {% set related_tgt_exchanges = actor.related_exchanges | selectattr("target.owner", "equalto", object) | list %}
+        {% set related_exchanges = related_src_exchanges + related_tgt_exchanges %}
+
+        {% if related_exchanges %}
+        <p>The <i>{{ object.name }}</i> interacts with the <i>{{ actor.name }}</i> via the following interfaces:</p>
+        <ul>
+            {%- for exchange in related_exchanges -%}
+            <li>{{ linked_name_with_icon(exchange) | safe }}</li>
+            {%- endfor -%}
+        </ul>
+        {% else %}
+        <p style="color:red">No interfaces defined between the system and the actor.</p>
+        {% endif %}
+    {% endfor %}
+{% else %}
+    <p style="color:red">No actors defined for the system.</p>
+{% endif %}
+
+<h2>5 System Functions</h2>
+<p>This chapter defines the functions of the system</p>
+
+{% macro functional_exchanges_table(exchange_col_label, owner_col_lable, exchanges, owner_decorator) %}
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>{{exchange_col_label}}</th>
+                <th>{{owner_col_lable}}</th>
+            </tr>
+        </thead>
+        <tbody>
+        {%- for exchange in exchanges -%}
+            <tr>
+                <td><a href="{{ exchange | make_href }}">{{ exchange.uuid[:5] | upper }}</a></td>
+                <td>{{ linked_name_with_icon(exchange) | safe }}</td>
+                <td>{{ owner_decorator(exchange) | safe }}</td>
+            </tr>
+        {%- endfor -%}
+        </tbody>
+    </table>
+{% endmacro %}
+
+{% macro decorate_own_source(exchange) %}
+{{ linked_name_with_icon(exchange.source.owner) | safe }} (own function)
+{% endmacro %}
+
+{% macro decorate_actor_source(exchange) %}
+{{ linked_name_with_icon(exchange.source.owner) | safe }}, a function of {{ linked_name_with_icon(exchange.source.owner.owner) | safe }}
+{% endmacro %}
+
+{% macro decorate_actor_target(exchange) %}
+{{ linked_name_with_icon(exchange.target.owner) | safe }}, a function of {{ linked_name_with_icon(exchange.target.owner.owner) | safe }}
+{% endmacro %}
+
+{% macro decorate_own_target(exchange) %}
+{{ linked_name_with_icon(exchange.target.owner) | safe }} (own function)
+{% endmacro %}
+
+{% if object.allocated_functions %}
+{% for function in object.allocated_functions %}
+    <h3>5.{{ loop.index }} {{ linked_name_with_icon(function) | safe }}</h3>
+    {{ description(function) | safe }}
+
+    {# Classify Functional IO #}
+    {%- set internal_inputs = [] -%}
+    {%- set external_inputs = [] -%}
+    {%- set undefined_owner_inputs = [] -%}
+    {%- set input_ports_with_no_exchanges = [] -%}
+    {%- set internal_outputs = [] -%}
+    {%- set external_outputs = [] -%}
+    {%- set undefined_owner_outputs = [] -%}
+    {%- set output_ports_with_no_exchanges = [] -%}
+
+    {%- if function.inputs -%}
+        {%- for input in function.inputs -%}
+            {%- if input.exchanges -%}
+                {%- for exchange in input.exchanges -%}
+                    {%- set partner = exchange.source.owner.owner -%}
+                    {%- if partner and partner != object -%}
+                        {%- set none_ = external_inputs.append(exchange) -%}
+                    {%- elif partner == object -%}
+                        {%- set none_ = internal_inputs.append(exchange) -%}
+                    {%- else -%}
+                        {%- set none_ = undefined_owner_inputs.append(exchange) -%}
+                    {%- endif -%}
+                {%- endfor -%}
+            {%- else -%}
+                {%- set none_ = input_ports_with_no_exchanges.append(input) -%}
+            {%- endif -%}
+        {%- endfor -%}
+    {%- endif -%}
+
+    {%- if function.outputs -%}
+        {%- for output in function.outputs -%}
+            {%- if output.exchanges -%}
+                {%- for exchange in output.exchanges -%}
+                    {%- set partner = exchange.target.owner.owner -%}
+                    {%- if partner and partner != object -%}
+                        {%- set none_ = external_outputs.append(exchange) -%}
+                    {%- elif partner == object -%}
+                        {%- set none_ = internal_outputs.append(exchange) -%}
+                    {%- else -%}
+                        {%- set none_ = undefined_owner_outputs.append(exchange) -%}
+                    {%- endif -%}
+                {%- endfor -%}
+            {%- else -%}
+                {%- set none_ = output_ports_with_no_exchanges.append(output) -%}
+            {%- endif -%}
+        {%- endfor -%}
+    {%- endif -%}
+
+    {# Visualize Functional IO #}
+
+    {% if function.inputs %}
+        <h4>5.{{ loop.index }}.1 Inputs</h4>
+        <p>The function <i>{{ function.name }}</i> may need the following inputs:</p>
+    
+        {% if external_inputs %}
+            <p><b>Inputs from activities of external actors:</b></p>
+            {{ functional_exchanges_table("Input", "Source", external_inputs, decorate_actor_source) | safe }}
+        {% endif %}
+
+        {% if internal_inputs %}
+            <p><b>Inputs from internal activities of {{ object.name }}</b></p>
+            <p>To <i>{{ function.name }}</i> {{object.name}} may need:</p>
+            {{ functional_exchanges_table("Input", "Source", internal_inputs, decorate_own_source) | safe }}
+        {% endif %}
+
+        {% if undefined_owner_inputs %}
+            <p style="color:red">The following exchanges come from functions that are not allocated to any entity:</p>
+            <ul>
+                {%- for exchange in undefined_owner_inputs -%}
+                <li>{{ linked_name_with_icon(exchange) | safe }}, an output of {{linked_name_with_icon(exchange.source.owner) | safe }}</li>
+                {%- endfor -%}
+            </ul>
+        {% endif %}
+
+        {% if input_ports_with_no_exchanges %}
+            <p style="color:red">The following input ports have no incoming exchanges defined:</p>
+            <ul>
+                {%- for port in input_ports_with_no_exchanges -%}
+                <li>{{ linked_name_with_icon(port) | safe }}</li>
+                {%- endfor -%}
+            </ul>
+        {% endif %}
+    {% else %}
+        <p style="color:red">{{object.name}} seems to require no inputs to {{function.name}}.</p>
+    {% endif %}
+
+    {% if function.outputs %}
+        <h4>5.{{ loop.index }}.2 Outputs</h4>
+        <p>The function <i>{{ function.name }}</i> may produce the following outputs:</p>
+        
+        {% if external_outputs %}
+            <p><b>Outputs to activities of external actors:</b></p>
+            {{ functional_exchanges_table("Output", "Target", external_outputs, decorate_actor_target) | safe }}
+        {% endif %}
+
+        {% if internal_outputs %}
+            <p><b>Outputs to internal activities of {{ object.name }}</b></p>
+            <p>From <i>{{ function.name }}</i> {{object.name}} may produce:</p>
+            {{ functional_exchanges_table("Output", "Target", internal_outputs, decorate_own_target) | safe }}
+        {% endif %}
+
+        {% if undefined_owner_outputs %}
+            <p style="color:red">The following exchanges go to functions that are not allocated to any entity:</p>
+            <ul>
+                {%- for exchange in undefined_owner_outputs -%}
+                <li>{{ linked_name_with_icon(exchange) | safe }}, an input of {{linked_name_with_icon(exchange.target.owner) | safe }}</li>
+                {%- endfor -%}
+            </ul>
+        {% endif %}
+
+        {% if output_ports_with_no_exchanges %}
+            <p style="color:red">The following output ports have no outgoing exchanges defined:</p>
+            <ul>
+                {%- for port in output_ports_with_no_exchanges -%}
+                <li>{{ linked_name_with_icon(port) | safe }}</li>
+                {%- endfor -%}
+            </ul>
+        {% endif %}
+    {% else %}
+        <p style="color:red">{{object.name}} seems to produce no outputs from {{function.name}}.</p>
+    {% endif %}
+
+    {% if not function.inputs and not function.outputs %}
+    <p style="color:red">{{ object.name }} seem to require no inputs and provide no outputs while performing "{{ function.name }}" which doesn't seem correct. A function should consume inputs and produce observable outputs unless it is a source or sink function.</p>
+    {% endif %}
+
+
+    {# TODO: describe inputs, outputs and capability involvements; distinguish internal vs external #}
+
+    {% if function.involved_in %}
+    <p>While performing <i>{{ function.name }}</i> the <i>{{ object.name }}</i> contributes to the following system capabilities:&nbsp;
+    {%- for cap in function.involved_in -%}
+            {{ linked_name_with_icon(cap) | safe }}{% if not loop.last %}, {% endif %}
+    {%- endfor -%}</p>
+    {% endif %}
+
+{% endfor %}
 {% else %}
     <p style="color:red">No functions allocated to the system.</p>
 {% endif %}
 
-{% if object.diagrams %}
-    <h2>Diagrams</h2>
-    <p>The following diagrams provide additional details on the system</p>
-    {% for diagram in object.diagrams %}
-        <h3>{{diagram.name}}</h3>
-        {{ diagram.as_svg |safe }}
+<h2>6 System Interfaces</h2>
+<p>This chapter describes the interfaces between the system and the actors.</p>
+
+{% set exchange_items_catalog = []  %}
+
+{% macro describe_exchange(object) %}
+{%- set source_function = object.source.owner -%}
+{%- set target_function = object.target.owner -%}
+{%- set source = source_function.owner -%}
+{%- set target = target_function.owner -%}
+The {{ linked_name_with_icon(source) | safe }} shall provide {{ linked_name_with_icon(object) | safe }} to {{ linked_name_with_icon(target) | safe }} so that the {{ linked_name_with_icon(target) | safe }} could {{ linked_name_with_icon(target_function)|safe }}.
+{% endmacro %}
+
+{% macro describe_interface(interface) %}
+{% if interface.description %}
+    {{ interface.description | safe }}
+    {% endif %}
+
+    {% if interface.allocated_functional_exchanges %}
+    <p>The figure below provides an overview of the functional interactions enabled by this interface.</p>
+    {{ interface.context_diagram | safe }}
+
+    <p>The interface may be used for the following functional interactions:</p>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Interaction description</th>
+        </thead>
+        <tbody>
+        {% for exchange in interface.allocated_functional_exchanges %}
+            <tr>
+                <td><a href="{{ exchange | make_href }}">{{ "LEXC-" + exchange.uuid[:5] | upper }}</a></td>
+                <td>
+                    {{ describe_exchange(exchange) | safe }}
+                    {% if exchange.exchange_items %}
+                    {% if exchange.exchange_items | length > 1 %}
+                    <p>{{ exchange.name }} is further specified via the following Exchange Items:</p>
+                    <ul>
+                        {% for item in exchange.exchange_items %}
+                        <li>{{ linked_name_with_icon(item) | safe }}</li>
+                        {%- if item not in exchange_items_catalog -%}
+                        {%- set _none = exchange_items_catalog.append(item) -%}
+                        {%- endif -%}
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p>This interaction is further specified via {{ linked_name_with_icon(exchange.exchange_items[0]) | safe}} Exchange Item</p>
+                    {% endif %}
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <p style="color:red">No exchanges defined for the interface.</p>
+    {% endif %}
+{% endmacro %}
+
+{% set interfaces = object.related_exchanges %}
+{% if interfaces %}
+    {% for interface in interfaces %}
+        <h3>6.{{ loop.index }} {{ linked_name_with_icon(interface) | safe }}</h3>
+        {{ describe_interface(interface) | safe }}
     {% endfor %}
+{% else %}
+    <p style="color:red">No interfaces defined for the system.</p>
 {% endif %}
 
-<h2>State Machines</h2>
+{% if exchange_items_catalog %}
+<h2>Apendix A: Exchange Items Catalog</h2>
+<p>The following items (energy, material, information) are exchanged through the system interactions with its interface partners</p>
+{% for item in exchange_items_catalog %}
+    <h3>A.{{ loop.index}} {{ linked_name_with_icon(item) | safe }}</h3>
+    {% if item.description %}
+    {{ item.description | safe }}
+    {% endif %}
+
+    {% if item.elements %}
+    <h4>Composition</h4>
+    <p>The exchange item "{{ item.name }}" is composed of the following elements:</p>
+    <ul>
+    {%- for element in item.elements -%}
+        <li>{{ display_property_label(item, element) | safe }}</li>
+    {%- endfor -%}
+    </ul>
+    {% endif %}
+{% endfor %}
+{% endif %}
+
+
+{# <h2>State Machines</h2>
 <p>The following state machines describe system modes and states:</p>
 {% for stm in object.state_machines %}
     <h3>{{ stm.name }}</h3>
@@ -79,11 +406,11 @@
     {% else %}
         <p style="color:red">State machine {{ stm.name }} has no regions.</p>
     {% endif %}
-{% endfor %}
+{% endfor %} #}
 
 {# TODO: object.description may contain a malformed link, we need to handle that #}
 
-<h2>Other properties of the system</h2>
-{% set excluded = ["description", "context_diagram", "owner", "parent", "allocated_functions", "diagrams", "name", "parts", "realizing_components", "state_machines", "xtype"] %}
+{# <h2>Other properties of the system</h2>
+{% set excluded = ["description", "context_diagram", "owner", "parent", "allocated_functions", "diagrams", "name", "parts", "realizing_components", "state_machines", "xtype", "ports", "related_exchanges"] %} #}
 
-{{ show_other_attributes(object, excluded) | safe}}
+{# show_other_attributes(object, excluded=excluded) | safe #}

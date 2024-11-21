@@ -2,15 +2,71 @@
     Copyright DB InfraGO AG and contributors
     SPDX-License-Identifier: Apache-2.0
 #}
-{% from 'common_macros.html.j2' import show_other_attributes, description %}
+{% from 'common_macros.html.j2' import show_other_attributes, description, display_property_values, linked_name_with_icon %}
 
 <h1>{{ object.name }}</h1>
-{{ description(object) | safe }}
+<small style="color: #aaa">UUID: {{ object.uuid }}</small>
 
+{{ description(object) | safe }}
+{# what could be interesting to cover:
+ - component nature: hardware or software
+ - if it is hardware, list what software runs on it
+    - if it is software, list what hardware it runs on
+ show interfaces of the component
+ describe interfaces
+
+ #}
 <h2>Context</h2>
 <p>The context of {{ object.name }} is summarized by the diagram below:</p>
-{{ object.context_diagram.render("svg", display_derived_interfaces=True) | safe }}
+{{ object.context_diagram.render("svg", display_derived_interfaces=True, display_port_labels=True) | safe }}
+
+<h2>Deployed software</h2>
+<p>No software deployment specified</p>
+
+{# <h2>Network interfaces</h2> #}
+{# <p>tbd</p> #}
+
+<h2>Electrical interfaces of {{ object.name }}</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>Port</th>
+            {# <th>Port Type</th> #}
+            <th>Cable ID</th>
+            <th>Target</th>
+            <th>Target Port</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for port in object.physical_ports %}
+        {% set cables = port.links %}
+        {% if cables %}
+            {% for cable in cables %}
+                <tr>
+                {% set other_port = cable.ends | reject("equalto", port) | first %}
+                {% if loop.first %}
+                    <td rowspan="{{ cables | length }}">{{ linked_name_with_icon(port) | safe }}</td>
+                    {# <td rowspan="{{ cables | length }}">{{ port.property_value_groups["design_for_integration.PortDetails"].type.name | safe }}</td> #}
+                {% endif %}
+                    <td>{{ linked_name_with_icon(cable) | safe }}</td>
+                    <td>{{ linked_name_with_icon(other_port.owner) | safe }}</td>
+                    <td>{{ linked_name_with_icon(other_port) | safe }}</td>
+                </tr>
+            {% endfor %}
+        {% else %}
+            <tr>
+                <td>{{ linked_name_with_icon(port) | safe }}</td>
+                {# <td>{{ port.property_value_groups["design_for_integration.PortDetails"].type.name | safe }}</td> #}
+                <td colspan="3">No cable connections planned</td>
+            </tr>
+        {% endif %}
+    {% endfor %}
+</table>
+
+
+{{ display_property_values(object) | safe }}
 
 <h2>Other properties of "{{ object.name }}"</h2>
-{% set excluded = ["context_diagram", "description"] %}
-{{ show_other_attributes(object, excluded) | safe}}
+{% set excluded = ["context_diagram", "description", "physical_ports", "applied_property_value_groups", "property_value_groups", "name", "uuid"] %}
+{{ show_other_attributes(object, excluded=excluded) | safe}}
