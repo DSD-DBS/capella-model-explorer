@@ -57,8 +57,8 @@ def find_objects(model, obj_type=None, below=None, attr=None, filters=None):
 
 
 class InstanceDetails(BaseModel):
-    idx: str = Field(..., title="Instance Identifier")
-    name: str = Field(..., title="Instance Name")
+    idx: str = Field(title="Instance Identifier")
+    name: str = Field(title="Instance Name")
 
 
 class TemplateScope(BaseModel):
@@ -72,13 +72,13 @@ class TemplateScope(BaseModel):
 
 
 class Template(BaseModel):
-    idx: str = Field(..., title="Template Identifier")
-    name: str = Field(..., title="Template Name")
-    template: Path = Field(..., title="Template File Path")
-    description: str = Field(..., title="Template Description")
+    idx: str = Field(title="Template Identifier")
+    name: str = Field(title="Template Name")
+    template: Path = Field(title="Template File Path")
+    description: str = Field(title="Template Description")
 
-    scope: TemplateScope | None = Field(
-        default_factory=dict, title="Template Scope"
+    scope: TemplateScope = Field(
+        default_factory=TemplateScope.model_construct, title="Template Scope"
     )
     single: bool | None = Field(None, title="Single Instance Flag")
     isStable: bool | None = Field(None, title="Stable Template Flag")
@@ -121,7 +121,7 @@ class Template(BaseModel):
 
 
 class TemplateCategory(BaseModel):
-    idx: str = Field(..., title="Category Identifier")
+    idx: str = Field(title="Category Identifier")
     templates: list[Template] = Field(
         default_factory=list, title="Templates in this category"
     )
