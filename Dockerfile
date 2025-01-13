@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 # Build frontend
-FROM node:20 as build-frontend
+FROM node:20 AS build-frontend
 WORKDIR /app
 COPY frontend/package*.json ./
 RUN npm install
