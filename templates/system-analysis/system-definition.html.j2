@@ -206,7 +206,7 @@
     {% if function.inputs %}
         <h4>5.{{ loop.index }}.1 Inputs</h4>
         <p>The function <i>{{ function.name }}</i> may need the following inputs:</p>
-    
+
         {% if external_inputs %}
             <p><b>Inputs from activities of external actors:</b></p>
             {{ functional_exchanges_table("Input", "Source", external_inputs, decorate_actor_source) | safe }}
@@ -242,7 +242,7 @@
     {% if function.outputs %}
         <h4>5.{{ loop.index }}.2 Outputs</h4>
         <p>The function <i>{{ function.name }}</i> may produce the following outputs:</p>
-        
+
         {% if external_outputs %}
             <p><b>Outputs to activities of external actors:</b></p>
             {{ functional_exchanges_table("Output", "Target", external_outputs, decorate_actor_target) | safe }}

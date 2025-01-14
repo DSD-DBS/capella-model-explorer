@@ -127,11 +127,11 @@ repos:
         language: node
         types_or: [javascript, jsx, ts, css, html, markdown]
         additional_dependencies:
-          - 'prettier@^3.3.3'
-          - 'prettier-plugin-tailwindcss@^0.6.6'
-          - 'prettier-plugin-classnames@^0.7.2'
-          - 'prettier-plugin-merge@^0.7.1'
-          - 'tailwind-scrollbar@^3.1.0'
+          - 'prettier@3.4.2'
+          - 'prettier-plugin-tailwindcss@0.6.9'
+          - 'prettier-plugin-classnames@0.7.5'
+          - 'prettier-plugin-merge@0.7.2'
+          - 'tailwind-scrollbar@3.1.0'
   - repo: https://github.com/pre-commit/mirrors-eslint
     rev: v9.14.0
     hooks:
