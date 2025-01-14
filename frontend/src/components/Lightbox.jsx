@@ -69,7 +69,8 @@ export const Lightbox = ({ onClose, imageSource }) => {
           </LightboxButton>
         </div>
         <div
-          className="svg-display mt-2 flex h-full w-full overflow-visible pt-16">
+          className="svg-display mt-2 flex h-full w-full overflow-visible
+            pt-16">
           {imageSource && (
             <TransformWrapper wheel={{ smoothStep: 0.005 }}>
               <TransformComponent>

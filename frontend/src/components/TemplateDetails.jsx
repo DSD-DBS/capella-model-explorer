@@ -83,7 +83,8 @@ export const TemplateDetails = ({ endpoint, onSingleInstance }) => {
             className="flex flex-wrap items-center justify-center overflow-auto
               border-2 border-transparent text-left scrollbar
               scrollbar-track-gray-200 scrollbar-thumb-gray-400
-              dark:scrollbar-track-custom-dark-3 dark:scrollbar-thumb-slate-600">
+              dark:scrollbar-track-custom-dark-3
+              dark:scrollbar-thumb-slate-600">
             {details.instanceList &&
             details.single === false &&
             details.instanceList.length === 0 ? (
