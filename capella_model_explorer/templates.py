@@ -119,6 +119,12 @@ class Template(BaseModel):
             simple_object(obj) for obj in self.find_instances(model)
         ]
 
+    def is_in_scope(self, obj: m.ModelElement | m.AbstractDiagram) -> bool:
+        if self.single:
+            return False
+
+        return obj in self.find_instances(obj._model)
+
 
 class TemplateCategory(BaseModel):
     idx: str = Field(..., title="Category Identifier")
