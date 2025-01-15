@@ -38,18 +38,6 @@ We additionally recommend that you set up your editor / IDE as follows.
 - _If you use Visual Studio Code_: Consider using a platform which supports
   third-party language servers more easily, and continue with the next point.
 
-  Otherwise, set up the editor to run `ruff` and `mypy` when saving. To enable
-  automatic import sorting with `isort`, add the following to your
-  `settings.json`:
-
-  ```json
-  "[python]": {
-      "editor.codeActionsOnSave": {
-          "source.organizeImports": true
-      }
-  }
-  ```
-
   Note that the Pylance language server is not recommended, as it occasionally
   causes false-positive errors for perfectly valid code.
 
@@ -62,7 +50,7 @@ We additionally recommend that you set up your editor / IDE as follows.
   You can install everything that's needed into the virtualenv with pip:
 
   ```sh
-  pip install "python-lsp-server" pyls-isort pylsp-mypy ruff
+  pip install "python-lsp-server" pylsp-mypy ruff
   ```
 
   This will provide as-you-type linting as well as automatic formatting on
@@ -111,11 +99,6 @@ The key differences are:
   requirement to break up long strings into smaller parts. Additionally, never
   break up strings that are presented to the user in e.g. log messages, as that
   makes it significantly harder to grep for them.
-
-  Use [isort] for automatic sorting of imports. Its settings should
-  automatically be picked up from the `pyproject.toml` file as well.
-
-  [isort]: https://github.com/PyCQA/isort
 
 - **Typing**: We do not make an exception for `typing` imports. Instead of
   writing `from typing import SomeName`, use `import typing as t` and access
