@@ -31,7 +31,7 @@ COPY ./capella_model_explorer ./capella_model_explorer
 COPY ./pyproject.toml ./
 COPY ./.git ./.git
 
-RUN pip install .
+RUN pip install --no-cache-dir .
 COPY --from=build-frontend /app/dist/ ./frontend/dist/
 
 # Expose the port the app runs in
@@ -49,16 +49,13 @@ RUN chmod -R 777 ./frontend/dist/
 # Run script to get software version
 ENV MODE=production
 COPY frontend/fetch-version.py ./frontend/
-RUN python frontend/fetch-version.py
-
-# Pre-install npm dependencies for context diagrams
-RUN python -c "from capellambse_context_diagrams import install_elk; install_elk()"
+RUN python frontend/fetch-version.py && \
+    python -c "from capellambse_context_diagrams import install_elk; install_elk()"
 
 # Run as non-root user per default
-RUN chmod -R 777 /home
-USER 1000
-
 RUN git config --global --add safe.directory /model && \
-    git config --global --add safe.directory /model/.git
+    git config --global --add safe.directory /model/.git && \
+    chmod -R 777 /home
+USER 1000
 
 ENTRYPOINT ["/entrypoint.sh"]

@@ -230,9 +230,9 @@ def compare_objects(
     new_object: capellambse.ModelObject,
     old_model: capellambse.MelodyModel,
 ):
-    assert old_object is None or type(old_object) is type(
-        new_object
-    ), f"{type(old_object).__name__} != {type(new_object).__name__}"
+    assert old_object is None or type(old_object) is type(new_object), (
+        f"{type(old_object).__name__} != {type(new_object).__name__}"
+    )
 
     attributes: dict[str, ChangedAttribute] = {}
     children: dict[str, t.Any] = {}

@@ -11,7 +11,7 @@ dynamic = ["version"]
 name = "capella-model-explorer"
 description = "A webapp for exploring Capella models"
 readme = "README.md"
-requires-python = ">=3.11, <3.13"
+requires-python = ">=3.11, <3.14"
 license = { text = "Apache-2.0" }
 authors = [{ name = "DB InfraGO AG" }]
 keywords = []
@@ -23,11 +23,11 @@ classifiers = [
   "Programming Language :: Python :: 3 :: Only",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
 ]
 dependencies = [
   "capellambse>=0.6.6,<0.7",
   "capellambse-context-diagrams>=0.4.1",
-  "capella-diff-tools",
   "diff-match-patch",
   "jinja2",
   "fastapi",
@@ -40,7 +40,7 @@ Homepage = "https://github.com/DSD-DBS/capella-model-explorer"
 Documentation = "https://dsd-dbs.github.io/capella-model-explorer"
 
 [project.optional-dependencies]
-docs = ["furo", "sphinx", "sphinx-copybutton", "tomli; python_version<'3.11'"]
+docs = ["furo", "sphinx", "sphinx-copybutton"]
 
 test = ["pytest", "pytest-cov"]
 
@@ -61,10 +61,6 @@ skip_covered = true
 [tool.docformatter]
 wrap-descriptions = 72
 wrap-summaries = 79
-
-[tool.isort]
-profile = 'black'
-line_length = 79
 
 [tool.mypy]
 check_untyped_defs = true
@@ -111,6 +107,7 @@ extend-select = [
   "FIX",    # flake8-fixme
   "FURB",   # refurb
   "G",      # flake8-logging-format
+  "I",      # isort
   "ICN",    # flake8-import-conventions
   "ISC001", # "Implicitly concatenated string literals on one line"
   "ISC003", # "Explicitly concatenated string should be implicitly concatenated"
@@ -121,7 +118,7 @@ extend-select = [
   "RET",    # flake8-return
   "RUF",    # ruff
   "SIM",    # flake8-simplify
-  "TCH005", # "Found empty type-checking block"
+  "TC005",  # "Found empty type-checking block"
   "T1",     # flake8-debugger
   "UP",     # pyupgrade
   "YTT",    # flake8-2020
