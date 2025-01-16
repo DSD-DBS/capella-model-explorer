@@ -49,6 +49,8 @@ dev-backend:
 
 .PHONY: dev-frontend
 dev-frontend: frontend/node_modules
+	sed -i "s|__ROUTE_PREFIX__||g" frontend/dist/static/env.js
+	python frontend/fetch-version.py
 	cd frontend && npm run dev
 
 .PHONY: storybook
