@@ -1,0 +1,7 @@
+.template-container ul > li > a > img,
+.template-container a > img {
+  margin: 0 !important;
+}
+html.dark .svg-display svg {
+  filter: hue-rotate(180deg) invert(80%) saturate(200%);
+}

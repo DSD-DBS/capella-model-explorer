@@ -12,7 +12,6 @@ A webapp for exploring Capella models through simple "auto-generated" textual
 and graphical views.
 
 **Longer story**:
-
 We see a larger non-MBSE crowd struggling with the things hidden in the model.
 With this app we expose model contents in an easy to review readable form with
 basic graphical annotations. Under the hood it uses Jinja templates enabling
@@ -24,6 +23,7 @@ shape and form.
 - Provide insights into / "spell-out" the model for non-MBSE stakeholders via
   document-a-like dynamic views that describe model elements in a
   human-readable form.
+
 - Provide meaningful default views (that can be further customized) for the key
   elements to kickstart the model exploration.
 
