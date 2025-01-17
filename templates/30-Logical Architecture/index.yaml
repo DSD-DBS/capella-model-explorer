@@ -1,0 +1,55 @@
+# Copyright DB InfraGO AG and contributors
+# SPDX-License-Identifier: Apache-2.0
+
+- template: logical-component.html.j2
+  name: Logical Components
+  id: logical-component
+  description: Specifies a logical component. This is a ported template from a prototype project.
+  isExperimental: true
+  scope:
+    type: LogicalComponent
+    below: la
+
+- template: logical-interface.html.j2
+  id: logical-interface
+  name: Logical Interfaces
+  description: Defines interfaces between actors and logical system components
+  isExperimental: true
+  scope:
+    type: ComponentExchange
+    below: la
+
+- template: FIS.html.j2
+  id: functional-interface-specification
+  name: Functional Interface Specification
+  description: Defines functional interfaces between logical components (subsystems) and actors
+  isExperimental: true
+  scope:
+    type: ComponentExchange
+    below: la
+
+- template: logical-function.html.j2
+  id: logical-function
+  name: Logical Functions
+  description: Defines function of a logical system component or an actor
+  scope:
+    type: LogicalFunction
+    below: la
+
+- template: logical-state.html.j2
+  id: logical-component-mode
+  name: Logical Component Modes
+  description: Defines states and modes of a system component or an actor
+  isExperimental: true
+  scope:
+    type: Mode
+    below: la
+
+- template: logical-state.html.j2
+  id: logical-component-state
+  name: Logical Component States
+  description: Defines states and modes of a system component or an actor
+  isExperimental: true
+  scope:
+    type: State
+    below: la
