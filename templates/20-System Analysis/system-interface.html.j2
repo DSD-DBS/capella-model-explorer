@@ -1,0 +1,65 @@
+{#
+    Copyright DB InfraGO AG and contributors
+    SPDX-License-Identifier: Apache-2.0
+#}
+{% from 'common_macros.html.j2' import show_other_attributes, linked_name, display_traceability %}
+
+{% macro describe_exchange_direction(source, target, interface, exchanges) %}
+  <p>
+    {%- set unique_exchange_names = [] -%}
+    {{ linked_name(source) | safe }}
+    should provide&nbsp;
+    {%- for fex in exchanges -%}
+      {%- if fex.name not in unique_exchange_names -%}
+        <a href="{{ fex.source.owner | make_href }}">{{ fex.name }}</a
+        >{% if not loop.last %},{% else %}{% endif %}
+        {%- set _none = unique_exchange_names.append(fex.name) -%}
+      {%- endif -%}
+    {% endfor %}
+    via <i>{{ interface.name }}</i> interface (component exchange) so that
+    {{ linked_name(target) | safe }} could&nbsp;
+    {%- for fnc in exchanges | map(attribute='target.owner') | unique(attribute="uuid") -%}
+      {{ linked_name(fnc) | safe }}{% if not loop.last %},{% else %}{% endif %}
+    {%- endfor -%}
+  </p>
+{% endmacro %}
+
+{% if object.name %}
+  <h1>
+    {{ object.name }}
+    <span style="font-size: 60%">({{ object.__class__.__name__ }})</span>
+  </h1>
+{% else %}
+  <h1>Unnamed ({{ object.__class__.__name__ }})</h1>
+{% endif %}
+{% set source_provides = [] %}
+{% set target_provides = [] %}
+{%- for fex in object.allocated_functional_exchanges -%}
+  {%- if fex.source.owner and fex.source.owner.owner and fex.source.owner.owner == object.source.owner -%}
+    {%- set _none = source_provides.append(fex) -%}
+  {% else %}
+    {%- set _none = target_provides.append(fex) -%}
+  {%- endif -%}
+{%- endfor -%}
+
+{% if source_provides %}
+  {{ describe_exchange_direction(object.source.owner, object.target.owner, object, source_provides) | safe }}
+{% endif %}
+
+{% if target_provides %}
+  {{ describe_exchange_direction(object.target.owner, object.source.owner, object, target_provides) | safe }}
+{% endif %}
+
+<h2>Functional context</h2>
+<p>
+  The functional interactions between interface partners via {{ object.name }}
+  are summarized by the diagram below:
+</p>
+{{ object.context_diagram.as_svg | safe }}
+
+{{ display_traceability(object) | safe }}
+
+<h2>Other object attributes</h2>
+
+{% set filtered = ["name", "description", "xtype", "allocated_functional_exchanges", "context_diagram", "parent", "realizing_component_exchanges", "realized_component_exchanges"] %}
+{{ show_other_attributes(object, filtered) | safe }}

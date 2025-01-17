@@ -1,0 +1,16 @@
+{#
+    Copyright DB InfraGO AG and contributors
+    SPDX-License-Identifier: Apache-2.0
+#}
+{% from 'common_macros.html.j2' import show_other_attributes %}
+
+{% if object.name %}
+  <h1>
+    {{ object.name }}
+    <span style="font-size: 60%">({{ object.__class__.__name__ }})</span>
+  </h1>
+{% else %}
+  <h1>Unnamed ({{ object.__class__.__name__ }})</h1>
+{% endif %}
+
+{{ show_other_attributes(object) | safe }}

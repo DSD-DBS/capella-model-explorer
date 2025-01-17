@@ -1,0 +1,80 @@
+{#
+    Copyright DB InfraGO AG and contributors
+    SPDX-License-Identifier: Apache-2.0
+#}
+{%
+  from 'common_macros.html.j2' import
+  description,
+  display_property_label,
+  linked_name_with_icon,
+  render_allocated_functions,
+  render_capability_section,
+  render_exchange_items_catalog,
+  render_involved_actors_section,
+  render_interfaces_section,
+  show_other_attributes
+%}
+{% set object = model.sa.root_component %}
+
+<h1>System Definition</h1>
+
+<h2>1 Document Purpose</h2>
+<p>The purpose of this document is the following:</p>
+<ul>
+  <li>Definition of the purpose of the system, system capabilities</li>
+  <li>
+    System description, including the following aspects
+    <ul>
+      <li>Definition of the system functions</li>
+      <li>The system boundary and the actors interacting with the system</li>
+      <li>Definition of the interfaces between the system and the actors</li>
+    </ul>
+  </li>
+  <li>Application conditions and limitations</li>
+  <li>Safety measures</li>
+  <li>Known limitations and assumptions</li>
+</ul>
+
+<p>
+  This document is intended to serve the needs of multiple audiences including,
+  but not limited to:
+</p>
+<ul>
+  <li>All readers, to describe the System under Consideration</li>
+  <li>Safety organisation, to provide the input document for RAMS analysis</li>
+  <li>
+    System architects, to provide foundations for architecture and design
+    activities
+  </li>
+  <li>IVV, to provide basic understanding about the system</li>
+</ul>
+
+<h2>2 System Description</h2>
+{{ description(object) | safe }}
+
+<h2>3 System Capabilities</h2>
+{% set capabilities = model.sa.all_capabilities %}
+{{ render_capability_section(capabilities) | safe }}
+
+<h2>4 System Boundary</h2>
+<p>
+  The figure below provides an overview of the system boundary and depicts all
+  the Actors that the <i>{{ object.name }}</i> interacts with.
+</p>
+{{ object.context_diagram.render("svg", display_derived_interfaces=True) | safe }}
+{% set actors = model.sa.all_actors %}
+{% set caps = model.sa.all_capabilities %}
+{{ render_involved_actors_section(object, actors, caps) | safe }}
+
+<h2>5 System Functions</h2>
+{{ render_allocated_functions(object) | safe }}
+
+<h2>6 System Interfaces</h2>
+{% set interfaces = object.related_exchanges %}
+{% set exchange_items_catalog = [] %}
+{{ render_interfaces_section(object, interfaces, exchange_items_catalog) | safe }}
+
+{% if exchange_items_catalog %}
+  <h2>Apendix A: Exchange Items Catalog</h2>
+  {{ render_exchange_items_catalog(exchange_items_catalog) | safe }}
+{% endif %}

@@ -13,6 +13,7 @@ repos:
     rev: v5.0.0
     hooks:
       - id: check-added-large-files
+        args: ['--maxkb=10000']
       - id: check-ast
       - id: check-builtin-literals
       - id: check-case-conflict
@@ -28,8 +29,10 @@ repos:
       - id: debug-statements
       - id: destroyed-symlinks
       - id: end-of-file-fixer
+        exclude: 'static/js/plotly.*\.min\.js'
       - id: fix-byte-order-marker
       - id: trailing-whitespace
+        exclude: 'static/js/plotly.*\.min\.js'
   - repo: https://github.com/Lucas-C/pre-commit-hooks
     rev: v1.5.5
     hooks:
@@ -65,7 +68,7 @@ repos:
       - id: insert-license
         name: Insert Apache license headers (C-style comments)
         files: '\.(?:s?css|js|ts)$'
-        exclude: '(?:^|/)\..+'
+        exclude: '(?:^|/)\..+|static/js/plotly.*\.min\.js'
         args:
           - --detect-license-in-X-top-lines=15
           - --license-filepath
@@ -137,35 +140,25 @@ repos:
       - id: prettier-css
         name: prettier-css
         language: system
-        entry: sh -c 'make frontend/node_modules && ./frontend/node_modules/.bin/prettier --write --tab-width 2 --print-width 79 --parser css "$@"' --
+        entry: sh -c 'node_modules/.bin/prettier --write --parser css "$@"' --
         require_serial: true
         files: '\.css$'
       - id: prettier-jinja
         name: prettier-jinja
         language: system
-        entry: sh -c 'make frontend/node_modules && ./frontend/node_modules/.bin/prettier --write --tab-width 2 --print-width 79 --parser jinja-template --plugin "$(npm root -g)/prettier-plugin-jinja-template/lib/index.js" "$@"' --
+        entry: sh -c 'node_modules/.bin/prettier --write --parser jinja-template --plugin "$(pwd)/node_modules/prettier-plugin-jinja-template/lib/index.js" "$@"' --
         require_serial: true
         files: '\.(j2|jinja)$'
       - id: prettier-js
         name: prettier-js
         language: system
-        entry: sh -c 'make frontend/node_modules && ./frontend/node_modules/.bin/prettier --write --tab-width 2 --print-width 79 --parser babel "$@"' --
+        entry: sh -c 'node_modules/.bin/prettier --write --parser babel "$@"' --
         require_serial: true
         files: '\.js$'
       - id: prettier-md
         # depends on https://github.com/remarkjs/remark/tree/main/packages/remark-parse
         name: prettier-md
         language: system
-        entry: sh -c 'make frontend/node_modules && ./frontend/node_modules/.bin/prettier --write --tab-width 2 --print-width 79 --parser markdown "$@"' --
+        entry: sh -c 'node_modules/.bin/prettier --write --parser markdown "$@"' --
         require_serial: true
         files: '\.md$'
-  - repo: local
-    hooks:
-      - id: eslint
-        name: eslint
-        language: system
-        entry: sh -c 'make frontend/node_modules && ./frontend/node_modules/.bin/eslint "$@"' --
-        require_serial: true
-        args: ['--fix', '--config', 'frontend/eslint.config.js']
-        types: []
-        files: '^frontend/.*\.(js|jsx)$'

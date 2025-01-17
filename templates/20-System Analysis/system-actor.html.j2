@@ -1,0 +1,101 @@
+{#
+    Copyright DB InfraGO AG and contributors
+    SPDX-License-Identifier: Apache-2.0
+#}
+{% from 'common_macros.html.j2' import show_other_attributes, description, render_reqs_by_type, typed_name, linked_name, linked_name_with_icon %}
+
+{% if object.name %}
+  <h1>
+    {%- if object.is_actor and not object.is_human -%}
+      Actor&nbsp;
+    {%- elif object.is_actor and object.is_human -%}
+      Human actor&nbsp;
+    {%- endif -%}
+    <b>{{ object.name }}</b>
+  </h1>
+{% else %}
+  <h1>Unnamed ({{ object.__class__.__name__ }})</h1>
+{% endif %}
+
+{{ description(object) | safe }}
+{%- set involving_caps = [] -%}
+{%- for cap in model.search("Capability", below=model.sa) -%}
+  {%- set _none = involving_caps.append(cap) if object in cap.involved_components else "" %}
+{%- endfor -%}
+
+{% if involving_caps %}
+  <p>
+    <b>{{ object.name }}</b> is involved in the following system
+    capabilities:&nbsp;
+    {%- for cap in involving_caps -%}
+      {{ linked_name_with_icon(cap) | safe }}{% if not loop.last %},{% endif %}
+    {%- endfor -%}
+  </p>
+{% endif %}
+
+<h2>Context</h2>
+<p>The context of {{ object.name }} is summarized by the diagram below:</p>
+{{ object.context_diagram.render("svg", display_derived_interfaces=True) | safe }}
+
+<h2>Functions</h2>
+{% if object.allocated_functions %}
+  <p>The {{ object.name }} is responsible for the following functions:</p>
+  <ul>
+    {%- for func in object.allocated_functions -%}
+      <li>{{ linked_name_with_icon(func) | safe }}</li>
+    {%- endfor -%}
+  </ul>
+{% else %}
+  <p style="color: red;">No functions allocated to this actor.</p>
+{% endif %}
+
+<h2>Interfaces</h2>
+{% if object.related_exchanges %}
+  <p>The {{ object.name }} has the following interfaces:</p>
+  <ul>
+    {%- for ex in object.related_exchanges -%}
+      {%- set partner = ex.source.owner if ex.source.owner != object else ex.target.owner -%}
+      <li>
+        {{ linked_name_with_icon(ex) | safe }} with
+        {{ linked_name_with_icon(partner) | safe }}
+      </li>
+    {%- endfor -%}
+  </ul>
+{% else %}
+  <p style="color: red;">
+    This actor seems to have no interfaces (component exchanges) defined
+  </p>
+{% endif %}
+
+{% if object.requirements %}
+  <h2>Linked Requirement objects</h2>
+  {% set types = model.search("RequirementType") | map(attribute="long_name") | unique | list %}
+  {{ render_reqs_by_type(object.requirements, types) | safe }}
+{% endif %}
+
+<h2>Traceability</h2>
+{% if object.realized_entities %}
+  <p>
+    {{ object.name }} realizes the following objects:&nbsp;
+    {%- for obj in object.realized_entities -%}{{ typed_name(obj) | safe }};{%- endfor -%}
+  </p>
+{% else %}
+  <p>{{ object.name }} doesn't seem to realize any operational entity</p>
+{% endif %}
+{% if object.realizing_logical_components %}
+  <p>
+    {{ object.name }} is realized by the following objects:&nbsp;
+    {%- for obj in object.realizing_logical_components -%}{{ typed_name(obj) | safe }};{%- endfor -%}
+  </p>
+{% else %}
+  <p>
+    {{ object.name }} doesn't seem to be realized by any logical components or
+    actors
+  </p>
+{% endif %}
+
+<h2>Other attributes</h2>
+
+{% set excluded = ["is_actor", "is_human", "name", "xtype", "allocated_functions", "description", "owner", "parent", "parts", "realized_components", "realized_entities", "realized_operational_entities", "realizing_components", "realizing_logical_components", "related_exchanges", "context_diagram", "requirements"] %}
+
+{{ show_other_attributes(object, excluded) | safe }}
