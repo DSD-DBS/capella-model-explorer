@@ -1,0 +1,158 @@
+{#
+    Copyright DB InfraGO AG and contributors
+    SPDX-License-Identifier: Apache-2.0
+#}
+{% from 'common_macros.html.j2' import show_other_attributes, description, typed_name, linked_name, linked_name_with_icon, display_traceability, render_requirements_table %}
+
+{# {%  macro linked_name_with_icon(obj) %}
+{% if obj.name %}{{ obj.name }}{% else %}{{ obj }}{% endif %}
+{% endmacro %} #}
+
+{% macro insert_work_item(object) %}
+  {{ linked_name_with_icon(object) | safe }}
+{% endmacro %}
+
+{% macro add_class_dependencies(cls, classes) %}
+  {% if cls and cls.xtype == "org.polarsys.capella.core.data.information:Class" and not cls in classes %}
+    {% set _none = classes.append(cls) %}
+    {% if cls.super %}
+      {{ add_class_dependencies(cls.super, classes) }}
+    {% endif %}
+    {% for property in cls.properties %}
+      {% set type = None %}
+      {% if "type" in property.__dir__() %}
+        {% set type = property.type %}
+      {% elif "abstract_type" in property.__dir__() %}
+        {% set type = property.abstract_type %}
+      {% endif %}
+      {{ add_class_dependencies(type, classes) }}
+    {% endfor %}
+  {% endif %}
+{% endmacro %}
+{% macro insert_or_link(object, inserted) %}
+  {% if object not in inserted %}
+    {{ insert_work_item(object) | safe }}
+    {% set _ = inserted.append(object) %}
+  {% else %}
+    <p>{{ linked_name_with_icon(object) }}</p>
+  {% endif %}
+{% endmacro %}
+
+<h1>{{ "Functional Interface Specification " + object.name }}</h1>
+<h2>Introduction</h2>
+<p>
+  This Functional Interface Specification (FIS) document specifies functional
+  communications between the sub-systems / components / system elements /
+  actors of the System under Consideration.
+</p>
+<h2>Interface Partners</h2>
+{% set partner_a = object.source.owner %}
+{% set partner_b = object.target.owner %}
+<p>
+  This document specifies <i>{{ object.name }}</i>, an interface between
+  {{ linked_name_with_icon(partner_a) | safe }} and
+  {{ linked_name_with_icon(partner_b) | safe }}.
+</p>
+<h3>{{ partner_a.name }}</h3>
+{{ description(partner_a) | safe }}
+<h3>{{ partner_b.name }}</h3>
+{{ description(partner_b) | safe }}
+<h2>Interface Description</h2>
+<p>The interface enables the following functional interactions:</p>
+{# todo: handle mesed up model state where a functional exchange was allocated, but then function was re-allocated to another component #}
+{% set partner_a_provides = object.allocated_functional_exchanges | selectattr('source.owner.owner.uuid', "equalto", partner_a.uuid) | list %}
+{% set partner_a_source_uuids = partner_a_provides | map(attribute="source.owner.uuid") | unique | list %}
+{% set partner_b_provides = object.allocated_functional_exchanges | selectattr('source.owner.owner.uuid', "equalto", partner_b.uuid) | list %}
+{% set partner_b_source_uuids = partner_b_provides | map(attribute="source.owner.uuid") | unique | list %}
+
+{% macro describe_provided_functional_exchanges(exchanges, source, target, sources) %}
+  <p>
+    {{ linked_name_with_icon(source) | safe }} may use the interface to
+    interact with (provide exchange items to)
+    {{ linked_name_with_icon(target) | safe }}:
+  </p>
+  <table>
+    <thead>
+      <tr>
+        <th>Source function</th>
+        <th>Interaction or Exchange Items</th>
+        <th>Target function</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for src_uuid in sources %}
+        {% set filtered_exchanges = exchanges | selectattr('source.owner.uuid', "equalto", src_uuid) | list %}
+        {% for exchange in filtered_exchanges %}
+          <tr>
+            {% if loop.first %}
+              <td rowspan="{{ filtered_exchanges | length }}">
+                {{ linked_name_with_icon(exchange.source.owner) | safe }}
+              </td>
+            {% endif %}
+            <td>
+              {% if exchange.exchange_items %}
+                {% if exchange.exchange_items | length > 1 %}
+                  <ul>
+                    {% for exi in exchange.exchange_items %}
+                      <li><a href="#exi-{{ exi.uuid }}">{{ exi.name }}</a></li>
+                    {% endfor %}
+                  </ul>
+                {% else %}
+                  {% set exi = exchange.exchange_items[0] %}
+                  <a href="#exi-{{ exi.uuid }}">{{ exi.name }}</a>
+                {% endif %}
+              {% else %}
+                {{ linked_name_with_icon(exchange) | safe }}
+              {% endif %}
+            </td>
+            <td>{{ linked_name_with_icon(exchange.target.owner) | safe }}</td>
+          </tr>
+        {% endfor %}
+      {% endfor %}
+    </tbody>
+  </table>
+{% endmacro %}
+
+{% if partner_a_provides %}
+  {{ describe_provided_functional_exchanges(partner_a_provides, partner_a, partner_b, partner_a_source_uuids) | safe }}
+{% endif %}
+
+{% if partner_b_provides %}
+  {{ describe_provided_functional_exchanges(partner_b_provides, partner_b, partner_a, partner_b_source_uuids) | safe }}
+{% endif %}
+
+<h2>Interface Specification</h2>
+<h3>Exchange Item (Message) Catalog</h3>
+<p>
+  This section identifies Exchange Items / Messages used within the interface.
+</p>
+{% for exi in object.exchange_items %}
+  <h4 id="exi-{{ exi.uuid }}">Exchange Item {{ exi.name }}</h4>
+  {{ description(exi) | safe }}
+  {% for el in exi.elements %}
+    {{ add_class_dependencies(el.abstract_type, classes[direction]) }}
+  {% endfor %}
+{% endfor %}
+
+{# {%- set classes = {} -%}
+{%- set inserted = [] -%}
+{% for direction, eis in exchange_items_by_direction.items() %}
+    {% set _ = classes.setdefault(direction, []) %}
+    {{ heading(4, model.by_uuid(direction[0]).name + " → " + model.by_uuid(direction[1]).name, session) }}
+    {% for ei in eis | unique %}
+        {{ heading(5, work_item_field(ei, "id") + " - " + ei.name, session) }}
+        {{ insert_or_link(ei, inserted) }}
+        {% for el in ei.elements %}
+            {{ add_class_dependencies(el.abstract_type, classes[direction]) }}
+        {% endfor %}
+    {% endfor %}
+{% endfor %} #}
+{# {{ heading(3, "Message Description", session)}}
+<p>This section provides a detailed description of each message used within the interface.</p>
+{% for direction, clss in classes.items() %}
+    {{ heading(4, model.by_uuid(direction[0]).name + " → " + model.by_uuid(direction[1]).name, session) }}
+    {% for cl in clss | unique %}
+        {{ heading(5, work_item_field(cl, "id") + " - " + cl.name, session) }}
+        {{ insert_or_link(cl, inserted) }}
+    {% endfor %}
+{% endfor %} #}

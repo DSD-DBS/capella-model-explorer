@@ -1,0 +1,40 @@
+{#
+    Copyright DB InfraGO AG and contributors
+    SPDX-License-Identifier: Apache-2.0
+#}
+{% from 'common_macros.html.j2' import show_other_attributes, description, linked_name_with_icon %}
+
+<h1>{{ object.name }}</h1>
+{{ object }}
+
+<h2>Description</h2>
+{{ description(object) | safe }}
+
+<h2>Referenced Objects</h2>
+{% if object.nodes %}
+  <ul>
+    {% for node in object.nodes %}
+      {% if node.__class__.__name__ == "InstanceRole" %}
+        <li>
+          {{ linked_name_with_icon(node) | safe }}, an instance of
+          {{ linked_name_with_icon(node.instance.type) | safe }}
+        </li>
+      {% elif node.__class__.__name__ == "StateFragment" %}
+        <li>
+          <a href="{{ node | make_href }}">StateFragment</a>, execution of
+          {{ linked_name_with_icon(node.function) | safe }}
+        </li>
+      {% elif node.name %}
+        <li>{{ linked_name_with_icon(node) | safe }}</li>
+      {% else %}
+        <li>
+          <a href="{{ node | make_href }}"
+            >Unnamed {{ node.__class__.__name__ }}</a
+          >
+        </li>
+      {% endif %}
+    {% endfor %}
+  </ul>
+{% else %}
+  <p style="color:red">No referenced objects available.</p>
+{% endif %}
