@@ -57,6 +57,62 @@ We additionally recommend that you set up your editor / IDE as follows.
   save. Language server clients are available for a wide range of editors, from
   Vim/Emacs to PyCharm/IDEA.
 
+### Preconditions
+
+- Python 3.11 or higher
+- Node package manager (npm)
+- Docker (to guarantee, that the app will continue to work in a container)
+
+### Quick start
+
+1. Clone the project, change into the project root directory, and install in
+   editable mode in the virtual environment:
+
+   ```bash
+   pip install -e ".[dev,docs,test]"
+   ```
+
+2. Install node packages (needed to build the CSS from TailwindCSS):
+
+   ```bash
+   npm clean-install
+   ```
+
+3. Optional:
+
+   Create a `.env` file in the root of the project and define any of the
+   environment variables decribed in the help `cme run local-dev -h`.
+
+   Example `.env` file:
+
+   ```bash
+   CME_MODEL={"path": "git+https://github.com/DSD-DBS/Capella-IFE-sample.git","revision": "master", "entrypoint": "In-Flight Entertainment System.aird"}
+   CME_PORT=5000
+   CME_ROUTE_PREFIX="/prefix"
+   ```
+
+4. Run the application in development mode with the following command executed
+   in the root directory of the project:
+
+   ```bash
+   dotenv run cme run local-dev  # if you want to make use of the .env file
+   cme run local-dev  # without .env file
+   ```
+
+`cme run local-dev` starts the TailwindCSS CLI and the FastHTML server in watch
+mode that reloads the backend and frontend on change of files with the
+extensions `*.css`, `*.j2` (templates), `*.js`, and `*.py`.
+
+The app will be available at the location printed to the terminal when
+the console confirms `Application startup complete.`.
+
+### Modifying the style of the frontend
+
+Always modify the style via TailwindCSS classes within the Python code.
+
+If not possible (because of collision with TailwindCSS' `prose` class), modify
+the file `static/css/input.css` directly.
+
 ## Code style
 
 We base our code style on a modified version of the
