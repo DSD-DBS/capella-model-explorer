@@ -35,7 +35,9 @@ Clone, then build and run locally with Docker:
 
 ```bash
 docker build -t model-explorer:latest .
-docker run -e ROUTE_PREFIX="" -v /absolute/path/to/your/model/folder/on/host:/model -v $(pwd)/templates:/views -p 8000:8000 model-explorer
+docker run --name=cme -e ROUTE_PREFIX="" \
+    -v /absolute/path/to/your/model/folder/on/host:/model \
+    -v "$PWD/templates:/views" -p 8000:8000 model-explorer
 ```
 
 Then open your browser at `http://localhost:8000/views` and start exploring
@@ -46,16 +48,13 @@ and see the changes immediately in the browser.
 
 # Development (local)
 
-To run the app in dev mode you'll need to first run `npm run build` - this is
-needed by the backend to have some statics to serve. Then run `npm run dev` in
-a terminal and
-`python -m capella_model_explorer.backend path_to_model path_to_templates` in
-another terminal. The backend and statically built frontend will be served at
+To run the app in dev mode you'll need to first run `make build-frontend`. This
+is needed by the backend to have some statics to serve. Then run `make
+dev-backend` in one terminal and `make dev-frontend` in another terminal. The
+backend and statically built frontend will be served at
 `http://localhost:8000`. The live frontend will be served by vite at
-`http://localhost:5173`(or similar, it will be printed in the terminal where
-you ran `npm run dev`). If you wish to display the Frontend Software Version,
-it will initially show 'Fetch Failed'. To successfully fetch and display the
-version, you need to run the command `python frontend/fetch_version.py`.
+`http://localhost:5173` (or similar, it will be printed in the terminal where
+you ran `make dev-frontend`).
 
 # Installation
 
