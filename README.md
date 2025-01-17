@@ -12,7 +12,6 @@ A webapp for exploring Capella models through simple "auto-generated" textual
 and graphical views.
 
 **Longer story**:
-
 We see a larger non-MBSE crowd struggling with the things hidden in the model.
 With this app we expose model contents in an easy to review readable form with
 basic graphical annotations. Under the hood it uses Jinja templates enabling
@@ -24,6 +23,7 @@ shape and form.
 - Provide insights into / "spell-out" the model for non-MBSE stakeholders via
   document-a-like dynamic views that describe model elements in a
   human-readable form.
+
 - Provide meaningful default views (that can be further customized) for the key
   elements to kickstart the model exploration.
 
@@ -31,16 +31,39 @@ There are a few more use cases but we will reveal them a bit later.
 
 # Quick start
 
+Ensure that you enable host networking in Docker settings. This is needed to
+access the app from the host machine.
+
 Clone, then build and run locally with Docker:
 
 ```bash
 docker build -t model-explorer:latest .
-docker run --name=cme -e ROUTE_PREFIX="" \
-    -v /absolute/path/to/your/model/folder/on/host:/model \
-    -v "$PWD/templates:/views" -p 8000:8000 model-explorer
+docker run --rm --name=cme \
+  -e MODEL_ENTRYPOINT='{"path": "git+https://github.com/eclipse-capella/capella","revision": "v7.0.0", "entrypoint": "samples/In-Flight Entertainment System/In-Flight Entertainment System.aird"}' \
+  -p 8000:8000 \
+  --net=host \
+  model-explorer
 ```
 
-Then open your browser at `http://localhost:8000/views` and start exploring
+If you want to be able to explore a local Capella model, and/ or live edit and
+test local templates, you can mount the model and templates folders into the
+container and enable live hot code reloading:
+
+```bash
+docker build -t model-explorer:latest .
+docker run --rm --name=cme \
+  -e LIVE="1" \
+  -v /absolute/path/to/your/model/folder/on/host:/model \
+  -v "$PWD/templates:/app/templates" \
+  -p 8000:8000 \
+  --net=host \
+  model-explorer
+```
+
+If you stop the app via CTRL+C, you must delete the container via `docker rm
+cme` before you can start it again.
+
+Then open your browser at `http://localhost:8000/` and start exploring
 your model.
 
 While the thing is running you can edit the templates in the `templates` folder
