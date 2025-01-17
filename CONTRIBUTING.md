@@ -20,14 +20,10 @@ our style guidelines outlined below.
 
 ## Developing
 
-We recommend that you
-[develop inside of a virtual environment](README.md#installation). After you
-have set it up, simply run the unit tests to verify that everything is set up
-correctly:
+### Common
 
-```sh
-pytest
-```
+We recommend that you
+[develop inside of a virtual environment](README.md#installation).
 
 We additionally recommend that you set up your editor / IDE as follows.
 
@@ -56,6 +52,66 @@ We additionally recommend that you set up your editor / IDE as follows.
   This will provide as-you-type linting as well as automatic formatting on
   save. Language server clients are available for a wide range of editors, from
   Vim/Emacs to PyCharm/IDEA.
+
+### Preconditions
+
+- Python 3.11 or higher
+- Node package manager (npm)
+- Docker (to guarantee, that the app will continue to work in a container)
+
+### Quick start
+
+1. Clone the project, change into the project root directory, and install in
+   editable mode in the virtual environment:
+
+   ```bash
+   pip install -e ."[dev,docs,test]"
+   ```
+
+1. Install node packages (needed to build the CSS from TailwindCSS):
+
+   ```bash
+   npm clean-install
+   ```
+
+1. Optional:
+
+   Create a `.env` file in the root of the project and define any of the
+   environment variables decribed in the help `cme run local-dev -h`.
+
+   Example `.env` file:
+
+   ```bash
+   CME_MODEL={"path": "git+https://github.com/DSD-DBS/Capella-IFE-sample.git","revision": "master", "entrypoint": "In-Flight Entertainment System.aird"}
+   CME_PORT=5000
+   CME_ROUTE_PREFIX="/prefic"
+   ```
+
+1. Run the application in development mode with the following command executed
+   in the root directory of the project:
+
+   ```bash
+   dotenv run cme run local-dev  # if you want to make use of the .env file
+   cme run local-dev  # without .env file
+   ```
+
+`cme run local-dev` starts the TailwindCSS CLI and the FastHTML server in watch
+mode that reloads the backend and frontend on change of files with the
+extensions `*.css`, `*.j2` (templates), `*.js`, and `*.py`.
+
+The app will be available at the location printed to the terminal when
+the console confirms `Application startup complete.`.
+
+### Modifying the style of the frontend
+
+Always modify the style via TailwindCSS classes within the Python or Jinja2
+template files.
+
+If not possible (because of collision with TailwindCSS' `prosa` class), modify
+the file `static/css/input.css` directly.
+
+Note, that it is sometimes needed to empty cache and hard reload the app in the
+browser, when styles are not applied correctly.
 
 ## Code style
 
