@@ -24,7 +24,7 @@ help:
 
 .PHONY: run
 run: frontend/dist/static/env.js
-	sed -i "s|__ROUTE_PREFIX__||g" frontend/dist/static/env.js
+	sed -i -e "s|__ROUTE_PREFIX__||g" frontend/dist/static/env.js
 	MODE=production python frontend/fetch-version.py
 	python -c "from capellambse_context_diagrams import install_elk; install_elk()"
 	MODEL="$$MODEL" TEMPLATES_DIR="$$TEMPLATES_DIR" uvicorn \
@@ -38,7 +38,7 @@ build-frontend: frontend/node_modules
 
 .PHONY: dev-backend
 dev-backend:
-	sed -i "s|__ROUTE_PREFIX__||g" frontend/dist/static/env.js
+	sed -i -e "s|__ROUTE_PREFIX__||g" frontend/dist/static/env.js
 	MODE=production python frontend/fetch-version.py
 	python -c "from capellambse_context_diagrams import install_elk; install_elk()"
 	MODEL="$$MODEL" TEMPLATES_DIR="$$TEMPLATES_DIR" uvicorn \
@@ -49,7 +49,7 @@ dev-backend:
 
 .PHONY: dev-frontend
 dev-frontend: frontend/node_modules
-	sed -i "s|__ROUTE_PREFIX__||g" frontend/dist/static/env.js
+	sed -i -e "s|__ROUTE_PREFIX__||g" frontend/dist/static/env.js
 	python frontend/fetch-version.py
 	cd frontend && npm run dev
 
