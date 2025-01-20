@@ -3,8 +3,8 @@
 
 CAPELLA_MODEL_EXPLORER_HOST_IP ?= 0.0.0.0
 CAPELLA_MODEL_EXPLORER_PORT ?= 8000
-MODEL ?= coffee-machine
-TEMPLATES_DIR ?= templates
+export MODEL ?= coffee-machine
+export TEMPLATES_DIR ?= templates
 
 # NOTE: Keep the 'help' target first, so that 'make' acts like 'make help'
 .PHONY: help
