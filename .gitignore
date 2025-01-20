@@ -161,3 +161,6 @@ node_modules/
 
 # Mac stuff
 .DS_Store
+
+# IntelliJ project files
+.idea/

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Home } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 
 export const HomeIcon = () => {
   return (

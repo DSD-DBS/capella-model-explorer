@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { useEffect, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router';
 import { API_BASE_URL } from '../APIConfig';
 
 export const Breadcrumbs = () => {
@@ -56,7 +56,7 @@ export const Breadcrumbs = () => {
       document.title = `${instanceName} - ${modelName} - Model Explorer`;
     };
     updateLabels();
-  }, [location, document.title]);
+  }, [location, pathnames]);
 
   const visible_pathnames = [
     breadcrumbLabels['/'],

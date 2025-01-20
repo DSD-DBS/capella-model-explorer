@@ -10,7 +10,7 @@ selected we show a hint to select one.
 */
 
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router';
 import { useMediaQuery } from 'react-responsive';
 import { Header } from '../components/Header';
 import { InstanceView } from '../components/InstanceView';
@@ -47,7 +47,7 @@ export const TemplateView = ({ endpoint }) => {
     if (isSmallScreen && objectID) {
       setIsSidebarVisible(false);
     }
-  }, [objectID, singleObjectID]);
+  }, [objectID, singleObjectID, isSmallScreen]);
   return (
     <div>
       <Header />
