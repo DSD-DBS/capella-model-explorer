@@ -136,28 +136,17 @@ repos:
     hooks:
       - id: prettier
         name: prettier
-        entry: prettier --write
-        language: node
+        language: system
+        entry: sh -c 'make frontend/node_modules && ./frontend/node_modules/.bin/prettier --write "$@"' --
+        require_serial: true
         types_or: [javascript, jsx, ts, css, html, markdown]
-        additional_dependencies:
-          - 'prettier@3.4.2'
-          - 'prettier-plugin-tailwindcss@0.6.10'
-          - 'prettier-plugin-classnames@0.7.5'
-          - 'prettier-plugin-merge@0.7.2'
-          - 'tailwind-scrollbar@3.1.0'
-  - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v9.18.0
+  - repo: local
     hooks:
       - id: eslint
-        additional_dependencies:
-          - '@eslint/js@^9.18.0'
-          - 'eslint@^9.18.0'
-          - 'eslint-config-prettier@^10.0.1'
-          - 'eslint-plugin-react@^7.37.4'
-          - 'eslint-plugin-react-hooks@^5.1.0'
-          - 'eslint-plugin-react-refresh@^0.4.18'
-          - 'eslint-plugin-storybook@^0.11.2'
-          - 'globals@^15.14.0'
+        name: eslint
+        language: system
+        entry: sh -c 'make frontend/node_modules && ./frontend/node_modules/.bin/eslint "$@"' --
+        require_serial: true
         args: ['--fix', '--config', 'frontend/eslint.config.js']
         types: []
         files: '^frontend/.*\.(js|jsx)$'
