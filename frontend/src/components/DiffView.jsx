@@ -84,7 +84,7 @@ export const DiffView = ({ objectID, endpoint }) => {
     if (objectID) {
       fetchTemplate();
     }
-  }, [objectID]);
+  }, [objectID, endpoint]);
 
   return (
     <div

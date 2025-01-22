@@ -99,13 +99,13 @@ repos:
         additional_dependencies:
           - docformatter[tomli]
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.9.1
+    rev: v0.9.2
     hooks:
       - id: ruff
         args: [--extend-ignore=FIX, --fix]
       - id: ruff-format
   - repo: https://github.com/rhysd/actionlint
-    rev: v1.7.6
+    rev: v1.7.7
     hooks:
       - id: actionlint
   - repo: https://github.com/pre-commit/mirrors-mypy
@@ -136,30 +136,17 @@ repos:
     hooks:
       - id: prettier
         name: prettier
-        entry: prettier --write
-        language: node
+        language: system
+        entry: sh -c 'make frontend/node_modules && ./frontend/node_modules/.bin/prettier --write "$@"' --
+        require_serial: true
         types_or: [javascript, jsx, ts, css, html, markdown]
-        additional_dependencies:
-          - 'prettier@3.4.2'
-          - 'prettier-plugin-tailwindcss@0.6.9'
-          - 'prettier-plugin-classnames@0.7.5'
-          - 'prettier-plugin-merge@0.7.2'
-          - 'tailwind-scrollbar@3.1.0'
-  - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v9.18.0
+  - repo: local
     hooks:
       - id: eslint
-        additional_dependencies:
-          - 'eslint@^8.57.0'
-          - 'eslint-config-prettier@^9.1.0'
-          - 'eslint-plugin-import@^2.29.1'
-          - 'eslint-plugin-unused-imports@^3.1.0'
-          - 'eslint-plugin-deprecation@^2.0.0'
-          - 'eslint-plugin-tailwindcss@^3.15.1'
-          - 'eslint-plugin-storybook@^0.8.0'
-          - 'eslint-plugin-react@^7.34.1'
-          - 'eslint-plugin-react-hooks@^4.6.2'
-          - 'eslint-plugin-react-refresh@^0.4.5'
-        args: ['--fix']
+        name: eslint
+        language: system
+        entry: sh -c 'make frontend/node_modules && ./frontend/node_modules/.bin/eslint "$@"' --
+        require_serial: true
+        args: ['--fix', '--config', 'frontend/eslint.config.js']
         types: []
         files: '^frontend/.*\.(js|jsx)$'

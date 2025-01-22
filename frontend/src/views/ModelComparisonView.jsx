@@ -29,7 +29,7 @@ export const ModelComparisonView = ({ endpoint }) => {
         const response = await fetch(API_BASE_URL + '/diff');
         const data = await response.json();
         setModelDiff(data);
-      } catch (err) {
+      } catch {
         setModelDiff({});
       }
       document.body.style.height = 'auto';
