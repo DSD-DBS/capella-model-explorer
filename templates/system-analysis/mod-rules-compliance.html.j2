@@ -41,7 +41,6 @@
   {% endif -%}
 {% endmacro -%}
 
-</head>
 <body>
 <h1>Modeling Rules Compliance Report for System Analysis Layer</h1>
 <p>
@@ -66,7 +65,7 @@
   {% if total != 0 %}
     <p><span style="color: {{color}}">{{score}}%</span> <small>({{passed}} / {{total}} rule checks)</small> for {{category}} rules category</p>
   {% else %}
-    <p><span style="color: #ccc">No rules in {{category}} category apply to objects under evaluation.</p>
+    <p><span style="color: #ccc">No rules in {{category}} category apply to objects under evaluation.</span></p>
   {% endif -%}
 {% endfor %}
 
@@ -102,8 +101,10 @@
 <table>
 <thead>
   <tr>
-    <th width="160px">Rule
-    <th>Definition
+    <th width="160px">Rule</th>
+    <th>Definition</th>
+  </tr>
+  </thead>
   <tbody>
     {% for rule in results.iter_rules() | sort(attribute="id") | sort(attribute="category.value") -%}
     {% set rule_results = results.by_rule(rule) -%}

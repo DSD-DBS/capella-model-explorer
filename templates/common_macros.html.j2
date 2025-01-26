@@ -168,7 +168,6 @@
                 {{req_rels(req.relations, scope=scope) | safe}}
                 {{show_other_attributes(req, excluded=["related", "relations", "requirements", "text", "owner", "validate", "xtype"], hide_rules_check=True, hide_unset_attrs=True) | safe}}
             </td>
-        </div>
         </tr>
     {% endfor %}
     </table>

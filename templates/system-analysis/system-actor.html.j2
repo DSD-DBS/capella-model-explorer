@@ -15,7 +15,7 @@
     <b>{{ object.name }}</b>
 </h1>
 {% else %}
-<h1>Unnamed ({{ object.__class__.__name__ }})</small></h1>
+<h1>Unnamed ({{ object.__class__.__name__ }})</h1>
 {% endif %}
 
 {{ description(object) | safe }}
