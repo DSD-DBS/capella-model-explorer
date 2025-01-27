@@ -4,312 +4,356 @@
 #}
 
 {% macro first_upper(text) %}
-    {{ text[0] | upper}}{{text[1:] }}
+  {{ text[0] | upper }}{{ text[1:] }}
 {% endmacro %}
 
 {% macro show_compliance_to_modeling_rules(object) %}
-{% if "validation" in object.__dir__() %}
+  {% if "validation" in object.__dir__() %}
     <h2>Compliance to modeling rules</h2>
     {% set results = object.validate() %}
     {% if results %}
-        <table>
-            <tbody>
-            {% for result in results %}
-                <tr style="{% if not result.passed %}border-bottom: none;{% endif %}">
-                    <td style="{% if not result.passed %}padding-top: 0.4em;{% endif %}">
-                        <b style="white-space: nowrap;">{{ result.rule.id }}</b>
-                    </td>
-                    <td style="{% if not result.passed %}padding-top: 0.4em;{% endif %}">
-                        <b>{{ result.rule.name }}</b>
-                    </td>
-                    <td style="{% if not result.passed %}padding-top: 0.4em;{% endif %}">
-                        <b style="color: {{ 'green' if result.passed else 'red'}}">
-                            {{ "PASSED" if result.passed else "FAILED"}}
-                        </b>
-                    </td>
-
-                </tr>
-                {% if not result.passed %}
-                <tr>
-                    <td colspan="3" style="padding-left: 2.5em;">
-                        <p>{{ result.rule.rationale }}</p>
-                        <p><b>Next action:</b> {{ result.rule.action }}</p>
-                    </td>
-                </tr>
-                {% endif %}
-            {% endfor %}
-            </tbody>
-        </table>
+      <table>
+        <tbody>
+          {% for result in results %}
+            <tr
+              style="{% if not result.passed %}border-bottom: none;{% endif %}"
+            >
+              <td
+                style="{% if not result.passed %}padding-top: 0.4em;{% endif %}"
+              >
+                <b style="white-space: nowrap;">{{ result.rule.id }}</b>
+              </td>
+              <td
+                style="{% if not result.passed %}padding-top: 0.4em;{% endif %}"
+              >
+                <b>{{ result.rule.name }}</b>
+              </td>
+              <td
+                style="{% if not result.passed %}padding-top: 0.4em;{% endif %}"
+              >
+                <b style="color: {{ 'green' if result.passed else 'red' }}">
+                  {{ "PASSED" if result.passed else "FAILED" }}
+                </b>
+              </td>
+            </tr>
+            {% if not result.passed %}
+              <tr>
+                <td colspan="3" style="padding-left: 2.5em;">
+                  <p>{{ result.rule.rationale }}</p>
+                  <p><b>Next action:</b> {{ result.rule.action }}</p>
+                </td>
+              </tr>
+            {% endif %}
+          {% endfor %}
+        </tbody>
+      </table>
     {% else %}
-        <p>Could not evaluate compliance of the object to the current modeling rules set.</p>
+      <p>
+        Could not evaluate compliance of the object to the current modeling
+        rules set.
+      </p>
     {% endif %}
-{% endif %}
+  {% endif %}
 {% endmacro %}
 
 {% macro show_other_attributes(object, object_diff={}, display_modified_changes=None, excluded=[], hide_rules_check=False, hide_unset_attrs=False) %}
-    {% set empty_attrs = [] %}
-    <table style="width: 100%;">
+  {% set empty_attrs = [] %}
+  <table style="width: 100%;">
     {% if object_diff %}
-        {% set attr_diff = object_diff["attributes"] %}
-        {% set attr_change = object_diff["change"] %}
-        {% set attr_lst = [] %}
-        {% if attr_diff is mapping %}
-            {%for key, val in attr_diff.items() %}
-                {{attr_lst.append(key)}}
-            {% endfor %}
-        {% endif %}
-    {%endif%}
+      {% set attr_diff = object_diff["attributes"] %}
+      {% set attr_change = object_diff["change"] %}
+      {% set attr_lst = [] %}
+      {% if attr_diff is mapping %}
+        {% for key, val in attr_diff.items() %}
+          {{ attr_lst.append(key) }}
+        {% endfor %}
+      {% endif %}
+    {% endif %}
     <thead>
-        <tr><th>Property</th><th>Value</th></tr>
+      <tr>
+        <th>Property</th>
+        <th>Value</th>
+      </tr>
     </thead>
     {%- for attr in object.__dir__()|sort if not attr.startswith("_") and attr not in ["from_model", "pvmt"]+excluded -%}
-    {% if attr in ["validation", "validate"] %}
-    {% else %}
+      {% if attr in ["validation", "validate"] %}
+
+      {% else %}
         {%- set value = object[attr] -%}
         {% if value %}
-            <tr>
+          <tr>
             {% if attr in attr_diff and attr_change == "modified" %}
-                <td style="word-break:normal; background-color:rgb(255, 218, 148)">
-                    {{ attr }}
-                </td>
-                <td>
+              <td
+                style="word-break:normal; background-color:rgb(255, 218, 148)"
+              >
+                {{ attr }}
+              </td>
+              <td>
                 {%- if value.as_svg -%}
-                    {{ value.as_svg|safe }}
+                  {{ value.as_svg|safe }}
                 {%- else -%}
-                    {{ display_modified_changes(attr_diff[attr]) | safe }}
+                  {{ display_modified_changes(attr_diff[attr]) | safe }}
                 {%- endif -%}
-                </td>
-                {{ attr_lst.remove(attr) }}
+              </td>
+              {{ attr_lst.remove(attr) }}
             {% else %}
-                <td style="word-break:normal">
-                    {{ attr }}
-                </td>
-                <td>
-                    {%- if value.as_svg -%}
-                        {{ value.as_svg | safe }}
-                    {%- elif value is iterable and value is not string -%}
-                        <ul>
-                            {% for item in value %}
-                                <li>{{ linked_name_with_icon(item) | safe }}</li>
-                            {% endfor %}
-                        </ul>
-                    {%- elif value._short_html_ -%}
-                        <p>{{ linked_name_with_icon(value) | safe }}</p>
-                    {%- else -%}
-                        <p>{{ value }}</p>
-                    {%- endif -%}
-                </td>
+              <td style="word-break:normal">{{ attr }}</td>
+              <td>
+                {%- if value.as_svg -%}
+                  {{ value.as_svg | safe }}
+                {%- elif value is iterable and value is not string -%}
+                  <ul>
+                    {% for item in value %}
+                      <li>{{ linked_name_with_icon(item) | safe }}</li>
+                    {% endfor %}
+                  </ul>
+                {%- elif value._short_html_ -%}
+                  <p>{{ linked_name_with_icon(value) | safe }}</p>
+                {%- else -%}
+                  <p>{{ value }}</p>
+                {%- endif -%}
+              </td>
             {% endif %}
-            </tr>
-
+          </tr>
         {% else %}
-            {% set _none = empty_attrs.append(attr) %}
+          {% set _none = empty_attrs.append(attr) %}
         {% endif %}
-    {% endif %}
+      {% endif %}
     {% endfor -%}
     {% if attr_lst and attr_change == "modified" %}
-        {% for attr in attr_lst %}
-            <td style="word-break:normal; background-color: red">
-            {{ attr }}
-            </td>
-            <td>
-            <p>{{ display_modified_changes(attr_diff[attr]) | safe }}</p>
-            </td>
-        {% endfor %}
+      {% for attr in attr_lst %}
+        <td style="word-break:normal; background-color: red">{{ attr }}</td>
+        <td>
+          <p>{{ display_modified_changes(attr_diff[attr]) | safe }}</p>
+        </td>
+      {% endfor %}
     {% endif %}
-
-    </table>
-    {% if empty_attrs %}
-        {% if not hide_unset_attrs %}
-            <h3>Unset attributes</h3>
-            <p>The object has the following attributes in unset state (empty values): {{ ", ".join(empty_attrs) }}</p>
-        {% endif %}
-        {% if not hide_rules_check %}
-            {{ show_compliance_to_modeling_rules(object) | safe }}
-        {% endif %}
+  </table>
+  {% if empty_attrs %}
+    {% if not hide_unset_attrs %}
+      <h3>Unset attributes</h3>
+      <p>
+        The object has the following attributes in unset state (empty values):
+        {{ ", ".join(empty_attrs) }}
+      </p>
     {% endif %}
+    {% if not hide_rules_check %}
+      {{ show_compliance_to_modeling_rules(object) | safe }}
+    {% endif %}
+  {% endif %}
 {% endmacro %}
 
 {% macro req_rels(rels, scope=None) %}
-{% if rels %}
-<ul>
-{% for rel in rels %}
-    {% if scope %}
-        {% if rel.target == scope or rel.source == scope %}
-        <li>
-            <a href="{{ rel.type | make_href }}">{{rel.type.long_name }}</a>
-            {{ linked_name_with_icon(rel.target) | safe}}
-        </li>
+  {% if rels %}
+    <ul>
+      {% for rel in rels %}
+        {% if scope %}
+          {% if rel.target == scope or rel.source == scope %}
+            <li>
+              <a href="{{ rel.type | make_href }}">{{ rel.type.long_name }}</a>
+              {{ linked_name_with_icon(rel.target) | safe }}
+            </li>
+          {% endif %}
+        {% else %}
+          <li>
+            <a href="{{ rel.type | make_href }}">{{ rel.type.long_name }}</a>
+            {{ linked_name_with_icon(rel.target) | safe }}
+          </li>
         {% endif %}
-    {% else %}
-        <li>
-            <a href="{{ rel.type | make_href }}">{{rel.type.long_name }}</a>
-            {{ linked_name_with_icon(rel.target) | safe}}
-        </li>
-    {% endif %}
-{% endfor %}
-</ul>
-{% else %}
-<p style="color: red;">Not linked to any model objects</p>
-{% endif%}
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p style="color: red;">Not linked to any model objects</p>
+  {% endif %}
 {% endmacro %}
 
 {% macro render_requirements_table(reqs, scope=None) %}
-    <table>
+  <table>
     {% for req in reqs %}
-        <tr>
-            <td>
-                <a href="{{ req | make_href }}">
-                    {{ req.identifier if req.identifier else "REQ-"+req.uuid[-5:] | upper }}
-                </a>
-            </td>
-            <td>
-                {{ req.text if req.text else req.long_name }}
-                {{req_rels(req.relations, scope=scope) | safe}}
-                {{show_other_attributes(req, excluded=["related", "relations", "requirements", "text", "owner", "validate", "xtype"], hide_rules_check=True, hide_unset_attrs=True) | safe}}
-            </td>
-        </tr>
+      <tr>
+        <td>
+          <a href="{{ req | make_href }}">
+            {{ req.identifier if req.identifier else "REQ-"+req.uuid[-5:] | upper }}
+          </a>
+        </td>
+        <td>
+          {{ req.text if req.text else req.long_name }}
+          {{ req_rels(req.relations, scope=scope) | safe }}
+          {{ show_other_attributes(req, excluded=["related", "relations", "requirements", "text", "owner", "validate", "xtype"], hide_rules_check=True, hide_unset_attrs=True) | safe }}
+        </td>
+      </tr>
     {% endfor %}
-    </table>
+  </table>
 {% endmacro %}
 
 {% macro render_reqs_by_type(reqs, types) %}
-    {% for req_type in types+[None] %}
-        {% set reqs = reqs.by_type(req_type)%}
-        {% if reqs %}
-            <h3>Of type "{{ req_type | string }}"</h3>
-            {{ render_requirements_table(reqs) | safe }}
-        {% endif %}
-    {% endfor %}
+  {% for req_type in types+[None] %}
+    {% set reqs = reqs.by_type(req_type) %}
+    {% if reqs %}
+      <h3>Of type "{{ req_type | string }}"</h3>
+      {{ render_requirements_table(reqs) | safe }}
+    {% endif %}
+  {% endfor %}
 {% endmacro %}
 
 {% macro description(obj) %}
-    {% if obj.description %}
-        <p>{{ obj.description | safe }}</p>
-    {% else %}
+  {% if obj.description %}
+    <p>{{ obj.description | safe }}</p>
+  {% else %}
     <p style="color:red">No description available.</p>
-    {% endif %}
+  {% endif %}
 {% endmacro %}
 
-{%- macro typed_name(object) -%}<b>{{ object.__class__.__name__ }}</b> <a href="{{ object | make_href }}">{{ object.name  | trim }}</a>{%- endmacro -%}
+{%- macro typed_name(object) -%}
+  <b>{{ object.__class__.__name__ }}</b>
+  <a href="{{ object | make_href }}">{{ object.name  | trim }}</a>
+{%- endmacro -%}
 
-{%- macro linked_name(object) -%}<a href="{{ object | make_href }}">{{ object.name  | trim }}</a>{%- endmacro -%}
+{%- macro linked_name(object) -%}
+  <a href="{{ object | make_href }}">{{ object.name  | trim }}</a>
+{%- endmacro -%}
 
 {% macro draw_icon(obj, size) %}
-{% if obj._get_icon %}
-{% set icon = obj._get_icon("datauri_svg", size=size) %}
-{% if icon %}
-    <img src="{{ icon | safe }}" height="{{size}}" width="{{size}}" style="display:inline-block"/>
-{% endif %}
-{% endif %}
+  {% if obj._get_icon %}
+    {% set icon = obj._get_icon("datauri_svg", size=size) %}
+    {% if icon %}
+      <img
+        src="{{ icon | safe }}"
+        height="{{ size }}"
+        width="{{ size }}"
+        style="display:inline-block"
+      />
+    {% endif %}
+  {% endif %}
 {% endmacro %}
 
 {% macro linked_name_with_icon(obj) %}
-    {% if obj %}
-        {% if obj.uuid %}
-        <a href="hlink://{{obj.uuid}}">
-            {% if obj.__class__.__name__ not in [ "Part"]%}
-            {{ draw_icon(obj, 15) | safe }}
-            {% endif %}
-            {% if obj.name %}{{ obj.name }}{% elif obj.long_name %}{{ obj.long_name }}{% else %}{{ obj.__class__.__name__ }}{% endif %}
-        </a>
-        {% else %}
-            {{ obj._short_html_ | safe }}
+  {% if obj %}
+    {% if obj.uuid %}
+      <a href="hlink://{{ obj.uuid }}">
+        {% if obj.__class__.__name__ not in [ "Part"] %}
+          {{ draw_icon(obj, 15) | safe }}
         {% endif %}
+        {% if obj.name %}{{ obj.name }}{% elif obj.long_name %}{{ obj.long_name }}{% else %}{{ obj.__class__.__name__ }}{% endif %}
+      </a>
     {% else %}
-    <span style="color:red">Deleted object</span>
+      {{ obj._short_html_ | safe }}
     {% endif %}
+  {% else %}
+    <span style="color:red">Deleted object</span>
+  {% endif %}
 {% endmacro %}
 
 {%- macro display_traceability(object, show_upper=True) -%}
-    {%- set realized_attrs = [] -%}
-    {%- set realizing_attrs = [] -%}
-    {%- for attr in object.__dir__() -%}
-        {%- if attr.startswith("realized_") -%}
-            {% set _none = realized_attrs.append(attr) %}
-        {%- elif attr.startswith("realizing_") -%}
-            {% set _none = realizing_attrs.append(attr) %}
-        {%- endif-%}
-    {%- endfor -%}
-    {%- set realized_objects = object[realized_attrs | first] if realized_attrs else [] -%}
-    {%- set realizing_objects = object[realizing_attrs | first] if realizing_attrs else [] -%}
+  {%- set realized_attrs = [] -%}
+  {%- set realizing_attrs = [] -%}
+  {%- for attr in object.__dir__() -%}
+    {%- if attr.startswith("realized_") -%}
+      {% set _none = realized_attrs.append(attr) %}
+    {%- elif attr.startswith("realizing_") -%}
+      {% set _none = realizing_attrs.append(attr) %}
+    {%- endif -%}
+  {%- endfor -%}
+  {%- set realized_objects = object[realized_attrs | first] if realized_attrs else [] -%}
+  {%- set realizing_objects = object[realizing_attrs | first] if realizing_attrs else [] -%}
 
-    <h2>Traceability</h2>
-    {% if (realized_objects | length > 0 or realizing_objects | length > 0) and "realization_view" in object.__dir__() %}
-        <p>The figure below provides an overview of objects that "{{ object.name}}" realizes but also those that realize "{{ object.name }}"</p>
-        {{ object.realization_view.as_svg | safe }}
-    {% endif %}
-    {% if show_upper %}
-        {% if realized_objects %}
-        <p>{{ object.name }} realizes the following objects:<p>
-        <ul>
-        {%- for obj in realized_objects -%}<li style="display: block;">{{ linked_name_with_icon(obj) | safe}}</li>{%- endfor -%}
-        </ul>
-        {%- else -%}
-            <p style="color: red;">{{ first_upper(object.name) }} doesn't seem to realize any object</p>
-        {%- endif -%}
-    {% endif %}
-    {% if realizing_objects %}
-        <p>{{ object.name }} is realized by the following objects:</p>
-        <ul>
-        {%- for obj in realizing_objects -%}<li style="display: block;">{{ linked_name_with_icon(obj) | safe}}</li>{%- endfor -%}
-        </ul>
-        {%- else -%}
-            <p style="color: red;">{{ first_upper(object.name) }} doesn't seem to be realized by any object</p>
-    {% endif %}
+  <h2>Traceability</h2>
+  {% if (realized_objects | length > 0 or realizing_objects | length > 0) and "realization_view" in object.__dir__() %}
+    <p>
+      The figure below provides an overview of objects that "{{ object.name }}"
+      realizes but also those that realize "{{ object.name }}"
+    </p>
+    {{ object.realization_view.as_svg | safe }}
+  {% endif %}
+  {% if show_upper %}
+    {% if realized_objects %}
+      <p>{{ object.name }} realizes the following objects:</p>
+      <p></p>
+      <ul>
+        {%- for obj in realized_objects -%}
+          <li style="display: block;">
+            {{ linked_name_with_icon(obj) | safe }}
+          </li>
+        {%- endfor -%}
+      </ul>
+    {%- else -%}
+      <p style="color: red;">
+        {{ first_upper(object.name) }} doesn't seem to realize any object
+      </p>
+    {%- endif -%}
+  {% endif %}
+  {% if realizing_objects %}
+    <p>{{ object.name }} is realized by the following objects:</p>
+    <ul>
+      {%- for obj in realizing_objects -%}
+        <li style="display: block;">
+          {{ linked_name_with_icon(obj) | safe }}
+        </li>
+      {%- endfor -%}
+    </ul>
+  {%- else -%}
+    <p style="color: red;">
+      {{ first_upper(object.name) }} doesn't seem to be realized by any object
+    </p>
+  {% endif %}
 {%- endmacro -%}
 
 {% macro display_property_values(object) %}
-{% if object.property_value_groups  %}
-<h2>Other properties (PVMT)</h2>
-    <p>The following properties were additionally assigned to {{ object.name }}:</p>
+  {% if object.property_value_groups %}
+    <h2>Other properties (PVMT)</h2>
+    <p>
+      The following properties were additionally assigned to {{ object.name }}:
+    </p>
     {# <p><b>{{ group.name | safe}}</b></p> #}
     <table>
-        <thead>
-            <tr>
-                <th><b>Property</b></th>
-                <th><b>Value</b></th>
-            </tr>
-        </thead>
-        <tbody>
-    {% for group in object.property_value_groups %}
-            {% for prop in group.property_values %}
+      <thead>
+        <tr>
+          <th><b>Property</b></th>
+          <th><b>Value</b></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for group in object.property_value_groups %}
+          {% for prop in group.property_values %}
             {%- set prop_def = prop.applied_property_values | first -%}
             {%- set unit_def = prop_def.property_values | selectattr("name", "equalto", "__UNIT__") | first -%}
             {%- set unit = unit_def.value if unit_def else "" -%}
             <tr>
-                <td>{{ linked_name_with_icon(prop) | safe }}</td>
-                <td>{{ prop.value.name | safe if prop.value.name else prop.value }} {{ unit }}</td>
+              <td>{{ linked_name_with_icon(prop) | safe }}</td>
+              <td>
+                {{ prop.value.name | safe if prop.value.name else prop.value }}
+                {{ unit }}
+              </td>
             </tr>
-            {% endfor %}
-    {% endfor %}
-        </tbody>
+          {% endfor %}
+        {% endfor %}
+      </tbody>
     </table>
-{% endif %}
+  {% endif %}
 {% endmacro %}
 
 {% macro display_property_label(object, property) %}
-    <p>
-        <b>{{ property.name }}</b> :
-        {% set type = None %}
-        {% if "type" in property.__dir__() %}
-            {% set type = property.type %}
-        {% elif "abstract_type" in property.__dir__() %}
-            {% set type = property.abstract_type %}
-        {% endif %}
-        {% if type %}
-            {{ linked_name_with_icon(type) | safe }}
-        {% else %}
-            <span style="color:red">No type defined</span>
-        {% endif %}
-        {% if property.min_card.value == property.max_card.value and property.max_card.value == "1" %}
-        {% elif property.min_card.value == property.max_card.value %}
-        [ {{ property.min_card.value }} ]
-        {% else %}
-        [ {{ property.min_card.value }} .. {{ property.max_card.value }} ]
-        {% endif %}
-        {% if property.parent != object %}
-        (inherited from {{ linked_name_with_icon(property.parent) | safe }})
-        {% endif %}
-    </p>
+  <p>
+    <b>{{ property.name }}</b> : {% set type = None %}
+    {% if "type" in property.__dir__() %}
+      {% set type = property.type %}
+    {% elif "abstract_type" in property.__dir__() %}
+      {% set type = property.abstract_type %}
+    {% endif %}
+    {% if type %}
+      {{ linked_name_with_icon(type) | safe }}
+    {% else %}
+      <span style="color:red">No type defined</span>
+    {% endif %}
+    {% if property.min_card.value == property.max_card.value and property.max_card.value == "1" %}
+
+    {% elif property.min_card.value == property.max_card.value %}
+      [ {{ property.min_card.value }} ]
+    {% else %}
+      [ {{ property.min_card.value }} .. {{ property.max_card.value }} ]
+    {% endif %}
+    {% if property.parent != object %}
+      (inherited from {{ linked_name_with_icon(property.parent) | safe }})
+    {% endif %}
+  </p>
 {% endmacro %}
