@@ -8,7 +8,6 @@ import { API_BASE_URL } from '../APIConfig';
 export const Breadcrumbs = () => {
   const location = useLocation();
   const [breadcrumbLabels, setBreadcrumbLabels] = useState({});
-  const pathnames = location.pathname.split('/').filter((x) => x);
 
   const fetchModelInfo = async () => {
     const response = await fetch(API_BASE_URL + `/model-info`);
@@ -37,6 +36,7 @@ export const Breadcrumbs = () => {
     const updateLabels = async () => {
       const title = await fetchModelInfo();
       const labels = { '/': title };
+      const pathnames = location.pathname.split('/').filter((x) => x);
 
       for (let i = 0; i < pathnames.length; i++) {
         const to = `/${pathnames.slice(0, i + 1).join('/')}`;
@@ -56,7 +56,7 @@ export const Breadcrumbs = () => {
       document.title = `${instanceName} - ${modelName} - Model Explorer`;
     };
     updateLabels();
-  }, [location, pathnames]);
+  }, [location]);
 
   const visible_pathnames = [
     breadcrumbLabels['/'],
