@@ -51,7 +51,7 @@
     {% if object.name %}
         <h1>{{ object.name }} <span style="font-size: 60%">({{ object.__class__.__name__ }})</span></h1>
     {% else %}
-        <h1>Unnamed ({{ object.__class__.__name__ }})</small></h1>
+        <h1>Unnamed ({{ object.__class__.__name__ }})</h1>
     {% endif %}
     {{show_other_attributes(object, object_diff, display_modified_changes=display_modified_changes) | safe}}
 {% else %}

@@ -15,7 +15,7 @@ The figure below provides an overview of the logical subsystem and external enti
 
 {{ object.context_diagram.as_svg|safe }}
 
-<h3>Logical interface partners of {{object.name}}</h2>
+<h3>Logical interface partners of {{object.name}}</h3>
 
 {% set lexcs = [] %}{% for port in object.ports %}{% for lexc in port.exchanges %}
 {% set _ = lexcs.append([lexc, lexc.source.owner if lexc.source.owner != subsystem else lexc.target.owner]) %}

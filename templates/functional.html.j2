@@ -108,7 +108,7 @@
 <p>The function is available in the following states of the {{ owner | safe }}:</p>
 <ul>
     {% for state in object.available_in_states %}
-        <li>{{linked_name_with_icon(state) | safe}}</a></li>
+        <li>{{linked_name_with_icon(state) | safe}}</li>
     {% endfor %}
 </ul>
 {% else %}

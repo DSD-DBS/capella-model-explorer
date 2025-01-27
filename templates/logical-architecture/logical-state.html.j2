@@ -30,19 +30,21 @@ Upon completion of all entry activities of <i>{{ render_name_with_icon(tx.source
 </ul>
 {% endif %}
 
-{% if object.entry %}
-<p>On entry into the <b>{{ object.name }}</b> {{ object.__class__.__name__ }} the system shall perform the following activities:
-{% for fnc in object.entry %}
+{% if object.entries %}
+<p>
+On entry into the <b>{{ object.name }}</b> {{ object.__class__.__name__ }} the system shall perform the following activities:
+{% for fnc in object.entries %}
 {{ render_name_with_icon(fnc) | safe }};
-{% endfor %}</p>
+{% endfor %}
+</p>
 {% endif %}
 
 {% if object.do_activity %}
-<p>While in <b>{{ object.name }}</b> {{ object.__class__.__name__ }} the system may perform the following activities: </p>
+<p>While in <b>{{ object.name }}</b> {{ object.__class__.__name__ }} the system may perform the following activities:</p>
 <ul>
 {% for fnc in object.do_activity %}
 <li>{{ render_name_with_icon(fnc) | safe }} </li>
-{% endfor %}</p>
+{% endfor %}
 </ul>
 {% endif %}
 
