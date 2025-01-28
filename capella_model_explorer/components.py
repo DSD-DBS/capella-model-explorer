@@ -66,7 +66,26 @@ def breadcrumb(breadcrumb: state.Breadcrumb) -> t.Any:
     )
 
 
-def breadcrumbs() -> t.Any:
+def breadcrumbs(*, oob: bool = False) -> t.Any:
+    breadcrumbs = []
+    if state.template and not state.template.single:
+        breadcrumbs = [
+            state.Breadcrumb(
+                label=state.template.name,
+                url=f"/templates/{quote(state.template.id)}",
+            ),
+        ]
+    if state.template and state.model_element:
+        breadcrumbs.append(
+            state.Breadcrumb(
+                label=state.model_element.name,
+                url=(
+                    f"/templates/{quote(state.template.id)}"
+                    f"/model-elements/{state.model_element.uuid}"
+                ),
+            )
+        )
+
     home_item = (
         ft.Li(
             ft.Div(
@@ -81,8 +100,8 @@ def breadcrumbs() -> t.Any:
         ),
     )
     breadcrumb_items_ = [home_item]
-    if state.breadcrumbs:
-        breadcrumb_items_.extend([breadcrumb(b) for b in state.breadcrumbs])
+    if breadcrumbs:
+        breadcrumb_items_.extend([breadcrumb(b) for b in breadcrumbs])
     return ft.Nav(
         ft.Ol(
             *breadcrumb_items_,
@@ -92,15 +111,7 @@ def breadcrumbs() -> t.Any:
         id="breadcrumbs",
         aria_label="Breadcrumb",
         cls="flex",
-    )
-
-
-def breadcrumbs_refresh_script() -> t.Any:
-    return ft.Script(
-        "htmx.ajax("
-        "'GET', '/breadcrumbs', {swap: 'outerHTML', target:'#breadcrumbs'}"
-        ");"
-        "console.log('breadcrumbs refreshed');"
+        **({"hx_swap_oob": "true"} if oob else {}),
     )
 
 

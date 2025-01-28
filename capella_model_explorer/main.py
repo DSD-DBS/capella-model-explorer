@@ -87,7 +87,6 @@ def _make_href_filter(obj: object) -> str | None:
 
 
 def _reset_state() -> None:
-    state.breadcrumbs = None
     state.diff = {}
     state.object_diff = {}
     state.model_element = None
@@ -138,29 +137,6 @@ def metrics():
 @ar.get("/")
 def home_page() -> t.Any:
     return fh.RedirectResponse(url="/templates")
-
-
-@ar.get("/breadcrumbs")
-def breadcrumbs() -> t.Any:
-    state.breadcrumbs = []
-    if state.template and not state.template.single:
-        state.breadcrumbs = [
-            state.Breadcrumb(
-                label=state.template.name,
-                url=f"/templates/{quote(state.template.id)}",
-            ),
-        ]
-    if state.template and state.model_element:
-        state.breadcrumbs.append(
-            state.Breadcrumb(
-                label=state.model_element.name,
-                url=(
-                    f"/templates/{quote(state.template.id)}/model-elements"
-                    f"/{state.model_element.uuid}"
-                ),
-            )
-        )
-    return components.breadcrumbs()
 
 
 @ar.get("/templates")
@@ -301,7 +277,6 @@ def template_page(template_id: str, model_element_uuid: str = "") -> t.Any:
             ),
         ),
         ft.Script(script),
-        components.breadcrumbs_refresh_script(),
         id="template-page-content",
         cls=("flex", "flex-row", "w-full", "h-full", "print:bg-white"),
     )
@@ -329,7 +304,6 @@ def render_template(template_id: str, model_element_uuid: str = "") -> t.Any:
                 "document.getElementById('root').classList.add('h-screen');"
                 "document.getElementById('print-button').classList.add('hidden');"
             ),
-            components.breadcrumbs_refresh_script(),
             cls=(
                 "h-full",
                 "justify-center",
@@ -342,7 +316,7 @@ def render_template(template_id: str, model_element_uuid: str = "") -> t.Any:
             hx_swap="outerHTML",
             hx_target="#template_container",
         )
-    )
+    ), components.breadcrumbs(oob=True)
 
 
 @ar.get("/theme-button/{theme}")

@@ -23,7 +23,6 @@ class Breadcrumb(pydantic.BaseModel):
     url: str
 
 
-breadcrumbs: list[Breadcrumb] | None = None
 idle_time_gauge = prometheus_client.Gauge(
     "idletime_minutes",
     "Time in minutes since the last user interaction",
