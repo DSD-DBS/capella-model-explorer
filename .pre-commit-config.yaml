@@ -6,7 +6,7 @@ default_stages: [pre-commit, pre-merge-commit]
 minimum_pre_commit_version: 4.0.0
 repos:
   - repo: https://github.com/gitleaks/gitleaks.git
-    rev: v8.23.0
+    rev: v8.23.2
     hooks:
       - id: gitleaks
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -99,7 +99,7 @@ repos:
         additional_dependencies:
           - docformatter[tomli]
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.9.2
+    rev: v0.9.3
     hooks:
       - id: ruff
         args: [--extend-ignore=FIX, --fix]
@@ -134,12 +134,31 @@ repos:
           - --ignore=DL3008
   - repo: local
     hooks:
-      - id: prettier
-        name: prettier
+      - id: prettier-css
+        name: prettier-css
         language: system
-        entry: sh -c 'make frontend/node_modules && ./frontend/node_modules/.bin/prettier --write "$@"' --
+        entry: sh -c 'make frontend/node_modules && ./frontend/node_modules/.bin/prettier --write --tab-width 2 --print-width 79 --parser css "$@"' --
         require_serial: true
-        types_or: [javascript, jsx, ts, css, html, markdown]
+        files: '\.css$'
+      - id: prettier-jinja
+        name: prettier-jinja
+        language: system
+        entry: sh -c 'make frontend/node_modules && ./frontend/node_modules/.bin/prettier --write --tab-width 2 --print-width 79 --parser jinja-template --plugin "$(npm root -g)/prettier-plugin-jinja-template/lib/index.js" "$@"' --
+        require_serial: true
+        files: '\.(j2|jinja)$'
+      - id: prettier-js
+        name: prettier-js
+        language: system
+        entry: sh -c 'make frontend/node_modules && ./frontend/node_modules/.bin/prettier --write --tab-width 2 --print-width 79 --parser babel "$@"' --
+        require_serial: true
+        files: '\.js$'
+      - id: prettier-md
+        # depends on https://github.com/remarkjs/remark/tree/main/packages/remark-parse
+        name: prettier-md
+        language: system
+        entry: sh -c 'make frontend/node_modules && ./frontend/node_modules/.bin/prettier --write --tab-width 2 --print-width 79 --parser markdown "$@"' --
+        require_serial: true
+        files: '\.md$'
   - repo: local
     hooks:
       - id: eslint
