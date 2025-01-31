@@ -1,0 +1,133 @@
+{#
+    Copyright DB InfraGO AG and contributors
+    SPDX-License-Identifier: Apache-2.0
+#}
+{% from 'common_macros.html.j2' import show_other_attributes, linked_name, linked_name_with_icon, description, display_property_label %}
+
+<style>
+  .table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  th,
+  td {
+    padding: 8px;
+
+    text-align: left;
+  }
+
+  tr:hover,
+  th {
+    background-color: #f2f2f2;
+  }
+</style>
+
+{% macro properties_list(props, obj) %}
+  {% for property in props %}
+    {{ display_property_label(obj, property) | safe }}
+    {% set prop_props = [] %}
+    {% if property.kind != "UNSET" %}{% set _none = prop_props.append(["Kind", property.kind]) %}{% endif %}
+    {% if property.min_value %}{% set _none = prop_props.append(["Min. value", property.min_value]) %}{% endif %}
+    {% if property.max_value %}{% set _none = prop_props.append(["Max. value", property.max_value]) %}{% endif %}
+    <div style="padding-left: 2.5em !important; padding-bottom: 0.6em;">
+      {{ description(property) | safe }}
+      {% if property.type.__class__.__name__ == "Enumeration" %}
+        <p>{{ property.type.name }} enumeration values:</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Enumeration Literal</th>
+              <th>Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for val in property.type.literals %}
+              <tr>
+                <td>{{ val.name }}</td>
+                <td>{{ val.value.value or "0" }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% endif %}
+
+      <p>
+        Property {{ property.name }} has the following additional attributes:
+      </p>
+      {% if prop_props %}
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Property</th>
+              <th>Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for key, val in prop_props %}
+              <tr>
+                <td>{{ key }}</td>
+                <td>
+                  {% if val.type %}
+                    {{ val.value }}
+                    :{{ linked_name_with_icon(val.type) | safe }}
+                  {% else %}
+                    {{ val.value }}
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% endif %}
+    </div>
+
+    {# show_other_attributes(property) | safe #}
+  {% endfor %}
+{% endmacro %}
+
+<h1>
+  <span style="font-weight: normal">{{ object.__class__.__name__ }}</span>
+  <b>{{ object.name }}</b>
+</h1>
+<small style="color: #aaa">UUID: {{ object.uuid }}</small>
+
+<p>Parent: {{ linked_name_with_icon(object.parent) | safe }}</p>
+<br />
+{% if object.description %}
+  <p>{{ object.description }}</p>
+{% else %}
+  <p style="color:red">No description available.</p>
+{% endif %}
+
+<h2>Relationships Overview</h2>
+<p>
+  The diagram below provides a view on raletionships between the
+  {{ object.name }} and other objects.
+</p>
+
+{{ object.tree_view.as_svg|safe }}
+{% set props = [] %}
+{% if object.super %}
+  {% set props = props | list + object.super.properties | list %}
+{% endif %}
+{% set props = props + object.owned_properties | list %}
+
+<h2>Properties</h2>
+{% if props %}
+  <p>
+    The object owns the properties listed below; We use the following format to
+    describe property: name : type [min .. max (instances of type)] or [ fixed
+    number]; if no multiplicity is shown assume its 1 (single instance).
+    Properties that were inherited through specialization are indicated
+    accordingly.
+  </p>
+  <br />
+  {{ properties_list(props, object) |safe }}
+{% else %}
+  <p style="color:red">No properties are owned by this object.</p>
+{% endif %}
+{% set handled_attrs = ["from_model", "pvmt", "owned_properties", "properties", "parent", "generalizations", "super", "tree_view", "xtype", "name", "uuid", "description"] %}
+
+<h2>Other Object Attributes</h2>
+{{ show_other_attributes(object, excluded=handled_attrs) | safe }}

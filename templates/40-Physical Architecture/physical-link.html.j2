@@ -1,0 +1,24 @@
+{#
+    Copyright DB InfraGO AG and contributors
+    SPDX-License-Identifier: Apache-2.0
+#}
+{% from 'common_macros.html.j2' import show_other_attributes, linked_name, display_property_values %}
+
+<h1>Physical Link <b>{{ object.name }}</b></h1>
+
+{% if object.parent %}
+  <p>A part of {{ linked_name(object.parent) | safe }}</p>
+{% endif %}
+
+{{ object.context_diagram.as_svg | safe }}
+
+<p>
+  Connects {{ linked_name(object.ends[0].owner) | safe }} via
+  {{ linked_name(object.ends[0]) | safe }} port and
+  {{ linked_name(object.ends[1].owner) | safe }} via
+  {{ linked_name(object.ends[1]) | safe }} port.
+</p>
+
+{{ display_property_values(object ) | safe }}
+{% set covered = ["ends", "linkEnds", "name", "owner", "source", "target", "xtype", "applied_property_value_groups", "property_value_groups", "parent", "context_diagram"] %}
+{{ show_other_attributes(object, covered) | safe }}

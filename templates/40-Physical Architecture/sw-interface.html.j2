@@ -1,0 +1,126 @@
+{#
+    Copyright DB InfraGO AG and contributors
+    SPDX-License-Identifier: Apache-2.0
+#}
+{% from 'common_macros.html.j2' import show_other_attributes, linked_name, linked_name_with_icon, description %}
+
+{% macro describe_exchange(object) %}
+  {%- set source_function = object.source.owner -%}
+  {%- set target_function = object.target.owner -%}
+  {%- set source = source_function.owner -%}
+  {%- set target = target_function.owner -%}
+  The {{ linked_name(source) | safe }} shall provide
+  {{ linked_name_with_icon(object) | safe }} to
+  {{ linked_name_with_icon(target) | safe }} so that the
+  {{ linked_name_with_icon(target) | safe }} could
+  {{ linked_name_with_icon(target_function)|safe }}.
+{% endmacro %}
+
+{% macro describe_functional_chain(object) %}
+{% endmacro %}
+
+{% macro describe_interface(object) %}
+{% endmacro %}
+
+<h1>Software Interface Control Document - {{ object.name }}</h1>
+<h2>Introduction</h2>
+<p>
+  This Interface Control Document only covers software message based
+  communication (application layer) between ETCS compatible components. At the
+  moment physical interface definition is not in scope for this document. The
+  scope of the document covers Interface Requirements and Definition
+</p>
+<h2>Interface Partners</h2>
+<p>The figure below provides an overview of the interface partners:</p>
+<p>There may be a diagram with 2 boxes and a blue line</p>
+<p>
+  This interface control document defines functional interactions between the
+  following 2 software components:
+</p>
+<ul>
+  <li>
+    {{ linked_name_with_icon(object.source.owner) | safe }}:
+    {{ description(object.source.owner) | safe }}
+  </li>
+  <li>
+    {{ linked_name_with_icon(object.target.owner) | safe }}:
+    {{ description(object.target.owner) | safe }}
+  </li>
+</ul>
+
+<h2>Interface Requirements</h2>
+<p>
+  The aim of this section is to specify interface requirements based on
+  required and provided functions of the interface partner components.
+</p>
+<p>
+  The figure below provides an overview of the behaviors that depend on this
+  interface:
+</p>
+{{ object.context_diagram.as_svg | safe }}
+<p>This interface enables the following interactions:</p>
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Interaction description</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for exchange in object.allocated_functional_exchanges %}
+      <tr>
+        <td>
+          <a href="{{ exchange | make_href }}"
+            >{{ "LEXC-" + exchange.uuid[:5] | upper }}</a
+          >
+        </td>
+        <td>
+          {{ describe_exchange(exchange) | safe }}
+          {% if exchange.exchange_items %}
+            {% if exchange.exchange_items | length > 1 %}
+              <p>
+                {{ exchange.name }} is further specified via the following
+                Exchange Items:
+              </p>
+              <ul>
+                {% for item in exchange.exchange_items %}
+                  <li>{{ linked_name_with_icon(item) | safe }}</li>
+                {% endfor %}
+              </ul>
+            {% else %}
+              <p>
+                This interaction is further specified via
+                {{ linked_name_with_icon(exchange.exchange_items[0]) | safe }}
+                Exchange Item
+              </p>
+            {% endif %}
+          {% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<h2>Interface Definition</h2>
+<h3>Message Catalog</h3>
+<p>This section identifies messages used within the interface.</p>
+<ul>
+  {% set items = [] %}
+  {% for exchange in object.allocated_functional_exchanges %}
+    {% for item in exchange.exchange_items %}
+      {% set _none = items.append(item) %}
+    {% endfor %}
+  {% endfor %}
+  {% for item in items | unique(attribute="uuid") %}
+    <li>{{ linked_name_with_icon(item) | safe }}</li>
+  {% endfor %}
+</ul>
+<h3>Message Description</h3>
+<p>
+  This section provides a detailed description of each message used within the
+  interface.
+</p>
+
+<h2>Other attributes</h2>
+{% set excluded = ["allocated_functional_exchanges", "context_diagram", "parent", "name", "source", "target", "exchange_items"] %}
+{{ show_other_attributes(object, excluded) | safe }}

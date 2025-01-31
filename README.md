@@ -12,7 +12,6 @@ A webapp for exploring Capella models through simple "auto-generated" textual
 and graphical views.
 
 **Longer story**:
-
 We see a larger non-MBSE crowd struggling with the things hidden in the model.
 With this app we expose model contents in an easy to review readable form with
 basic graphical annotations. Under the hood it uses Jinja templates enabling
@@ -24,6 +23,7 @@ shape and form.
 - Provide insights into / "spell-out" the model for non-MBSE stakeholders via
   document-a-like dynamic views that describe model elements in a
   human-readable form.
+
 - Provide meaningful default views (that can be further customized) for the key
   elements to kickstart the model exploration.
 
@@ -31,16 +31,52 @@ There are a few more use cases but we will reveal them a bit later.
 
 # Quick start
 
-Clone, then build and run locally with Docker:
+Clone this repository, then build and run a Docker container:
 
 ```bash
-docker build -t model-explorer:latest .
-docker run --name=cme -e ROUTE_PREFIX="" \
-    -v /absolute/path/to/your/model/folder/on/host:/model \
-    -v "$PWD/templates:/views" -p 8000:8000 model-explorer
+python3 -m pip install capella-model-explorer
+cd capella-model-explorer
+python3 -m capella_model_explorer build image
+python3 -m capella_model_explorer run container  # set port via CME_PORT env var
 ```
 
-Then open your browser at `http://localhost:8000/views` and start exploring
+Above will start the app with a sample model which can be found here:
+[In-Flight Entertainment System](https://github.com/DSD-DBS/Capella-IFE-sample)
+
+To run the application with a custom model in a container:
+
+```bash
+export CME_VERSION=$(python -c 'import capella_model_explorer as cme; print(cme.__version__)')
+docker run --rm \
+  --name capella-model-explorer \
+  -e MODEL_ENTRYPOINT='{"path": "git+https://github.com/DSD-DBS/Capella-IFE-sample.git","revision": "master", "entrypoint": "In-Flight Entertainment System.aird"}' \
+  -p 8000:8000 \
+  capella-model-explorer:$CME_VERSION
+```
+
+More information about the `MODEL_ENTRYPOINT` can be found in the documentation
+of capellambse:
+
+https://dsd-dbs.github.io/py-capellambse/start/specifying-models.html
+
+If you want to be able to explore a local Capella model, and/ or live edit and
+test local templates, you can mount a local model and a templates folder into
+the container with automatically enabled live template reloading and rendering:
+
+```bash
+export CME_VERSION=$(python -c 'import capella_model_explorer as cme; print(cme.__version__)')
+docker run --rm \
+  --name capella-model-explorer \
+  -p 8000:8000 \
+  -v /absolute/path/to/your/model/folder/on/host:/model \  # optional local model
+  -v "$(pwd)/templates:/app/templates" \
+  capella-model-explorer:$CME_VERSION
+```
+
+If you stop the app via CTRL+C, you must delete the container via `docker rm
+capella-model-explorer` before you can start it again.
+
+Then open your browser at `http://localhost:8000/` and start exploring
 your model.
 
 While the thing is running you can edit the templates in the `templates` folder

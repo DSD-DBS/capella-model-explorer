@@ -1,0 +1,116 @@
+{#
+    Copyright DB InfraGO AG and contributors
+    SPDX-License-Identifier: Apache-2.0
+#}
+{% from 'common_macros.html.j2' import show_other_attributes, description, render_reqs_by_type, typed_name, display_traceability, linked_name_with_icon %}
+
+<h1>{{ object.name }}</h1>
+{{ description(object) | safe }}
+
+<p style="margin-top:1.5em; ">
+  <b>Parent:</b> {{ linked_name_with_icon(object.parent) | safe }}
+</p>
+
+{% if object.capabilities %}
+  <p>
+    <i>{{ object.name }} {% if object.is_human %}(human){% endif %}</i> is
+    involved in the following operational capabilities:
+  </p>
+  <ul>
+    {%- for cap in object.capabilities -%}
+      <li>{{ linked_name_with_icon(cap) | safe }}</li>
+    {%- endfor -%}
+  </ul>
+{% endif %}
+
+{% if object.state_machines %}
+  <h2>States and Modes</h2>
+  <p>
+    The following state machines describe modes and states of
+    <i>{{ object.name }}</i>:
+  </p>
+  {% for stm in object.state_machines %}
+    <h3>{{ stm.name }}</h3>
+    {% if stm.regions | length > 1 %}
+      <p>The state machine has the following regions:</p>
+      <ul>
+        {% for region in stm.regions %}
+          <li><a href="{{ region | make_href }}">{{ region.name }}</a></li>
+        {% endfor %}
+      </ul>
+    {% elif stm.regions | length == 1 %}
+      {% set region = stm.regions | first %}
+      <ul>
+        {% for state in region.states if state.__class__.__name__ in ["State", "Mode"] %}
+          <li>
+            <b>{{ state.__class__.__name__ }}</b>
+            <a href="{{ state | make_href }}">{{ state.name }}</a
+            >{{ ": " + state.description | safe if state.description else "" }}
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p style="color:red">State machine {{ stm.name }} has no regions.</p>
+    {% endif %}
+  {% endfor %}
+{% endif %}
+
+{% if object.activities %}
+  <h2>Activities</h2>
+  <p>
+    <i>{{ object.name }}</i> is responsible for the following operational
+    activities:
+  </p>
+  <ul>
+    {% for activity in object.activities %}
+      <li>
+        {{ linked_name_with_icon(activity) | safe }}{{ ": " + activity.description | safe if activity.description else "" }}
+        {%- set involving_caps = [] -%}
+        {%- for cap in object.capabilities -%}
+          {%- if activity in cap.involved_activities -%}
+            {%- set _ = involving_caps.append(cap) -%}
+          {%- endif -%}
+        {%- endfor -%}
+        {%- if involving_caps -%}
+          <p>
+            involving operational capabilities:
+            {%- for cap in object.capabilities -%}
+              {%- if activity in cap.involved_activities -%}
+                {{ linked_name_with_icon(cap) | safe }}{% if not loop.last %},{% endif %}
+              {%- endif -%}
+            {%- endfor -%}
+          </p>
+        {%- endif -%}
+      </li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+{% if object.requirements %}
+  <h2>Linked ReqIF objects</h2>
+  {% set types = model.search("RequirementType") | map(attribute="long_name") | unique | list %}
+  {{ render_reqs_by_type(object.requirements, types) | safe }}
+{% endif %}
+
+{% if object.entities %}
+  <h2>Contained Operational Entities</h2>
+  <p>
+    <b>{{ object.name }}</b> contains {{ object.entities | length }}
+    operational entities:
+  </p>
+  <ul>
+    {% for entity in object.entities %}
+      <li>
+        <a href="{{ entity | make_href }}">{{ entity.name }}</a>:
+        {{ description(entity) | safe }}
+      </li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+{{ display_traceability(object, show_upper=False)| safe }}
+
+<h2>Other attributes</h2>
+
+{% set filtered = ["description", "realizing_system_components", "realizing_components", "xtype", "is_actor", "is_human", "entities", "owner", "parent", "parts", "requirements", "state_machines", "activities", "capabilities", "name", "realization_view"] %}
+{{ show_other_attributes(object, filtered) | safe }}
