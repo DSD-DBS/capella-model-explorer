@@ -316,7 +316,7 @@
         {% for group in object.property_value_groups %}
           {% for prop in group.property_values %}
             {%- set prop_def = prop.applied_property_values | first -%}
-            {%- set unit_def = prop_def.property_values | selectattr("name", "equalto", "__UNIT__") | first -%}
+            {%- set unit_def = prop_def.property_values | selectattr("name", "equalto", "__UNIT__") | first if prop_def else "" -%}
             {%- set unit = unit_def.value if unit_def else "" -%}
             <tr>
               <td>{{ linked_name_with_icon(prop) | safe }}</td>
