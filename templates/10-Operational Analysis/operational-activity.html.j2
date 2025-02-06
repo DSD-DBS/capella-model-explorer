@@ -1,0 +1,165 @@
+{#
+    Copyright DB InfraGO AG and contributors
+    SPDX-License-Identifier: Apache-2.0
+#}
+{% from 'common_macros.html.j2' import show_other_attributes, description, typed_name, linked_name, linked_name_with_icon, display_traceability, render_requirements_table %}
+
+<h1>{{ object.name }}</h1>
+{{ description(object) | safe }}
+{%- set owner_label = '<span style="color: red">Unidentified entity</span>' -%}
+{%- if object.owner -%}{%- set owner_label = linked_name_with_icon(object.owner) -%}{%- endif -%}
+
+{% if object.owner %}
+  <p>This activity is performed by {{ owner_label | safe }}.</p>
+
+  {%- if object.available_in_states -%}
+    <p>
+      {{ owner_label | safe }} may {{ object.name }} while in one of the
+      following modes or states:&nbsp;
+      {%- for state in object.available_in_states -%}
+        {{ linked_name_with_icon(state) | safe }}{%- if not loop.last -%},{% endif -%}
+      {%- endfor -%}
+    </p>
+  {% endif %}
+{% else %}
+  <p style="color: red;">
+    No entity is responsible for performing this activity at the moment.
+  </p>
+{% endif %}
+{%- set involving_capabilities = [] -%}
+{%- for cap in model.oa.all_capabilities -%}
+  {%- if object in cap.involved_activities -%}
+    {%- set _none = involving_capabilities.append(cap) -%}
+  {%- endif -%}
+{%- endfor -%}
+
+{% if involving_capabilities %}
+  <p>
+    The {{ owner_label | safe }} may have to {{ object.name }} to support the
+    following operational capabilities:
+  </p>
+  <ul>
+    {% for cap in involving_capabilities %}
+      <li>{{ linked_name_with_icon(cap) | safe }}</li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p style="color: red;">
+    No operational activities are known to require the {{ owner_label | safe }}
+    to {{ object.name }}.
+  </p>
+{% endif %}
+
+<h2>Involved actors</h2>
+<p>
+  While performing this activity {{ owner_label | safe }} may involve the
+  following entities:&nbsp;
+  {% set ins = object.inputs | map(attribute="source") | selectattr("owner") | map(attribute="owner") | list %}
+  {% set outs = object.outputs | map(attribute="target") | selectattr("owner") | map(attribute="owner") | list %}
+  {%- set partners = ins + outs -%}
+  {%- if object.owner -%}
+    {% set partners = partners | rejectattr("uuid", "equalto", object.owner.uuid) | list %}
+  {%- endif -%}
+  {%- for partner in partners | unique(attribute="uuid") -%}{{ linked_name_with_icon(partner) | safe }},&nbsp;{%- endfor -%}
+</p>
+
+<h2>Operational Activity Context</h2>
+
+<p>
+  The figure below provides an overview of the interactions between the
+  activity of interest and other activities.
+</p>
+
+{{ object.context_diagram.as_svg|safe }}
+
+{%- if object.inputs -%}
+  <h2>Inputs</h2>
+  <p>
+    To <i>{{ object.name }}</i> the
+    {{ linked_name(object.owner) | safe if object.owner else "<span style='color: red'>Unassigned Entity</span>" | safe }}
+    may need:
+  </p>
+  <ul>
+    {% for input in object.inputs %}
+      <li>
+        {%- set act = input.source -%}
+        {{ linked_name_with_icon(input) | safe }}
+        produced by "{{ linked_name_with_icon(act) | safe }}" activity of&nbsp;
+        {%- if act.owner -%}
+          {{ linked_name_with_icon(act.owner) | safe }}
+        {%- else -%}
+          <span style="color: red;">Unassigned entity</span>
+        {%- endif -%}
+        {% if input.exchange_items %}
+          <p>
+            This interaction is further detailed by the following exchange
+            items:
+            {% for exi in input.exchange_items %}{{ linked_name_with_icon(exi) | safe }}{% endfor %}
+          </p>
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+{%- endif -%}
+
+{% if object.outputs %}
+  <h2>Outputs</h2>
+  <p>
+    The outputs of <i>{{ object.name }}</i> may be used for the following
+    purposes:
+  </p>
+  <ul>
+    {% for output in object.outputs %}
+      <li>
+        {%- set act = output.target -%}
+        {%- if act.owner -%}
+          {{ linked_name_with_icon(act.owner) | safe }}
+        {%- else -%}
+          <span style="color: red;">Unassigned entity</span>
+        {%- endif -%}&nbsp;
+        may require {{ linked_name_with_icon(output) | safe }} to perform
+        "{{ linked_name_with_icon(act) | safe }}" activity.
+        {% if output.exchange_items %}
+          <p>
+            {{ output.name }} is further detailed by the following exchange
+            items:
+            {% for exi in output.exchange_items %}{{ linked_name_with_icon(exi) | safe }}{% endfor %}
+          </p>
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+{% endif %}
+{%- set diagrams = [] -%}
+{%- for diagram in model.oa.diagrams -%}
+  {%- for node in diagram.nodes -%}
+    {%- if node == object -%}
+      {%- if not diagram in diagrams -%}{%- set _none = diagrams.append(diagram) -%}{%- endif -%}
+    {%- elif node.__class__.__name__ == "FunctionalChainInvolvementFunction" and node.involved == object -%}
+      {%- if not diagram in diagrams -%}{%- set _none = diagrams.append(diagram) -%}{%- endif -%}
+    {%- elif node.__class__.__name__ == "StateFragment" and object == node.function -%}
+      {%- if not diagram in diagrams -%}{%- set _none = diagrams.append(diagram) -%}{%- endif -%}
+    {%- endif -%}
+  {%- endfor -%}
+{%- endfor -%}
+
+{% if diagrams %}
+  <h2>Referencing diagrams</h2>
+  <p>This activity appears in the following diagrams:</p>
+  <ul>
+    {% for diagram in diagrams | sort(attribute="name") %}
+      <li>{{ linked_name_with_icon(diagram) | safe }}</li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+{% if object.requirements %}
+  <h2>Linked ReqIF objects</h2>
+  {{ render_requirements_table(object.requirements, scope=object) | safe }}
+{% endif %}
+
+{{ display_traceability(object, show_upper=False) | safe }}
+
+<h2>Other properties of "{{ object.name }}"</h2>
+{% set excluded = ["name", "available_in_states", "related_exchanges", "requirements", "realizing_system_functions", "inputs", "outputs", "context_diagram", "xtype", "parent", "owner", "owning_entity", "realization_view", "description"] %}
+{{ show_other_attributes(object, excluded) | safe }}

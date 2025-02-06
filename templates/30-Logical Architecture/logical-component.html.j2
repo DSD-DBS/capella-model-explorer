@@ -1,0 +1,69 @@
+{#
+    Copyright DB InfraGO AG and contributors
+    SPDX-License-Identifier: Apache-2.0
+#}
+{%
+  from 'common_macros.html.j2' import
+  description,
+  display_property_label,
+  linked_name_with_icon,
+  render_allocated_functions,
+  render_capability_section,
+  render_exchange_items_catalog,
+  render_involved_actors_section,
+  render_interfaces_section,
+  show_other_attributes
+%}
+
+<h1>Definition of {{ object.name }}</h1>
+{{ description(object) | safe }}
+
+<h2>Capabilities</h2>
+{% set capabilities = object.involved_capabilities %}
+{{ render_capability_section(object, capabilities) | safe }}
+
+<h2>Component Boundary</h2>
+<p>
+  The figure below provides an overview of <i>{{ object.name }}</i>'s boundary
+  and depicts all the actors that it interacts with.
+</p>
+{{ object.context_diagram.render("svg", display_derived_interfaces=True) | safe }}
+{% set actors = object.context_diagram.nodes.by_is_actor(True) %}
+{{ render_involved_actors_section(object, actors, capabilities) | safe }}
+
+<h2>Allocated Functions</h2>
+{{ render_allocated_functions(object) | safe }}
+
+<h2>Interfaces</h2>
+{% set interfaces = object.related_exchanges %}
+{% set exchange_items_catalog = [] %}
+{{ render_interfaces_section(object, interfaces, exchange_items_catalog) | safe }}
+
+{% if exchange_items_catalog %}
+  <h2>Apendix A: Exchange Items Catalog</h2>
+  <p>
+    The following items (e.g. energy, material, information) are exchanged
+    through the interactions with its interface partners.
+  </p>
+  {{ render_exchange_items_catalog(exchange_items_catalog) | safe }}
+{% endif %}
+
+<h2>Other Properties</h2>
+{%
+  set excluded = [
+      "description",
+      "context_diagram",
+      "owner",
+      "parent",
+      "allocated_functions",
+      "diagrams",
+      "name",
+      "parts",
+      "realizing_components",
+      "state_machines",
+      "xtype",
+      "ports",
+      "related_exchanges",
+  ]
+%}
+{{ show_other_attributes(object, excluded=excluded) | safe }}

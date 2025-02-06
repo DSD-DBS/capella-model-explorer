@@ -1,0 +1,72 @@
+{#
+    Copyright DB InfraGO AG and contributors
+    SPDX-License-Identifier: Apache-2.0
+#}
+{% from 'common_macros.html.j2' import show_other_attributes, linked_name_with_icon %}
+
+<h1>{{ object.name }}</h1>
+{% if object.description %}
+  <p>{{ object.description }}</p>
+{% else %}
+  <p style="color:red">No description available.</p>
+{% endif %}
+
+<br /><b>Pre-condition</b>:
+{% if object.precondition %}
+  <p>{{ object.precondition.specification['capella:linkedText']|safe }}</p>
+{% else %}
+  <p style="color:red">No pre-condition defined</p>
+{% endif %}
+
+<br /><b>Post-condition</b>:
+{% if object.postcondition %}
+  <p>{{ object.postcondition.specification['capella:linkedText']|safe }}</p>
+{% else %}
+  <p style="color:red">No post-condition defined</p>
+{% endif %}
+
+<h2>Context Diagram</h2>
+<p>
+  The diagram below provides an overview over the entities immediately involved
+  in the Capability and related Capabilities.
+</p>
+
+{{ object.context_diagram.as_svg|safe }}
+
+<h2>Data Flow Diagram</h2>
+
+<p>
+  The diagram below provides an overview of the System (green) and actor (blue)
+  functions that are required to realize the Capability.
+</p>
+
+{{ object.data_flow_view.as_svg | safe }}
+
+<h2>Functional Requirements</h2>
+
+<p>
+  This section provides a summary of what functions are required from the
+  System and the actors to enable the system Capability.
+</p>
+
+{% set real_entities = object.involved_functions | selectattr("owner") | map(attribute="owner") | unique(attribute="uuid") %}
+
+{% for entity in real_entities %}
+  <h3>{{ entity.name }}</h3>
+  <p>
+    To enable the system Capability <b>{{ object.name }}</b> the
+    {{ linked_name_with_icon(entity) | safe }} shall:
+  </p>
+  <ul>
+    {% for fnc in object.involved_functions %}
+      {% if fnc.owner == entity %}
+        <li>{{ linked_name_with_icon(fnc) | safe }}</li>
+      {% endif %}
+    {% endfor %}
+  </ul>
+{% endfor %}
+
+<h2>Other properties of "{{ object.name }}"</h2>
+
+{% set excluded = ["involved_functions", "postcondition", "precondition", "description", "name", "data_flow_view", "context_diagram", "xtype", "parent"] %}
+{{ show_other_attributes(object, excluded) | safe }}

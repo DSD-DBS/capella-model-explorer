@@ -1,0 +1,126 @@
+{#
+    Copyright DB InfraGO AG and contributors
+    SPDX-License-Identifier: Apache-2.0
+#}
+{% from 'common_macros.html.j2' import show_other_attributes, description, render_reqs_by_type, linked_name, linked_name_with_icon, display_traceability %}
+
+<h1>{{ object.name }}</h1>
+{{ description(object) | safe }}
+
+<br /><b>Pre-condition</b>:
+{% if object.precondition %}
+  <p>{{ object.precondition.specification['capella:linkedText']|safe }}</p>
+{% else %}
+  <p style="color:red">No pre-condition defined</p>
+{% endif %}
+
+<br /><b>Post-condition</b>:
+{% if object.postcondition %}
+  <p>{{ object.postcondition.specification['capella:linkedText']|safe }}</p>
+{% else %}
+  <p style="color:red">No post-condition defined</p>
+{% endif %}
+
+{% if object.extends %}
+  <p>
+    The capability {{ object.name }} extends the following operational
+    capabilities:
+  </p>
+  <ul>
+    {%- for ext in object.extends -%}
+      <li>{{ linked_name_with_icon(ext.target) | safe }}</li>
+    {%- endfor -%}
+  </ul>
+{% endif %}
+
+{% if object.extended_by %}
+  <p>
+    The capability {{ object.name }} is further extended by the following
+    operational capabilities:
+  </p>
+  <ul>
+    {%- for ext in object.extended_by -%}
+      <li>{{ linked_name_with_icon(ext.source) | safe }}</li>
+    {%- endfor -%}
+  </ul>
+{% endif %}
+
+<h2>Context Diagram</h2>
+<p>
+  The diagram below provides an overview over the entities immediately involved
+  in the Capability and related Capabilities.
+</p>
+{# Q: should we resolve inherited activities and actors / explicitly indicate where an actor / activity got inherited #}
+{{ object.context_diagram.as_svg|safe }}
+
+<h2>Involved entities and activities</h2>
+To enable the Capability, the following entities and activities are involved:
+{%- set entities = object.involved_entities | list + object.involved_activities | map(attribute="owner") | unique(attribute="uuid") | list -%}
+{%- if entities -%}
+  <ul>
+    {%- for entity in entities -%}
+      {%- set activities = object.involved_activities | selectattr("owner", "equalto", entity) | list -%}
+      {%- if activities -%}
+        <li>
+          {{ linked_name_with_icon(entity) | safe }} may need to:
+          <ul>
+            {%- for activity in activities -%}
+              <li>{{ linked_name_with_icon(activity) | safe }}</li>
+            {%- endfor -%}
+          </ul>
+        </li>
+      {%- else -%}
+        <li>
+          Involvement of {{ linked_name(entity) | safe }} is expected but
+          specific activities are not yet identified
+        </li>
+      {%- endif -%}
+    {%- endfor -%}
+    {%- set activities_with_no_owner = object.involved_activities | selectattr("owner", "none") | list -%}
+    {%- if activities_with_no_owner -%}
+      <li>
+        There are involved activities that are not yet assigned to an
+        entity:&nbsp;
+        {%- for activity in activities_with_no_owner -%}
+          {{ linked_name_with_icon(activity) | safe }};&nbsp;
+        {%- endfor -%}
+      </li>
+    {%- endif -%}
+  </ul>
+{%- else -%}
+  <p style="color:red">No entities or activities involved</p>
+{%- endif -%}
+
+{%- if object.involved_activities -%}
+  <h2>Data Flow Diagram</h2>
+
+  <p>
+    The diagram below provides an overview of the operational activities that
+    are required to realize the Capability.
+  </p>
+
+  {{ object.data_flow_view.as_svg | safe }}
+{%- endif -%}
+
+{% if object.diagrams %}
+  <h2>Other related diagrams</h2>
+  <ul>
+    {% for diagram in object.diagrams %}
+      <h3>{{ diagram.name }}</h3>
+      {{ diagram.as_svg |safe }}
+    {% endfor %}
+  </ul>
+{% endif %}
+
+{% if object.requirements %}
+  <h2>Linked Requirement objects</h2>
+  {% set types = model.search("RequirementType") | map(attribute="long_name") | unique | list %}
+  {{ render_reqs_by_type(object.requirements, types) | safe }}
+{% endif %}
+
+{{ display_traceability(object)| safe }}
+
+<h2>Other object attributes</h2>
+
+{% set filtered = ["description", "xtype", "postcondition", "precondition", "context_diagram", "data_flow_view", "diagrams", "entity_involvements", "involved_entities", "name", "parent", "realizing_capabilities", "involved_activities"] %}
+{{ show_other_attributes(object, filtered) | safe }}

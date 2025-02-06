@@ -12,7 +12,6 @@ A webapp for exploring Capella models through simple "auto-generated" textual
 and graphical views.
 
 **Longer story**:
-
 We see a larger non-MBSE crowd struggling with the things hidden in the model.
 With this app we expose model contents in an easy to review readable form with
 basic graphical annotations. Under the hood it uses Jinja templates enabling
@@ -24,6 +23,7 @@ shape and form.
 - Provide insights into / "spell-out" the model for non-MBSE stakeholders via
   document-a-like dynamic views that describe model elements in a
   human-readable form.
+
 - Provide meaningful default views (that can be further customized) for the key
   elements to kickstart the model exploration.
 
@@ -31,93 +31,100 @@ There are a few more use cases but we will reveal them a bit later.
 
 # Quick start
 
-Clone, then build and run locally with Docker:
+## Installation
+
+You can install the latest released version directly from PyPI.
 
 ```bash
-docker build -t model-explorer:latest .
-docker run --name=cme -e ROUTE_PREFIX="" \
-    -v /absolute/path/to/your/model/folder/on/host:/model \
-    -v "$PWD/templates:/views" -p 8000:8000 model-explorer
+pip install capella-model-explorer
 ```
 
-Then open your browser at `http://localhost:8000/views` and start exploring
+## Run the app
+
+The app comes with a command line interface (CLI).
+To get help, just command
+
+```bash
+cme -h
+```
+
+or display the help for any subcommand, e.g.
+
+```bash
+cme run -h
+```
+
+## Build a Docker image and run the app in a container
+
+```bash
+cme build image
+cme run container  # set port via CME_PORT env var
+```
+
+Above will start the app with a sample model which can be found here:
+[In-Flight Entertainment System](https://github.com/DSD-DBS/Capella-IFE-sample)
+
+To run the application with a custom model in a container:
+
+```bash
+docker run --rm \
+  --name cme \
+  -e CME_MODEL='{"path": "git+https://github.com/DSD-DBS/Capella-IFE-sample.git","revision": "master", "entrypoint": "In-Flight Entertainment System.aird"}' \
+  -p 8000:8000 \
+  capella-model-explorer:$(cme --version)
+```
+
+More information describing what kinds of values can be specified via the
+environment variable `CME_MODEL` can be found in the documentation of
+capellambse:
+
+https://dsd-dbs.github.io/py-capellambse/start/specifying-models.html
+
+If you want to be able to explore a local Capella model, and/ or live edit and
+test local templates, you can mount a local model and a templates folder into
+the container with automatically enabled live template reloading and rendering:
+
+```bash
+docker run --rm \
+  --name cme \
+  -p 8000:8000 \
+  -v /absolute/path/to/your/model/folder/on/host:/model \  # optional local model
+  -v "$(pwd)/templates:/app/templates" \
+  capella-model-explorer:$(cme --version)
+```
+
+If you stop the app via CTRL+C, you must delete the container via `docker rm
+cme` before you can start it again.
+
+Then open your browser at `http://localhost:8000/` and start exploring
 your model.
 
-While the thing is running you can edit the templates in the `templates` folder
+While the app is running you can edit the templates in the `templates` folder
 and see the changes immediately in the browser.
 
 # Development (local)
 
-To run the app in dev mode you'll need to first run `make build-frontend`. This
-is needed by the backend to have some statics to serve. Then run `make
-dev-backend` in one terminal and `make dev-frontend` in another terminal. The
-backend and statically built frontend will be served at
-`http://localhost:8000`. The live frontend will be served by vite at
-`http://localhost:5173` (or similar, it will be printed in the terminal where
-you ran `make dev-frontend`).
-
-# Installation
-
-You can install the latest released version directly from PyPI.
-
-```sh
-pip install capella-model-explorer
-```
-
-To set up a development environment, clone the project and install it into a
-virtual environment.
-
-```sh
-git clone https://github.com/DSD-DBS/capella-model-explorer
-cd capella-model-explorer
-python -m venv .venv
-
-source .venv/bin/activate.sh  # for Linux / Mac
-.venv\Scripts\activate  # for Windows
-
-pip install -U pip pre-commit
-pip install -e '.[docs,test]'
-pre-commit install
-```
+To run the app in dev mode you'll need to run `cme run local-dev`.
+The app will be served at `http://localhost:8000`.
 
 # Development
 
-This repo contains a Makefile with recipes for a few commonly needed tasks
-during development. Run `make help` for more details.
-
-## Developing the frontend
-
-To develop frontend components, run:
+Run the app in development mode with hot reloading:
 
 ```bash
-make storybook
-```
-
-To develop the app as a whole, run:
-
-```bash
-make dev-frontend
-```
-
-Note that this requires a running backend server, see the next section.
-
-## Backend development
-
-To run the backend, use the following command:
-
-```bash
-make run MODEL=../path/to/model.aird
+cme run local-dev
 ```
 
 This will start the API server on <http://localhost:8000>, where it will serve
-the frontend in production mode. These static files can be rebuilt with `make
-build-frontend`, although it is usually more convenient to run the frontend in
-development mode with `make dev-frontend` (see above).
+the app in development mode with hot reloading.
 
-The MODEL parameter can be set to anything that
-[`capellambse.loadcli`](https://dsd-dbs.github.io/py-capellambse/start/specifying-models.html)
-understands, but some functionality requires a Git-backed model (e.g. using a
-`git+https://` URL).
+Check
+
+```bash
+cme run local-dev -h
+```
+
+for more information.
 
 # Integration in the Capella Collaboration Manager
 
@@ -143,10 +150,10 @@ config:
       requests: 1.6Gi
       limits: 6Gi
   environment:
-    MODEL_ENTRYPOINT:
+    CME_MODEL:
       stage: before
       value: "{CAPELLACOLLAB_SESSION_PROVISIONING[0][path]}"
-    ROUTE_PREFIX: "{CAPELLACOLLAB_SESSIONS_BASE_PATH}"
+    CME_ROUTE_PREFIX: "{CAPELLACOLLAB_SESSIONS_BASE_PATH}"
   connection:
     methods:
       - id: f51872a8-1a4f-4a4d-b4f4-b39cbd31a75b
