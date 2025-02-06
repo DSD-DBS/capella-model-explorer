@@ -445,6 +445,62 @@
   {% endfor %}
 {% endmacro %}
 
+{% macro render_connected_nodes_section(object, capabilities) %}
+  {% set ends = object.physical_ports.map("links.ends.owner") - [object] %}
+  {% set nodes = [] %}
+  {% for end in ends if object._element not in end._model._loader.iterancestors(end._element) %}
+    {% set _ = nodes.append(end) %}
+  {% endfor %}
+
+  {% for node in nodes %}
+    {% if loop.first %}
+      <p>
+        The <i>{{ object.name }}</i> is connected to the nodes described below.
+      </p>
+    {% endif %}
+
+    <h3>{{ linked_name_with_icon(node) | safe }}</h3>
+    <p>{{ node.description }}</p>
+
+    {%- set involving_caps = [] -%}
+    {%- for cap in capabilities -%}
+      {%- if node in cap.involved_components -%}
+        {%- set _ = involving_caps.append(cap) -%}
+      {%- endif -%}
+    {%- endfor -%}
+
+    {% if involving_caps %}
+      <p>
+        <i>{{ node.name }}</i> is involved in the following capabilities:&nbsp;
+        {%- for cap in involving_caps -%}
+          {{ linked_name_with_icon(cap) | safe }}{% if not loop.last %},{% endif %}
+        {%- endfor -%}
+      </p>
+    {% endif %}
+    {% set related_src_exchanges = node.physical_ports.map("links") | selectattr("source.owner", "equalto", object) | list %}
+    {% set related_tgt_exchanges = node.physical_ports.map("links") | selectattr("target.owner", "equalto", object) | list %}
+    {% set related_exchanges = related_src_exchanges + related_tgt_exchanges %}
+
+    {% if related_exchanges %}
+      <p>
+        The <i>{{ object.name }}</i> interacts with the
+        <i>{{ node.name }}</i> via the following interfaces:
+      </p>
+      <ul>
+        {%- for exchange in related_exchanges -%}
+          <li>{{ linked_name_with_icon(exchange) | safe }}</li>
+        {%- endfor -%}
+      </ul>
+    {% else %}
+      <p style="color:red">
+        No physical links defined between {{ object.name }} and the node.
+      </p>
+    {% endif %}
+  {% else %}
+    <p style="color:red">No connected nodes defined for {{ object.name }}.</p>
+  {% endfor %}
+{% endmacro %}
+
 {% macro render_allocated_functions(object) %}
   {% macro functional_exchanges_table(exchange_col_label, owner_col_lable, exchanges, owner_decorator) %}
     <table>
@@ -705,7 +761,7 @@
         The figure below provides an overview of the functional interactions
         enabled by this interface.
       </p>
-      {{ interface.context_diagram | safe }}
+      {{ interface.context_diagram.render("svg") | safe }}
 
       <p>
         The interface may be used for the following functional interactions:
