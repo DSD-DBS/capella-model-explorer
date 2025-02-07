@@ -1,8 +1,12 @@
 # Copyright DB InfraGO AG and contributors
 # SPDX-License-Identifier: Apache-2.0
 
+import http
 import logging
+import os
 import pathlib
+import signal
+import threading
 import time
 import traceback
 import typing as t
@@ -11,7 +15,7 @@ import capellambse
 import jinja2
 import prometheus_client
 from fasthtml import common as fh
-from fasthtml import ft
+from fasthtml import ft, starlette
 
 import capella_model_explorer.constants as c
 from capella_model_explorer import components, core, icons, reports, state
@@ -25,7 +29,7 @@ logger.setLevel("INFO")
 core.setup_logging(logger)
 
 logger.info("Configuration:")
-logger.info("Route prefix: '%s'", c.ROUTE_PREFIX)
+logger.info("\tRoute prefix: '%s'", c.ROUTE_PREFIX)
 logger.info("\tLive mode: %s", c.LIVE_MODE)
 logger.info("\tHost: '%s'", c.HOST)
 logger.info("\tRoute prefix: '%s'", c.ROUTE_PREFIX)
@@ -48,6 +52,11 @@ ar = fh.APIRouter(prefix=c.ROUTE_PREFIX)
 app.static_route_exts(f"{c.ROUTE_PREFIX}/static", "./static")
 
 
+def _delayed_shutdown() -> None:
+    time.sleep(0.05)
+    os.kill(os.getpid(), signal.SIGINT)
+
+
 @app.on_event("startup")
 async def startup() -> None:
     logger.info("Waiting for model to load from specification '%s'", c.MODEL)
@@ -64,6 +73,26 @@ async def startup() -> None:
     state.JINJA_ENV.finalize = reports._finalize
     state.JINJA_ENV.filters["make_href"] = reports._make_href_filter
     logger.info("Templates load complete.")
+
+
+@app.post("/shutdown")
+def shutdown() -> t.Any:
+    if c.LIVE_MODE:
+        return starlette.Response(
+            content=(
+                "Shutdown not supported in live mode."
+                " Set environment variable CME_LIVE_MODE=0"
+                " to be able to shut down the server via HTTP request."
+            ),
+            status_code=http.HTTPStatus.NOT_IMPLEMENTED,
+        )
+    # delay shutdown to allow response to be sent
+    thread = threading.Thread(target=_delayed_shutdown)
+    thread.start()
+    return starlette.Response(
+        content="Will shut down server.",
+        status_code=http.HTTPStatus.ACCEPTED,
+    )
 
 
 @app.middleware("http")
