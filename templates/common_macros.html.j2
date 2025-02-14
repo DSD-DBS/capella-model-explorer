@@ -90,7 +90,7 @@
               </td>
               <td>
                 {%- if value.as_svg -%}
-                  {{ value.as_svg|safe }}
+                  {{ value }}
                 {%- else -%}
                   {{ display_modified_changes(attr_diff[attr]) | safe }}
                 {%- endif -%}
@@ -100,7 +100,7 @@
               <td style="word-break:normal">{{ attr }}</td>
               <td>
                 {%- if value.as_svg -%}
-                  {{ value.as_svg | safe }}
+                  {{ value }}
                 {%- elif value is iterable and value is not string -%}
                   <ul>
                     {% for item in value %}
@@ -263,7 +263,7 @@
       The figure below provides an overview of objects that "{{ object.name }}"
       realizes but also those that realize "{{ object.name }}"
     </p>
-    {{ object.realization_view.as_svg | safe }}
+    {{ object.realization_view }}
   {% endif %}
   {% if show_upper %}
     {% if realized_objects %}
@@ -761,7 +761,7 @@
         The figure below provides an overview of the functional interactions
         enabled by this interface.
       </p>
-      {{ interface.context_diagram.render("svg") | safe }}
+      {{ interface.context_diagram.render(None) | safe }}
 
       <p>
         The interface may be used for the following functional interactions:
