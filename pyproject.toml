@@ -26,13 +26,12 @@ classifiers = [
   "Programming Language :: Python :: 3.13",
 ]
 dependencies = [
-  "capellambse>=0.6.6,<0.7",
-  "capellambse-context-diagrams>=0.4.1",
-  "diff-match-patch",
+  "capellambse-context-diagrams>=0.7.3,<0.8",
+  "capellambse>=0.6.13,<0.7",
   "jinja2",
-  "fastapi",
-  "uvicorn",
   "prometheus-client",
+  "python-fasthtml",
+  "uvicorn",
 ]
 
 [project.urls]
@@ -40,9 +39,12 @@ Homepage = "https://github.com/DSD-DBS/capella-model-explorer"
 Documentation = "https://dsd-dbs.github.io/capella-model-explorer"
 
 [project.optional-dependencies]
+dev = ["pre-commit", "python-dotenv"]
 docs = ["furo", "sphinx", "sphinx-copybutton"]
+test = ["coverage", "pytest", "pytest-cov"]
 
-test = ["pytest", "pytest-cov"]
+[project.scripts]
+cme = "capella_model_explorer.__main__:main"
 
 [tool.coverage.run]
 branch = true
@@ -75,7 +77,7 @@ python_version = "3.11"
 
 [[tool.mypy.overrides]]
 # Untyped third party libraries
-module = ["diff_match_patch"]
+module = ["fasthtml.*", "requests.*"]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]

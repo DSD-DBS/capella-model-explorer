@@ -6,13 +6,14 @@ default_stages: [pre-commit, pre-merge-commit]
 minimum_pre_commit_version: 4.0.0
 repos:
   - repo: https://github.com/gitleaks/gitleaks.git
-    rev: v8.23.0
+    rev: v8.23.3
     hooks:
       - id: gitleaks
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
     hooks:
       - id: check-added-large-files
+        args: ['--maxkb=500']
       - id: check-ast
       - id: check-builtin-literals
       - id: check-case-conflict
@@ -28,8 +29,10 @@ repos:
       - id: debug-statements
       - id: destroyed-symlinks
       - id: end-of-file-fixer
+        exclude: '\.min\.[^.]+$'
       - id: fix-byte-order-marker
       - id: trailing-whitespace
+        exclude: '\.min\.[^.]+$'
   - repo: https://github.com/Lucas-C/pre-commit-hooks
     rev: v1.5.5
     hooks:
@@ -55,7 +58,7 @@ repos:
       - id: insert-license
         name: Insert license headers (XML-style comments)
         files: '\.(?:html|md|xml)$'
-        exclude: '(?:^|/)\..+'
+        exclude: '(?:^|/)\..+|favicon\.svg$'
         args:
           - --detect-license-in-X-top-lines=15
           - --license-filepath
@@ -65,7 +68,7 @@ repos:
       - id: insert-license
         name: Insert Apache license headers (C-style comments)
         files: '\.(?:s?css|js|ts)$'
-        exclude: '(?:^|/)\..+'
+        exclude: '(?:^|/)\..+|.*\.min\.[^.]+$'
         args:
           - --detect-license-in-X-top-lines=15
           - --license-filepath
@@ -99,7 +102,7 @@ repos:
         additional_dependencies:
           - docformatter[tomli]
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.9.2
+    rev: v0.9.5
     hooks:
       - id: ruff
         args: [--extend-ignore=FIX, --fix]
@@ -109,7 +112,7 @@ repos:
     hooks:
       - id: actionlint
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.14.1
+    rev: v1.15.0
     hooks:
       - id: mypy
         additional_dependencies:
@@ -137,16 +140,5 @@ repos:
       - id: prettier
         name: prettier
         language: system
-        entry: sh -c 'make frontend/node_modules && ./frontend/node_modules/.bin/prettier --write "$@"' --
-        require_serial: true
-        types_or: [javascript, jsx, ts, css, html, markdown]
-  - repo: local
-    hooks:
-      - id: eslint
-        name: eslint
-        language: system
-        entry: sh -c 'make frontend/node_modules && ./frontend/node_modules/.bin/eslint "$@"' --
-        require_serial: true
-        args: ['--fix', '--config', 'frontend/eslint.config.js']
-        types: []
-        files: '^frontend/.*\.(js|jsx)$'
+        entry: node_modules/.bin/prettier --write
+        types_or: [css, javascript, jinja, markdown]
