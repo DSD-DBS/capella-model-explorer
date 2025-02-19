@@ -38,7 +38,7 @@ logger.info("\tTemplates directory: '%s'", c.TEMPLATES_DIR)
 @contextlib.asynccontextmanager
 async def lifespan(_):
     model_spec = capellambse.loadinfo(c.MODEL)
-    logger.info("Loading model from: %s", model_spec["path"].path)
+    logger.info("Loading model from: %s", model_spec["path"])
     state.model = capellambse.MelodyModel(**model_spec)
     logger.info("Loading templates from: %s", c.TEMPLATES_DIR)
     reports.load_templates()
