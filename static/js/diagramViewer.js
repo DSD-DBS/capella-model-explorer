@@ -3,11 +3,16 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-function showDiagramInPlotly(svgContainer) {
-  let plotlyChart = svgContainer.nextElementSibling;
-  while (plotlyChart && !plotlyChart.classList.contains("plotly-chart")) {
-    plotlyChart = plotlyChart.nextElementSibling;
+function openDiagramViewer(svgContainer) {
+  const plotlyChart = svgContainer.nextElementSibling;
+  if (!plotlyChart.classList.contains("plotly-chart")) {
+    console.error(
+      "clicked svg container is not followed by a plotly container!",
+    );
+    return;
   }
+  plotlyChart.style.display = "block";
+
   const svgElement = svgContainer.firstElementChild;
   const svg_width = parseFloat(svgElement.getAttribute("width")) + 2;
   const svg_height = parseFloat(svgElement.getAttribute("height")) + 2;
@@ -123,14 +128,6 @@ function showDiagramInPlotly(svgContainer) {
   Plotly.newPlot(plotlyChart, data, layout, config);
 }
 
-function openDiagramViewer(svgContainer) {
-  let plotlyChart = svgContainer.nextElementSibling;
-  while (plotlyChart && !plotlyChart.classList.contains("plotly-chart")) {
-    plotlyChart = plotlyChart.nextElementSibling;
-  }
-  plotlyChart.style.display = "block";
-  showDiagramInPlotly(svgContainer);
-}
 document.addEventListener("keydown", function (event) {
   if (event.key === "Escape") {
     const charts = document.querySelectorAll(".plotly-chart");
