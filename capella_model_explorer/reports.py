@@ -21,6 +21,20 @@ from fasthtml import ft
 import capella_model_explorer.constants as c
 from capella_model_explorer import app, components, icons, state
 
+SVG_WRAP_MARKUP = markupsafe.Markup(
+    '<div class="svg-container relative inline-block cursor-pointer hover:opacity-[.5]"'
+    ' onclick="openDiagramViewer(this)">'
+    "{svg_data}"
+    '<div class="text-wrap text-center absolute bottom-0 left-0'
+    " right-0 top-0 flex items-center justify-center bg-black"
+    " font-sans text-2xl text-white opacity-0 transition-opacity"
+    ' duration-300 hover:opacity-[.5] print:hidden">'
+    "Click to enlarge"
+    "</div>"
+    "</div>"
+    '<div class="plotly-chart fixed left-1/2 top-1/2 z-[1000] hidden h-full w-full -translate-x-1/2 -translate-y-1/2 transform bg-black p-5 shadow-lg"></div>'
+)
+
 
 class Template(p.BaseModel):
     id: str = p.Field(title="Template identifier")
@@ -201,20 +215,8 @@ def finalize(markup: t.Any) -> object:
     if isinstance(markup, capellambse.diagram.Diagram):
         svg = m.diagram.convert_format(None, "svg", markup)
         return markupsafe.Markup(
-            (
-                '<div class="svg-container relative inline-block cursor-pointer hover:opacity-[.5]"'
-                ' onclick="openDiagramViewer(this)" >'
-            )
-            + svg
-            + (
-                '<div class="text-wrap text-center absolute bottom-0 left-0'
-                " right-0 top-0 flex items-center justify-center bg-black"
-                " font-sans text-2xl text-white opacity-0 transition-opacity"
-                ' duration-300 hover:opacity-[.5] print:hidden" style="@media print { display: none; }">'
-                "Click to enlarge"
-                "</div>"
-                "</div>"
-                '<div class="plotly-chart fixed left-1/2 top-1/2 z-[1000] hidden h-full w-full -translate-x-1/2 -translate-y-1/2 transform bg-black p-5 shadow-lg"></div>'
+            SVG_WRAP_MARKUP.format(
+                svg_data=markupsafe.Markup(svg),
             )
         )
     markup = markupsafe.escape(markup)
