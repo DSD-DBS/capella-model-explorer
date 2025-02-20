@@ -46,7 +46,7 @@ LIVE_MODE: t.Final[bool] = CONFIG(
 
 ROUTE_PREFIX: t.Final[str] = CONFIG(
     "ROUTE_PREFIX", default=Defaults.route_prefix
-)
+).rstrip("/")
 TEMPLATES_DIR: t.Final[pathlib.Path] = CONFIG(
     "TEMPLATES_DIR",
     cast=pathlib.Path,
