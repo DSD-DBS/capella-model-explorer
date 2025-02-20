@@ -69,6 +69,7 @@ function openDiagramViewer(svgContainer) {
   var config = {
     toImageButtonOptions: {
       format: "svg", // one of png, svg, jpeg, webp
+      filename: svgContainer.dataset.diagramTitle,
     },
     modeBarButtonsToRemove: ["autoScale2d"],
     modeBarButtonsToAdd: [

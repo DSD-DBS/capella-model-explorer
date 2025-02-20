@@ -23,7 +23,7 @@ from capella_model_explorer import app, components, icons, state
 
 SVG_WRAP_MARKUP = markupsafe.Markup(
     '<div class="svg-container relative inline-block cursor-pointer hover:opacity-[.5]"'
-    ' onclick="openDiagramViewer(this)">'
+    ' onclick="openDiagramViewer(this)" data-diagram-title="{title}">'
     "{svg_data}"
     '<div class="text-wrap text-center absolute bottom-0 left-0'
     " right-0 top-0 flex items-center justify-center bg-black"
@@ -217,6 +217,7 @@ def finalize(markup: t.Any) -> object:
         return markupsafe.Markup(
             SVG_WRAP_MARKUP.format(
                 svg_data=markupsafe.Markup(svg),
+                title=markup.name,
             )
         )
     markup = markupsafe.escape(markup)
