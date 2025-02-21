@@ -11,6 +11,7 @@ function openDiagramViewer(svgContainer) {
     );
     return;
   }
+  plotlyChart.innerHTML = "";
   plotlyChart.style.display = "block";
 
   const svgElement = svgContainer.firstElementChild;

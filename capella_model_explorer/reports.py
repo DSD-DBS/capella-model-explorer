@@ -32,7 +32,7 @@ SVG_WRAP_MARKUP = markupsafe.Markup(
     "Click to enlarge"
     "</div>"
     "</div>"
-    '<div class="plotly-chart fixed left-1/2 top-1/2 z-[1000] hidden h-full w-full -translate-x-1/2 -translate-y-1/2 transform bg-black p-5 shadow-lg"></div>'
+    '<div class="plotly-chart fixed left-1/2 top-1/2 z-[1000] hidden h-full w-full -translate-x-1/2 -translate-y-1/2 transform bg-black p-5 shadow-lg">&nbsp;</div>'
 )
 
 
