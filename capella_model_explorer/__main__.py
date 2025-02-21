@@ -4,6 +4,7 @@
 
 from __future__ import annotations
 
+import importlib
 import logging
 import os
 import pathlib
@@ -11,7 +12,6 @@ import shlex
 import shutil
 import subprocess
 import time
-import typing as t
 
 import click
 
@@ -294,10 +294,24 @@ def main() -> None:
 def run(
     container: bool,  # noqa: FBT001
     dev: bool,  # noqa: FBT001
-    **envvars: t.Any,
+    host: str,
+    port: int,
+    model: str,
+    templates_dir: str,
+    live_mode: str,
+    route_prefix: str,
+    docker_image_name: str,
 ) -> None:
     """Run the application."""
-    del envvars
+    os.environ["CME_HOST"] = host
+    os.environ["CME_PORT"] = str(port)
+    os.environ["CME_MODEL"] = model
+    os.environ["CME_TEMPLATES_DIR"] = templates_dir
+    os.environ["CME_LIVE_MODE"] = live_mode
+    os.environ["CME_ROUTE_PREFIX"] = route_prefix
+    os.environ["CME_DOCKER_IMAGE_NAME"] = docker_image_name
+    importlib.reload(c)
+
     if container and dev:
         raise click.UsageError(
             "Options --container and --dev are mutually exclusive."
