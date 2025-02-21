@@ -7,6 +7,7 @@ import argparse
 import os
 import pathlib
 import shlex
+import shutil
 import subprocess
 import textwrap
 import time
@@ -16,16 +17,16 @@ import capella_model_explorer.constants as c
 
 
 def _install_npm_pkgs() -> None:
-    subprocess.check_output(["npm", "--version"])
-    cmd = ["npm", "clean-install"]
+    npm = _find_exe("npm")
+    cmd = [npm, "clean-install"]
     print(shlex.join(cmd))
     subprocess.check_call(cmd)
 
 
 def run_container():
-    subprocess.check_output(["docker", "--version"])
+    docker = _find_exe("docker")
     cmd = [
-        "docker",
+        docker,
         "run",
         "--rm",
         "-it",
@@ -75,14 +76,16 @@ def run_container():
 
 def run_local():
     """Run the application locally."""
+    uvicorn = shutil.which("uvicorn")
+    if uvicorn is None:
+        raise SystemExit("`uvicorn` not found, did you run `pip install`?")
     if not pathlib.Path(c.TEMPLATES_DIR).is_dir():
         raise SystemExit(f"Templates directory not found: {c.TEMPLATES_DIR}")
-    subprocess.check_output(["uvicorn", "--version"])
     if not pathlib.Path(c.main_css_path).exists():
         build_css(watch=False)
     print("Running the application locally...")
     cmd = [
-        "uvicorn",
+        uvicorn,
         "--host",
         c.HOST,
         "--port",
@@ -115,12 +118,14 @@ def run_local():
 
 
 def run_local_dev() -> None:
+    uvicorn = shutil.which("uvicorn")
+    if uvicorn is None:
+        raise SystemExit("`uvicorn` not found, did you run `pip install`?")
     print("Running the application locally with full reload...")
     if not pathlib.Path(c.TEMPLATES_DIR).is_dir():
         raise SystemExit(f"Templates directory not found: {c.TEMPLATES_DIR}")
-    subprocess.check_output(["uvicorn", "--version"])
     uvicorn_cmd = [
-        "uvicorn",
+        uvicorn,
         "--host",
         c.HOST,
         "--port",
@@ -167,8 +172,9 @@ def run_local_dev() -> None:
 def build_css(*, watch: bool) -> subprocess.Popen | None:
     """Build style sheet using Tailwind CSS."""
     _install_npm_pkgs()
-    exe = "node_modules/.bin/tailwindcss"
-    subprocess.check_output([exe, "--help"])
+    exe = shutil.which("node_modules/.bin/tailwindcss")
+    if exe is None:
+        raise SystemExit("tailwindcss failed to install, please try again")
     print("Building style sheet...")
     input_css = pathlib.Path("static/css/input.css")
     if not input_css.is_file():
@@ -193,9 +199,9 @@ def build_css(*, watch: bool) -> subprocess.Popen | None:
 def build_image():
     if not (pathlib.Path.cwd() / "capella_model_explorer").is_dir():
         raise SystemExit("Run this command from the root of the project.")
-    subprocess.check_output(["docker", "--version"])
+    docker = _find_exe("docker")
     cmd = [
-        "docker",
+        docker,
         "build",
         "--no-cache",
         "-t",
@@ -207,11 +213,19 @@ def build_image():
 
 
 def pre_commit_setup():
+    pre_commit = _find_exe("pre-commit")
     print("Installing tools needed for pre-commit hooks...")
     _install_npm_pkgs()
     print("Installing pre-commit hooks...")
-    subprocess.check_call(["pre-commit", "install-hooks"])
-    subprocess.check_call(["pre-commit", "install"])
+    subprocess.check_call([pre_commit, "install-hooks"])
+    subprocess.check_call([pre_commit, "install"])
+
+
+def _find_exe(name: str) -> str:
+    path = shutil.which(name)
+    if path is None:
+        raise SystemExit(f"Cannot find {name!r}, install it and try again")
+    return path
 
 
 def main():
