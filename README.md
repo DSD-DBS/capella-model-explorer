@@ -43,14 +43,14 @@ pip install capella-model-explorer
 ## Run the app
 
 The app comes with a command line interface (CLI).
-Command `cme -h` to get help or `cme SUBCOMMAND -h` to get help for any
+Command `cme --help` to get help or `cme SUBCOMMAND --help` to get help for any
 subcommand.
 
 ```bash
-cme run -h
+cme run --help
 ```
 
-lists the available run options.
+explains the available run options.
 
 In all cases the running app will be served at a location (default:
 `http://localhost:8000`) that will be printed to the console.
@@ -64,8 +64,8 @@ cme run
 ### Build a Docker image and run the app in a container
 
 ```bash
-cme build image
-cme run --container
+docker build -t capella-model-explorer .
+cme run --container --image capella-model-explorer
 ```
 
 Above will start the app with a sample model which can be found here:
