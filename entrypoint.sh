@@ -5,4 +5,4 @@
 
 export CME_TEMPLATES_DIR="/templates"
 . /app/.venv/bin/activate
-exec cme run local
+exec cme run
