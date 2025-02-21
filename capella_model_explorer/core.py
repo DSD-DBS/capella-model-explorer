@@ -44,10 +44,15 @@ class ColoredFormatter(logging.Formatter):
 
 
 def setup_logging(logger: logging.Logger):
-    logging.getLogger("uvicorn").setLevel("INFO")
+    logger.setLevel("INFO")
     formatter = ColoredFormatter(
         "%(asctime)s.%(msecs)03d|%(levelname)-8s | %(message)s",
         datefmt="%Y-%m-%d|%H:%M:%S",
     )
-    for handler in logger.handlers:
-        handler.setFormatter(formatter)
+    if not logger.hasHandlers():
+        console_handler = logging.StreamHandler()
+        console_handler.setFormatter(formatter)
+        logger.addHandler(console_handler)
+    else:
+        for handler in logger.handlers:
+            handler.setFormatter(formatter)
