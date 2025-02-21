@@ -4,7 +4,7 @@
 from __future__ import annotations
 
 import argparse
-import os
+import os.path
 import pathlib
 import shlex
 import shutil
@@ -175,6 +175,7 @@ def build_css(*, watch: bool) -> subprocess.Popen | None:
     exe = shutil.which("node_modules/.bin/tailwindcss")
     if exe is None:
         raise SystemExit("tailwindcss failed to install, please try again")
+    exe = os.path.realpath(exe)
     print("Building style sheet...")
     input_css = pathlib.Path("static/css/input.css")
     if not input_css.is_file():
