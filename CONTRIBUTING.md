@@ -81,7 +81,7 @@ We additionally recommend that you set up your editor / IDE as follows.
 3. Optional:
 
    Create a `.env` file in the root of the project and define any of the
-   environment variables decribed in the help `cme run local-dev -h`.
+   environment variables decribed in the help `cme run -h`.
 
    Example `.env` file:
 
@@ -95,8 +95,8 @@ We additionally recommend that you set up your editor / IDE as follows.
    in the root directory of the project:
 
    ```bash
-   dotenv run cme run local-dev  # if you want to make use of the .env file
-   cme run local-dev  # without .env file
+   dotenv run cme run # if you want to make use of the .env file
+   cme run # without .env file
    ```
 
 `cme run local-dev` starts the TailwindCSS CLI and the FastHTML server in watch

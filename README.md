@@ -58,14 +58,14 @@ In all cases the running app will be served at a location (default:
 ### Run the app locally
 
 ```bash
-cme run local
+cme run
 ```
 
 ### Build a Docker image and run the app in a container
 
 ```bash
 cme build image
-cme run container
+cme run --container
 ```
 
 Above will start the app with a sample model which can be found here:
@@ -78,7 +78,7 @@ Stop the app via CTRL+C.
 ```bash
 export CME_MODEL='git+https://github.com/DSD-DBS/Capella-IFE-sample.git'
 export CME_PORT=5000  # optional, default is 8000
-cme run container
+cme run --container
 ```
 
 More information describing what kinds of values can be specified via the
@@ -95,7 +95,7 @@ enabled.
 
 ```bash
 export CME_MODEL=/path/on/host/to/model
-cme run container
+cme run --container
 ```
 
 ### Run the app in a container and enable live report template editing
@@ -106,7 +106,7 @@ and rendering will be enabled.
 
 ```bash
 export CME_TEMPLATES_DIR=$(realpath ./templates)
-cme run container
+cme run --container
 ```
 
 # Integration in the Capella Collaboration Manager
