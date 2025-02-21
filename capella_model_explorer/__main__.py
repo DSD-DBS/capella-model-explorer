@@ -78,7 +78,7 @@ def run_local():
     if not pathlib.Path(c.TEMPLATES_DIR).is_dir():
         raise SystemExit(f"Templates directory not found: {c.TEMPLATES_DIR}")
     subprocess.check_output(["uvicorn", "--version"])
-    if not list(pathlib.Path().glob("static/css/main-*.css")):
+    if not pathlib.Path(c.main_css_path).exists():
         build_css(watch=False)
     print("Running the application locally...")
     cmd = [
@@ -166,8 +166,6 @@ def run_local_dev() -> None:
 
 def build_css(*, watch: bool) -> subprocess.Popen | None:
     """Build style sheet using Tailwind CSS."""
-    for file in pathlib.Path().glob("static/css/main-*.css"):
-        file.unlink()
     _install_npm_pkgs()
     exe = "node_modules/.bin/tailwindcss"
     subprocess.check_output([exe, "--help"])
@@ -181,7 +179,7 @@ def build_css(*, watch: bool) -> subprocess.Popen | None:
         "--input",
         str(input_css),
         "--output",
-        "static/css/main.min.css",
+        c.main_css_path,
     ]
     if watch:
         tailwind_cmd.append("--watch")
