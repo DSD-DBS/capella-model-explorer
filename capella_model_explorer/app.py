@@ -30,7 +30,6 @@ logger.info("Configuration:")
 logger.info("\tRoute prefix: '%s'", c.ROUTE_PREFIX)
 logger.info("\tLive mode: %s", c.LIVE_MODE)
 logger.info("\tHost: '%s'", c.HOST)
-logger.info("\tRoute prefix: '%s'", c.ROUTE_PREFIX)
 logger.info("\tCapella model: '%s'", c.MODEL)
 logger.info("\tTemplates directory: '%s'", c.TEMPLATES_DIR)
 
