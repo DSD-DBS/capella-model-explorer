@@ -14,6 +14,7 @@ import subprocess
 import time
 
 import click
+import uvicorn
 
 import capella_model_explorer
 import capella_model_explorer.constants as c
@@ -70,95 +71,50 @@ def run_container() -> None:
 
 def run_local() -> None:
     """Run the application locally."""
-    if not (uvicorn := shutil.which("uvicorn")):
-        raise SystemExit("`uvicorn` not found, did you run `pip install`?")
-
     if not pathlib.Path(c.TEMPLATES_DIR).is_dir():
         raise SystemExit(f"Templates directory not found: {c.TEMPLATES_DIR}")
-
     if not pathlib.Path(c.main_css_path).exists():
         build_css(watch=False)
-
     logger.info("Running the application locally...")
-    cmd = [uvicorn, "--host", c.HOST, "--port", str(c.PORT)]
-    if c.LIVE_MODE:
-        cmd.extend(
-            [
-                "--reload",
-                "--reload-exclude",
-                "git_askpass.py",
-                "--reload-dir",
-                str(c.TEMPLATES_DIR),
-                "--reload-include",
-                "*.j2",
-            ]
-        )
-
-    cmd.append("capella_model_explorer.app:app")
-    logger.info(shlex.join(cmd))
-    subprocess.check_call(
-        cmd,
-        env=os.environ
-        | {
-            "CME_LIVE_MODE": "1" if c.LIVE_MODE else "0",
-            "CME_MODEL": c.MODEL,
-            "CME_ROUTE_PREFIX": c.ROUTE_PREFIX,
-            "CME_TEMPLATES_DIR": str(c.TEMPLATES_DIR),
-        },
+    uvicorn.run(
+        app="capella_model_explorer.app:app",
+        host=c.HOST,
+        port=c.PORT,
+        reload=c.LIVE_MODE,
+        reload_dirs=str(c.TEMPLATES_DIR),
+        reload_excludes="git_askpass.py",
+        reload_includes="*.j2",
     )
 
 
 def run_local_dev() -> None:
-    if not (uvicorn := shutil.which("uvicorn")):
-        raise SystemExit("`uvicorn` not found, did you run `pip install`?")
-
     logger.info("Running the application locally with full reload...")
     if not pathlib.Path(c.TEMPLATES_DIR).is_dir():
         raise SystemExit(f"Templates directory not found: {c.TEMPLATES_DIR}")
 
-    uvicorn_cmd = [
-        uvicorn,
-        "--host",
-        c.HOST,
-        "--port",
-        str(c.PORT),
-        "--reload",
-        "--reload-exclude",
-        "git_askpass.py",
-        "--reload-exclude",
-        "input.css",
-        "--reload-dir",
-        ".",
-        "--reload-include",
-        "*.css",
-        "--reload-include",
-        "*.j2",
-        "--reload-include",
-        "*.js",
-        "--reload-include",
-        "*.py",
-        "capella_model_explorer.app:app",
-    ]
-    logger.info(" ".join(uvicorn_cmd))
     assert (tailwind_proc := build_css(watch=True))
     time.sleep(1)
-
-    uvicorn_proc = subprocess.Popen(
-        uvicorn_cmd,
-        env=os.environ
-        | {
-            "CME_LIVE_MODE": "1",
-            "CME_MODEL": c.MODEL,
-            "CME_TEMPLATES_DIR": c.TEMPLATES_DIR,
-        },
-    )
     try:
-        with tailwind_proc, uvicorn_proc:
-            while True:
-                time.sleep(3600)
+        with tailwind_proc:
+            uvicorn.run(
+                app="capella_model_explorer.app:app",
+                host=c.HOST,
+                port=c.PORT,
+                reload=True,
+                reload_dirs=".",
+                reload_excludes=[
+                    "git_askpass.py",
+                    "input.css",
+                ],
+                reload_includes=[
+                    "*.css",
+                    "*.j2",
+                    "*.js",
+                    "*.py",
+                ],
+            )
     except KeyboardInterrupt:
         tailwind_proc.terminate()
-        uvicorn_proc.terminate()
 
 
 def build_css(*, watch: bool) -> subprocess.Popen | None:
