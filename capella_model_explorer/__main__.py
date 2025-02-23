@@ -17,9 +17,10 @@ import click
 
 import capella_model_explorer
 import capella_model_explorer.constants as c
+from capella_model_explorer import core
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
+core.setup_logging(logger)
 
 
 def _install_npm_pkgs() -> None:
