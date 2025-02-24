@@ -6,6 +6,7 @@ from __future__ import annotations
 import contextlib
 import logging
 import pathlib
+import sys
 import tempfile
 import time
 import traceback
@@ -30,9 +31,12 @@ logger.info("Configuration:")
 logger.info("\tRoute prefix: '%s'", c.ROUTE_PREFIX)
 logger.info("\tLive mode: %s", c.LIVE_MODE)
 logger.info("\tHost: '%s'", c.HOST)
-logger.info("\tRoute prefix: '%s'", c.ROUTE_PREFIX)
 logger.info("\tCapella model: '%s'", c.MODEL)
 logger.info("\tTemplates directory: '%s'", c.TEMPLATES_DIR)
+
+if c.ROUTE_PREFIX and not c.ROUTE_PREFIX.startswith("/"):
+    logger.error("Invalid route prefix: %r", c.ROUTE_PREFIX)
+    sys.exit(1)
 
 
 @contextlib.asynccontextmanager
@@ -87,6 +91,13 @@ def metrics() -> t.Any:
         content=prometheus_client.generate_latest(),
         media_type="text/plain",
     )
+
+
+@app.get("/")
+def prefix_redirect() -> t.Any:
+    if c.ROUTE_PREFIX:
+        return fh.RedirectResponse(url=app.url_path_for("main_home"))
+    return home()
 
 
 @ar.get("/", name="main_home")
