@@ -229,7 +229,7 @@ def template_page(template_id: str, model_element_uuid: str = "") -> t.Any:
                 cls=(
                     "bg-white",
                     "border",
-                    "border-gray-200",
+                    "border-neutral-200",
                     "dark:bg-neutral-800",
                     "dark:border-neutral-700",
                     "dark:shadow-neutral-700",

@@ -54,10 +54,10 @@ def home() -> svg.Svg:
         stroke_linejoin="round",
         cls=(
             "dark:hover:stroke-neutral-100",
-            "dark:stroke-blue-500",
+            "dark:stroke-neutral-400",
             "fill-none",
-            "hover:stroke-blue-900",
-            "stroke-neutral-200",
+            "hover:stroke-neutral-50",
+            "stroke-neutral-300",
         ),
     )
 
@@ -168,7 +168,7 @@ def lock_icon(state: t.Literal["open", "closed"]) -> svg.Svg:
         viewbox="0 0 24 24",
         fill="none",
         stroke="currentColor",
-        cls="size-6 flex-none text-gray-400 stroke-2",
+        cls="size-6 flex-none text-neutral-400 stroke-2",
     )
 
 
@@ -225,7 +225,7 @@ def magnifying_glass() -> svg.Svg:
         data_slot="icon",
         cls=(
             "pointer-events-none col-start-1 row-start-1 ml-3 size-5"
-            " self-center text-gray-400"
+            " self-center text-neutral-400"
         ),
     )
 
@@ -247,10 +247,10 @@ def printer() -> svg.Svg:
         stroke_linejoin="round",
         cls=(
             "dark:hover:stroke-neutral-100",
-            "dark:stroke-blue-500",
+            "dark:stroke-neutral-400",
             "fill-none",
-            "hover:stroke-blue-900",
-            "stroke-neutral-200",
+            "hover:stroke-neutral-50",
+            "stroke-neutral-300",
         ),
     )
 
@@ -283,32 +283,24 @@ def report() -> svg.Svg:
     )
 
 
-def spinner(scale: float) -> svg.Svg:
-    size = int(scale * 5)
+def spinner() -> svg.Svg:
     return svg.Svg(
         svg.Circle(
             cx="12",
             cy="12",
             r="10",
             stroke_width="4",
-            cls="opacity-25",
+            cls=("opacity-25", "stroke-primary-500"),
         ),
         svg.Path(
-            d=(
-                "M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2"
-                " 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3"
-                " 7.938l3-2.647z"
-            ),
-            cls=("opacity-75", "fill-blue-500"),
+            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z",
+            cls=("opacity-100", "fill-primary-500"),
         ),
         xmlns="http://www.w3.org/2000/svg",
         fill="none",
         viewbox="0 0 24 24",
         cls=(
-            "mr-3",
-            "-ml-1",
             "animate-spin",
-            "stroke-blue-500",
-            f"h-{size} w-{size}",
+            "size-15",
         ),
     )

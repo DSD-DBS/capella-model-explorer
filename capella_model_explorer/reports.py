@@ -156,7 +156,7 @@ def home() -> tuple[ft.Title, ft.Main]:
                     href="https://github.com/DSD-DBS/capella-model-explorer",
                     target="_blank",
                     cls=(
-                        "dark:text-neutral-300",
+                        "dark:text-gray-300",
                         "flex",
                         "hover:underline",
                         "max-w-fit",
