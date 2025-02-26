@@ -185,6 +185,14 @@ the Capella Model Explorer. More information about read-only sessions is
 available in the
 [Capella Collaboration Manager documentation](https://dsd-dbs.github.io/capella-collab-manager/user/sessions/types/read-only/).
 
+# Theme
+
+The app comes with a default light and dark theme and the hue value for the
+primary color can be customized via the environment variable
+`CME_PRIMARY_COLOR_HUE`. The default hue value is 231 which corresponds to the
+purple/ blue color used as primary color in the
+[Capella Collaboration Manager documentation](https://dsd-dbs.github.io/capella-collab-manager).
+
 # Contributing
 
 We'd love to see your bug reports and improvement suggestions! Please take a

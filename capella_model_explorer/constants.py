@@ -29,6 +29,7 @@ class Defaults:
         "git+https://github.com/DSD-DBS/Capella-IFE-sample.git"
     )
     port: t.Final[int] = 8000
+    primary_color_hue: t.Final[int] = 231
     route_prefix: t.Final[str] = ""
     templates_dir: t.Final[pathlib.Path] = pathlib.Path("templates")
 
@@ -39,7 +40,9 @@ DOCKER_IMAGE_NAME: str = CONFIG(
 HOST: str = CONFIG("HOST", default=Defaults.host)
 MODEL: str = CONFIG("MODEL", default=Defaults.model)
 PORT: int = CONFIG("PORT", cast=int, default=Defaults.port)
-
+PRIMARY_COLOR_HUE: int = CONFIG(
+    "PRIMARY_COLOR_HUE", cast=int, default=Defaults.primary_color_hue
+)
 LIVE_MODE: t.Final[bool] = CONFIG(
     "LIVE_MODE", cast=bool, default=Defaults.live_mode
 )
@@ -89,6 +92,7 @@ HEADERS: t.Final[list[fh.Link | ft.Script]] = [
         charset="utf-8",
         src=f"{ROUTE_PREFIX}/{theme_path}?v={theme_hash}",
     ),
+    ft.Style(f":root {{ --primary-color-hue: {PRIMARY_COLOR_HUE}; }}"),
 ]
 if sys.stderr.isatty():
     LOGGING_COLORS = {
