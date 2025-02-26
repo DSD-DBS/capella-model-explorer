@@ -211,15 +211,13 @@ def _make_href(
 
 def finalize(markup: t.Any) -> object:
     if isinstance(markup, m.AbstractDiagram):
-        markup = markup.render(None)
+        svg = markupsafe.Markup(markup.render("svg"))
+        return SVG_WRAP_MARKUP.format(svg_data=svg, title=markup.name)
+
     if isinstance(markup, capellambse.diagram.Diagram):
-        svg = m.diagram.convert_format(None, "svg", markup)
-        return markupsafe.Markup(
-            SVG_WRAP_MARKUP.format(
-                svg_data=markupsafe.Markup(svg),
-                title=markup.name,
-            )
-        )
+        svg = markupsafe.Markup(m.diagram.convert_format(None, "svg", markup))
+        return SVG_WRAP_MARKUP.format(svg_data=svg, title=markup.name)
+
     markup = markupsafe.escape(markup)
     return capellambse.helpers.replace_hlinks(markup, state.model, _make_href)
 
