@@ -154,7 +154,7 @@ def rendered_report(template_id: str, model_element_uuid: str = "") -> t.Any:
                 cls="dark:text-neutral-100 grow content-center",
             )
         )
-    return components.template_container(
+    content = components.template_container(
         ft.Div(
             fh.NotStr(rendered_template),
             ft.Script(
@@ -163,6 +163,11 @@ def rendered_report(template_id: str, model_element_uuid: str = "") -> t.Any:
             ),
             cls="prose svg-display dark:prose-invert",
         )
+    )
+    return (
+        content,
+        fh.HttpHeader(k="Cache-Control", v="max-age=31536000"),
+        fh.HttpHeader(k="Vary", v="X-CME-Render-Environment"),
     )
 
 
