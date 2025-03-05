@@ -12,7 +12,6 @@ import fasthtml.starlette
 from fasthtml import common as fh
 from fasthtml import ft
 
-import capella_model_explorer as cme
 from capella_model_explorer import core
 
 CONFIG = fasthtml.starlette.Config(env_prefix="CME_")
@@ -20,9 +19,7 @@ CONFIG = fasthtml.starlette.Config(env_prefix="CME_")
 
 @dataclasses.dataclass
 class Defaults:
-    docker_image_name: t.Final[str] = (
-        f"capella-model-explorer:{cme.__version__}"
-    )
+    docker_image_name: t.Final[str] = "capella-model-explorer:latest"
     host: t.Final[str] = "0.0.0.0"
     live_mode: bool = True
     model: t.Final[str] = (

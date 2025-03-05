@@ -1,31 +1,36 @@
 # Copyright DB InfraGO AG and contributors
 # SPDX-License-Identifier: Apache-2.0
+"""Command line interface for the application."""
 
 from __future__ import annotations
 
-import argparse
-import os.path
+import importlib
+import logging
+import os
 import pathlib
 import shlex
 import shutil
 import subprocess
-import textwrap
 import time
 
+import click
 import uvicorn
 
-import capella_model_explorer
 import capella_model_explorer.constants as c
+from capella_model_explorer import app, core
+
+logger = logging.getLogger(__name__)
+core.setup_logging(logger)
 
 
 def _install_npm_pkgs() -> None:
     npm = _find_exe("npm")
     cmd = [npm, "clean-install"]
-    print(shlex.join(cmd))
+    logger.info(shlex.join(cmd))
     subprocess.check_call(cmd)
 
 
-def run_container():
+def run_container() -> None:
     docker = _find_exe("docker")
     cmd = [
         docker,
@@ -48,41 +53,31 @@ def run_container():
         model = model.parent
     if model.is_dir():
         cmd.extend(
-            [
-                "-v",
-                f"{model.resolve()}:/model",
-                "-e",
-                "CME_MODEL=/model",
-            ]
+            ["-v", f"{model.resolve()}:/model", "-e", "CME_MODEL=/model"]
         )
     else:
-        cmd.extend(
-            [
-                "-e",
-                f"CME_MODEL={c.MODEL}",
-            ]
-        )
+        cmd.extend(["-e", f"CME_MODEL={c.MODEL}"])
     if pathlib.Path(c.TEMPLATES_DIR).is_dir():
         cmd.extend(
-            [
-                "-v",
-                f"{pathlib.Path(c.TEMPLATES_DIR).resolve()}:/templates",
-            ]
+            ["-v", f"{pathlib.Path(c.TEMPLATES_DIR).resolve()}:/templates"]
         )
     else:
         raise SystemExit(f"Templates directory not found: {c.TEMPLATES_DIR}")
+
     cmd.append(c.DOCKER_IMAGE_NAME)
-    print(shlex.join(cmd))
+    logger.info(shlex.join(cmd))
     subprocess.check_call(cmd)
 
 
-def run_local():
+def run_local() -> None:
     """Run the application locally."""
     if not pathlib.Path(c.TEMPLATES_DIR).is_dir():
         raise SystemExit(f"Templates directory not found: {c.TEMPLATES_DIR}")
+
     if not pathlib.Path(c.main_css_path).exists():
         build_css(watch=False)
-    print("Running the application locally...")
+
+    logger.info("Running the application locally...")
     uvicorn.run(
         app="capella_model_explorer.app:app",
         host=c.HOST,
@@ -95,12 +90,14 @@ def run_local():
 
 
 def run_local_dev() -> None:
-    print("Running the application locally with full reload...")
+    logger.info("Running the application locally with full reload...")
     if not pathlib.Path(c.TEMPLATES_DIR).is_dir():
         raise SystemExit(f"Templates directory not found: {c.TEMPLATES_DIR}")
+
     tailwind_proc = build_css(watch=True)
     assert tailwind_proc is not None
     time.sleep(1)  # avoid direct uvicorn reload when css file is written
+
     try:
         with tailwind_proc:
             uvicorn.run(
@@ -131,10 +128,12 @@ def build_css(*, watch: bool) -> subprocess.Popen | None:
     if exe is None:
         raise SystemExit("tailwindcss failed to install, please try again")
     exe = os.path.realpath(exe)
-    print("Building style sheet...")
+
+    logger.info("Building style sheet...")
     input_css = pathlib.Path("static/css/input.css")
     if not input_css.is_file():
         raise SystemExit(f"Input CSS file not found: {input_css}")
+
     tailwind_cmd = [
         exe,
         "--minify",
@@ -145,36 +144,12 @@ def build_css(*, watch: bool) -> subprocess.Popen | None:
     ]
     if watch:
         tailwind_cmd.append("--watch")
-        print(shlex.join(tailwind_cmd))
+        logger.info(shlex.join(tailwind_cmd))
         return subprocess.Popen(tailwind_cmd)
-    print(shlex.join(tailwind_cmd))
+
+    logger.info(shlex.join(tailwind_cmd))
     subprocess.check_call(tailwind_cmd)
     return None
-
-
-def build_image():
-    if not (pathlib.Path.cwd() / "capella_model_explorer").is_dir():
-        raise SystemExit("Run this command from the root of the project.")
-    docker = _find_exe("docker")
-    cmd = [
-        docker,
-        "build",
-        "--no-cache",
-        "-t",
-        f"capella-model-explorer:{capella_model_explorer.__version__}",
-        ".",
-    ]
-    print(shlex.join(cmd))
-    subprocess.check_call(cmd)
-
-
-def pre_commit_setup():
-    pre_commit = _find_exe("pre-commit")
-    print("Installing tools needed for pre-commit hooks...")
-    _install_npm_pkgs()
-    print("Installing pre-commit hooks...")
-    subprocess.check_call([pre_commit, "install-hooks"])
-    subprocess.check_call([pre_commit, "install"])
 
 
 def _find_exe(name: str) -> str:
@@ -184,104 +159,136 @@ def _find_exe(name: str) -> str:
     return path
 
 
-def main():
-    parser = argparse.ArgumentParser(
-        description=(
-            "CLI for managing the application. Every command"
-            " has its own `--help` option."
+@click.group()
+def main() -> None:
+    """Command line interface to control the application."""
+
+
+@main.command()
+@click.option(
+    "--container",
+    is_flag=True,
+    default=False,
+    show_default=True,
+    help="Launch as a Docker container.",
+)
+@click.option(
+    "--dev",
+    is_flag=True,
+    show_default=True,
+    help="Launch in development mode with full auto-reload."
+    " This option cannot be used together with --container.",
+)
+@click.option(
+    "--host",
+    envvar="CME_HOST",
+    default=c.Defaults.host,
+    show_default=True,
+    help="The hostname or IP address to bind to."
+    " Ignored when running with '--container'.",
+)
+@click.option(
+    "--port",
+    envvar="CME_PORT",
+    default=c.Defaults.port,
+    show_default=True,
+    help="The port to listen on.",
+)
+@click.option(
+    "--model",
+    envvar="CME_MODEL",
+    default=c.Defaults.model,
+    show_default=True,
+    help="The Capella model to load (file, URL or JSON string).",
+)
+@click.option(
+    "--templates-dir",
+    envvar="CME_TEMPLATES_DIR",
+    default=str(c.Defaults.templates_dir.resolve()),
+    show_default=True,
+    help="The directory containing the templates.",
+)
+@click.option(
+    "--live-mode/--no-live-mode",
+    envvar="CME_LIVE_MODE",
+    default=c.Defaults.live_mode,
+    show_default=True,
+    help=(
+        "Control automatic reloading of templates on changes."
+        " Ignored in '--dev' mode, where it is always enabled."
+    ),
+)
+@click.option(
+    "--route-prefix",
+    envvar="CME_ROUTE_PREFIX",
+    default="",
+    show_default=True,
+    help="Add a prefix to all web routes."
+    f" (Note: this prefix does not apply to '{app.metrics.to()}').",
+)
+@click.option(
+    "--image",
+    envvar="CME_DOCKER_IMAGE_NAME",
+    default=c.Defaults.docker_image_name,
+    show_default=True,
+    help="The Docker image to use with '--container'.",
+)
+def run(
+    *,
+    container: bool,
+    dev: bool,
+    host: str,
+    port: int,
+    model: str,
+    templates_dir: str,
+    live_mode: bool,
+    route_prefix: str,
+    image: str,
+) -> None:
+    """Run the application."""
+    os.environ["CME_HOST"] = host
+    os.environ["CME_PORT"] = str(port)
+    os.environ["CME_MODEL"] = model
+    os.environ["CME_TEMPLATES_DIR"] = templates_dir
+    os.environ["CME_LIVE_MODE"] = "1" if live_mode else "0"
+    os.environ["CME_ROUTE_PREFIX"] = route_prefix
+    os.environ["CME_DOCKER_IMAGE_NAME"] = image
+    importlib.reload(c)
+
+    if container and dev:
+        raise click.UsageError(
+            "Options --container and --dev are mutually exclusive."
         )
-    )
-    parser.add_argument(
-        "--version",
-        action="version",
-        version=f"%(prog)s {capella_model_explorer.__version__}",
-    )
+    if container:
+        run_container()
+    elif dev:
+        run_local_dev()
+    else:
+        run_local()
 
-    subparsers = parser.add_subparsers(
-        dest="command", required=True, help="Available commands"
-    )
 
-    # Run command
-    run_description = textwrap.dedent(
-        f"""\
-        Run the application.
+@main.command()
+@click.option(
+    "--watch",
+    is_flag=True,
+    default=False,
+    show_default=True,
+    help="Watch for changes and rebuild automatically.",
+)
+def build(*, watch: bool) -> None:
+    """Build style sheet using Tailwind CSS."""
+    build_css(watch=watch)
 
-        The following environment variables are honored:
 
-        CME_HOST: The hostname or IP address to bind to. Default: {c.Defaults.host}
-            Ignored when running with '--container'.
-        CME_PORT: The port to listen on. Default: {c.Defaults.port}
-        CME_MODEL: The Capella model to load, either as file, URL or JSON string.
-            For details, refer to the capellambse documentation:
-            https://dsd-dbs.github.io/py-capellambse/start/specifying-models.html
-            Default: {c.Defaults.model}
-        CME_TEMPLATES_DIR: The directory containing the templates.
-            Default: {c.Defaults.templates_dir.resolve()}
-        CME_LIVE_MODE: Control automatic reloading of templates on changes.
-            Set to 1 to enable, 0 to disable. Default: {"01"[c.Defaults.live_mode]}
-            Ignored in '--dev' mode, where auto-reloading for
-            both templates and code is always enabled.
-        CME_ROUTE_PREFIX: Add a prefix to all web routes.
-            Note that this prefix does not apply to '/metrics'.
-        CME_DOCKER_IMAGE_NAME: The Docker image to use with '--container'.
-            Default: {c.Defaults.docker_image_name}
-        """
-    )
-    run_parser = subparsers.add_parser(
-        "run",
-        description=run_description,
-        help="Run the application with various options.",
-        formatter_class=argparse.RawTextHelpFormatter,
-    )
-    run_mode_group = run_parser.add_mutually_exclusive_group()
-    run_mode_group.add_argument(
-        "--dev",
-        action="store_true",
-        help="Launch in development mode with full auto-reload.",
-    )
-    run_mode_group.add_argument(
-        "--container",
-        action="store_true",
-        help=(
-            "Launch as a Docker container. See also: cme build image --help"
-        ),
-    )
-
-    # Build command
-    build_parser = subparsers.add_parser(
-        "build", help="Run a specified build process"
-    )
-    build_subparsers = build_parser.add_subparsers(
-        dest="subcommand", required=True, help="Subcommands for build"
-    )
-
-    build_subparsers.add_parser(
-        "css",
-        help="Build style sheet with Tailwind CSS CLI.",
-    )
-    build_subparsers.add_parser("image", help="Build Docker image.")
-
-    # Pre-commit setup command
-    subparsers.add_parser(
-        "pre-commit-setup", help="Install tools needed for pre-commit hooks"
-    )
-
-    args = parser.parse_args()
-
-    if args.command == "run":
-        if args.container:
-            run_container()
-        elif args.dev:
-            run_local_dev()
-        else:
-            run_local()
-    elif args.command == "build":
-        if args.subcommand == "css":
-            build_css(watch=False)
-        elif args.subcommand == "image":
-            build_image()
-    elif args.command == "pre-commit-setup":
-        pre_commit_setup()
+@main.command("pre-commit-setup")
+def pre_commit_setup_cmd() -> None:
+    """Install tools needed for pre-commit hooks."""
+    pre_commit = _find_exe("pre-commit")
+    logger.info("Installing tools needed for pre-commit hooks...")
+    _install_npm_pkgs()
+    logger.info("Installing pre-commit hooks...")
+    subprocess.check_call([pre_commit, "install-hooks"])
+    subprocess.check_call([pre_commit, "install"])
 
 
 if __name__ == "__main__":

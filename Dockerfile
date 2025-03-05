@@ -67,7 +67,7 @@ RUN uv venv && \
 
 # install Node pkgs and build the CSS {{{
 RUN npm clean-install && \
-  uv run python3 -m capella_model_explorer build css && \
+  uv run python3 -m capella_model_explorer build && \
   rm -rf node_modules
 # }}}
 
