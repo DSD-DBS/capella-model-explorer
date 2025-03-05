@@ -199,14 +199,14 @@ def main() -> None:
     envvar="CME_MODEL",
     default=c.Defaults.model,
     show_default=True,
-    help="The Capella model to load (file, URL or JSON string). ",
+    help="The Capella model to load (file, URL or JSON string).",
 )
 @click.option(
     "--templates-dir",
     envvar="CME_TEMPLATES_DIR",
     default=str(c.Defaults.templates_dir.resolve()),
     show_default=True,
-    help="The directory containing the templates. ",
+    help="The directory containing the templates.",
 )
 @click.option(
     "--live-mode/--no-live-mode",
@@ -231,7 +231,7 @@ def main() -> None:
     envvar="CME_DOCKER_IMAGE_NAME",
     default=c.Defaults.docker_image_name,
     show_default=True,
-    help="The Docker image to use with '--container'. ",
+    help="The Docker image to use with '--container'.",
 )
 def run(
     *,

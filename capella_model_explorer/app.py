@@ -30,13 +30,9 @@ core.setup_logging(logger)
 @contextlib.asynccontextmanager
 async def lifespan(_):
     logger.info("Configuration:")
-    logger.info("\tRoute prefix: '%s'", c.ROUTE_PREFIX)
     logger.info("\tLive mode: %s", c.LIVE_MODE)
     logger.info("\tHost: '%s'", c.HOST)
     logger.info("\tRoute prefix: '%s'", c.ROUTE_PREFIX)
-    logger.info("\tCapella model: '%s'", c.MODEL)
-    logger.info("\tTemplates directory: '%s'", c.TEMPLATES_DIR)
-
     model_spec = capellambse.loadinfo(c.MODEL)
     logger.info("Loading model from: %s", model_spec["path"])
     state.model = capellambse.MelodyModel(**model_spec)
