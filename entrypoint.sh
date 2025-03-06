@@ -5,4 +5,4 @@
 
 export CME_TEMPLATES_DIR="/templates"
 . /app/.venv/bin/activate
-exec cme run
+exec cme run --skip-rebuild
