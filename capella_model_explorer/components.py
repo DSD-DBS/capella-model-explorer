@@ -3,14 +3,18 @@
 
 from __future__ import annotations
 
+import json
 import pathlib
 import typing as t
 
+import capellambse
+import capellambse_context_diagrams
 import pydantic
 from fasthtml import common as fh
 from fasthtml import ft, svg
 
-from capella_model_explorer import app, icons, reports, state
+import capella_model_explorer
+from capella_model_explorer import app, core, icons, reports, state
 
 
 class _Breadcrumb(pydantic.BaseModel):
@@ -284,6 +288,22 @@ def report_loader(
     template_id: str,
     model_element_uuid: str = "",
 ) -> t.Any:
+    template = reports.template_by_id(template_id)
+    assert template is not None
+    model_revision = state.model.info.resources["\x00"].rev_hash
+    if model_revision:
+        render_environment = json.dumps(
+            {
+                "model-explorer-version": capella_model_explorer.__version__,
+                "capellambse-version": capellambse.__version__,
+                "ctx-diags-version": capellambse_context_diagrams.__version__,
+                "template-hash": core.compute_file_hash(str(template.path)),
+                "model-revision": state.model.info.resources["\x00"].rev_hash,
+            }
+        )
+        hx_headers = json.dumps({"Render-Environment": render_environment})
+    else:
+        hx_headers = None
     return ft.Div(
         icons.spinner(),
         ft.Script(
@@ -302,6 +322,7 @@ def report_loader(
             template_id=template_id,
             model_element_uuid=model_element_uuid,
         ),
+        hx_headers=hx_headers,
         hx_push_url=app.app.url_path_for(
             "template_page",
             template_id=template_id,
