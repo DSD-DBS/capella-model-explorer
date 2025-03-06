@@ -6,7 +6,6 @@ from __future__ import annotations
 import contextlib
 import logging
 import pathlib
-import sys
 import tempfile
 import time
 import traceback
@@ -27,20 +26,16 @@ from capella_model_explorer import components, core, reports, state
 logger = logging.getLogger("uvicorn")
 core.setup_logging(logger)
 
-logger.info("Configuration:")
-logger.info("\tRoute prefix: '%s'", c.ROUTE_PREFIX)
-logger.info("\tLive mode: %s", c.LIVE_MODE)
-logger.info("\tHost: '%s'", c.HOST)
-logger.info("\tCapella model: '%s'", c.MODEL)
-logger.info("\tTemplates directory: '%s'", c.TEMPLATES_DIR)
-
-if c.ROUTE_PREFIX and not c.ROUTE_PREFIX.startswith("/"):
-    logger.error("Invalid route prefix: %r", c.ROUTE_PREFIX)
-    sys.exit(1)
-
 
 @contextlib.asynccontextmanager
 async def lifespan(_):
+    logger.info("Configuration:")
+    logger.info("\tRoute prefix: '%s'", c.ROUTE_PREFIX)
+    logger.info("\tLive mode: %s", c.LIVE_MODE)
+    logger.info("\tHost: '%s'", c.HOST)
+    logger.info("\tCapella model: '%s'", c.MODEL)
+    logger.info("\tTemplates directory: '%s'", c.TEMPLATES_DIR)
+
     model_spec = capellambse.loadinfo(c.MODEL)
     logger.info("Loading model from: %s", model_spec["path"])
     state.model = capellambse.MelodyModel(**model_spec)
