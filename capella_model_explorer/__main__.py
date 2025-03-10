@@ -69,12 +69,12 @@ def run_container() -> None:
     subprocess.check_call(cmd)
 
 
-def run_local() -> None:
+def run_local(*, rebuild: bool) -> None:
     """Run the application locally."""
     if not pathlib.Path(c.TEMPLATES_DIR).is_dir():
         raise SystemExit(f"Templates directory not found: {c.TEMPLATES_DIR}")
 
-    if not pathlib.Path(c.main_css_path).exists():
+    if rebuild or not pathlib.Path(c.main_css_path).exists():
         build_css(watch=False)
 
     logger.info("Running the application locally...")
@@ -123,13 +123,14 @@ def run_local_dev() -> None:
 
 def build_css(*, watch: bool) -> subprocess.Popen | None:
     """Build style sheet using Tailwind CSS."""
+    logger.info("Building style sheet...")
+
     _install_npm_pkgs()
     exe = shutil.which("node_modules/.bin/tailwindcss")
     if exe is None:
         raise SystemExit("tailwindcss failed to install, please try again")
     exe = os.path.realpath(exe)
 
-    logger.info("Building style sheet...")
     input_css = pathlib.Path("static/css/input.css")
     if not input_css.is_file():
         raise SystemExit(f"Input CSS file not found: {input_css}")
@@ -233,6 +234,11 @@ def main() -> None:
     show_default=True,
     help="The Docker image to use with '--container'.",
 )
+@click.option(
+    "--skip-rebuild/--no-skip-rebuild",
+    default=False,
+    help="Don't rebuild already existing assets.",
+)
 def run(
     *,
     container: bool,
@@ -244,6 +250,7 @@ def run(
     live_mode: bool,
     route_prefix: str,
     image: str,
+    skip_rebuild: bool,
 ) -> None:
     """Run the application."""
     os.environ["CME_HOST"] = host
@@ -264,7 +271,7 @@ def run(
     elif dev:
         run_local_dev()
     else:
-        run_local()
+        run_local(rebuild=not skip_rebuild)
 
 
 @main.command()
