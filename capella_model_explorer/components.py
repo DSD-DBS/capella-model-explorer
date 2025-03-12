@@ -28,21 +28,24 @@ def application_shell(
 ) -> tuple[ft.Title, ft.Main]:
     return (
         ft.Title(f"{state.model.name} - Model Explorer"),
-        ft.Main(
-            page_header(),
-            content,
-            # placeholder for script injection per outerHTML swap
-            ft.Script(id="script"),
-            id="root",
-            cls=(
-                "bg-neutral-100",
-                "dark:bg-neutral-900",
-                "flex",
-                "flex-col",
-                "h-screen",
-                "min-h-screen",
-                f"place-items-{align}",
+        ft.Body(
+            ft.Main(
+                page_header(),
+                content,
+                # placeholder for script injection per outerHTML swap
+                ft.Script(id="script"),
+                id="root",
+                cls=(
+                    "bg-neutral-100",
+                    "dark:bg-neutral-900",
+                    "flex",
+                    "flex-col",
+                    "h-screen",
+                    "min-h-screen",
+                    f"place-items-{align}",
+                ),
             ),
+            hx_boost="true",
         ),
     )
 
