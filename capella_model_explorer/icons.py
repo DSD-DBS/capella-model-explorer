@@ -144,6 +144,26 @@ def file_stack() -> svg.Svg:
     )
 
 
+def hamburger() -> svg.Svg:
+    return svg.Svg(
+        svg.Path(
+            stroke_linecap="round",
+            stroke_linejoin="round",
+            d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5",
+        ),
+        viewbox="0 0 24 24",
+        stroke_width="1.5",
+        cls=(
+            "dark:hover:stroke-neutral-100",
+            "dark:stroke-neutral-400",
+            "fill-none",
+            "hover:stroke-neutral-500",
+            "size-6",
+            "stroke-neutral-800",
+        ),
+    )
+
+
 def lock_icon(state: t.Literal["open", "closed"]) -> svg.Svg:
     if state == "open":
         d = (
@@ -296,11 +316,32 @@ def spinner() -> svg.Svg:
             d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z",
             cls=("opacity-100", "fill-primary-500"),
         ),
-        xmlns="http://www.w3.org/2000/svg",
         fill="none",
         viewbox="0 0 24 24",
         cls=(
             "animate-spin",
             "size-15",
+        ),
+    )
+
+
+def x_mark(*additional_classes: str) -> svg.Svg:
+    return svg.Svg(
+        svg.Path(
+            d="M6 18L18 6M6 6l12 12",
+        ),
+        width="24",
+        height="24",
+        viewbox="0 0 24 24",
+        stroke_linecap="round",
+        stroke_linejoin="round",
+        cls=(
+            "dark:hover:stroke-neutral-100",
+            "dark:stroke-neutral-400",
+            "fill-none",
+            "hover:stroke-neutral-500",
+            "size-6",
+            "stroke-neutral-800",
+            *additional_classes,
         ),
     )

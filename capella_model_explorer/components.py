@@ -68,15 +68,16 @@ def breadcrumb(breadcrumb: _Breadcrumb) -> ft.Li:
                         "dark:hover:text-neutral-100",
                         "dark:text-neutral-400",
                         "font-medium",
-                        "ml-4",
                         "hover:text-neutral-50",
+                        "lg:text-sm",
+                        "ml-4",
                         "text-neutral-300",
-                        "text-sm",
+                        "text-xs/3",
                     ),
                 ),
                 cls="flex items-center",
             ),
-            cls="flex",
+            cls="flex max-w-24 sm:max-w-fit",
         ),
     )
 
@@ -110,7 +111,24 @@ def breadcrumbs(
                         ),
                     )
                 )
-
+    hamburger = (
+        ft.Li(
+            ft.Div(
+                ft.A(
+                    icons.hamburger(),
+                    onclick=(
+                        "console.log('clicked');"
+                        "document.getElementById('template-sidebar').ariaExpanded = true;"
+                        "this.closest('li').classList.add('hidden');"
+                        "document.getElementById('template_container').classList.add('hidden');"
+                    ),
+                ),
+                cls="flex items-center",
+            ),
+            id="hamburger-menu",
+            cls=("flex", "hidden" if not template else None, "lg:hidden"),
+        ),
+    )
     home_item = (
         ft.Li(
             ft.Div(
@@ -126,14 +144,15 @@ def breadcrumbs(
     )
     return ft.Nav(
         ft.Ol(
+            hamburger,
             home_item,
             *(breadcrumb(b) for b in breadcrumbs_),
             role="list",
-            cls="flex space-x-4 rounded-md px-6",
+            cls="flex space-x-4 rounded-md lg:px-6",
         ),
         id="breadcrumbs",
         aria_label="Breadcrumb",
-        cls="flex",
+        cls="flex stretch",
         **({"hx_swap_oob": "true"} if oob else {}),
     )
 
@@ -180,6 +199,10 @@ def model_object_button(
         else None,
         id=f"model-element-{model_element['uuid']}",
         aria_selected="true" if selected else "false",
+        onclick=(
+            "document.getElementById('hamburger-menu').classList.remove('hidden');"
+            "document.getElementById('template-sidebar').ariaExpanded = false;"
+        ),
         cls=(
             "aria-selected:bg-primary-500",
             "aria-selected:dark:hover:bg-primary-500",
@@ -623,7 +646,8 @@ def template_container(content: t.Any) -> ft.Div:
             "html-content",  # copied from v0.2.3
             "items-center",
             "justify-center",
-            "ml-96",
+            "lg:ml-96",
+            "lg:ml-2",
             "overflow-x-auto",
             "p-4",
             "print:bg-white",
@@ -657,7 +681,24 @@ def template_sidebar(
         ),
     )
     return ft.Div(
-        sidebar_caption,
+        ft.Div(
+            sidebar_caption,
+            fh.Div(
+                icons.x_mark("justify-self-end"),
+                onclick=(
+                    "document.getElementById('template-sidebar').ariaExpanded = false;"
+                    "document.getElementById('template_container').classList.remove('hidden');"
+                    "document.getElementById('hamburger-menu').classList.remove('hidden');"
+                ),
+                cls=(
+                    "cursor-pointer",
+                    "grow",
+                    "justify-self-end",
+                    "lg:hidden",
+                ),
+            ),
+            cls="flex flex-row",
+        ),
         search_field(template, search=search),
         model_elements_list(
             template=template,
