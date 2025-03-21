@@ -15,7 +15,6 @@ import jinja2
 import markupsafe
 import pydantic as p
 import yaml
-from fasthtml import common as fh
 from fasthtml import ft
 
 import capella_model_explorer.constants as c
@@ -125,12 +124,34 @@ class Template(p.BaseModel):
 
 class TemplateScope(p.BaseModel):
     type: str | None = p.Field(None, title="Model Element Type")
-    below: str | None = p.Field(
+    below: t.Literal["oa", "sa", "la", "pa"] | None = p.Field(
         None, title="Model element to search below, scope limiter"
     )
     filters: dict[str, t.Any] | None = p.Field(
         {}, title="Filters to apply to the search"
     )
+
+    def applies_to(self, obj: m.ModelElement | m.AbstractDiagram) -> bool:
+        if obj.xtype.rsplit(":", 1)[-1] != self.type:
+            return False
+
+        if (
+            (self.below == "oa" and obj.layer != obj._model.oa)
+            or (self.below == "sa" and obj.layer != obj._model.sa)
+            or (self.below == "la" and obj.layer != obj._model.la)
+            or (self.below == "pa" and obj.layer != obj._model.pa)
+        ):
+            return False
+
+        for key, value in (self.filters or {}).items():
+            try:
+                actual = getattr(obj, key)
+            except AttributeError:
+                return False
+            if actual != value:
+                return False
+
+        return True
 
 
 class TemplateCategory(p.BaseModel):
@@ -191,22 +212,31 @@ def _register_template_category(category: str) -> None:
 def _make_href(
     obj: m.ModelElement | m.AbstractDiagram,
 ) -> str | None:
+    generic_template: Template | None = None
     for template in state.templates:
-        if template.scope is not None:
-            clsname = template.scope.type
-            if obj.xtype.rsplit(":", 1)[-1] == clsname:
-                return app.app.url_path_for(
-                    "template_page",
-                    template_id=template.id,
-                    model_element_uuid=obj.uuid,
-                )
-        if "__generic__" in template.path.stem:
-            return app.app.url_path_for(
-                "template_page",
-                template_id=template.id,
-                model_element_uuid=obj.uuid,
-            )
-    return fh.RedirectResponse(app.app.url_path_for("home"))
+        if template.path.name.startswith("__generic__"):
+            generic_template = template
+            continue
+
+        if template.single:
+            continue
+
+        if template.scope and not template.scope.applies_to(obj):
+            continue
+
+        return app.app.url_path_for(
+            "template_page",
+            template_id=template.id,
+            model_element_uuid=obj.uuid,
+        )
+
+    if generic_template is None:
+        return None
+    return app.app.url_path_for(
+        "template_page",
+        template_id=generic_template.id,
+        model_element_uuid=obj.uuid,
+    )
 
 
 def finalize(markup: t.Any) -> object:
