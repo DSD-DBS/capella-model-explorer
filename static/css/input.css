@@ -87,7 +87,9 @@ html.dark .svg-display svg:not(.main-svg):not(.icon) {
 .html-content table tr th {
   vertical-align: top;
   padding: 0 0.4em;
-  word-break: break-word;
+  white-space: normal;
+  overflow-wrap: break-word;
+  word-break: normal;
 }
 .html-content table tr td:first-of-type,
 .html-content table tr th:first-of-type {
