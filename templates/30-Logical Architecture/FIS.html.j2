@@ -4,10 +4,6 @@
 #}
 {% from 'common_macros.html.j2' import show_other_attributes, description, typed_name, linked_name, linked_name_with_icon, display_traceability, render_requirements_table %}
 
-{# {%  macro linked_name_with_icon(obj) %}
-{% if obj.name %}{{ obj.name }}{% else %}{{ obj }}{% endif %}
-{% endmacro %} #}
-
 {% macro insert_work_item(object) %}
   {{ linked_name_with_icon(object) | safe }}
 {% endmacro %}
@@ -64,7 +60,7 @@
 {% set partner_a_source_uuids = partner_a_provides | map(attribute="source.owner.uuid") | unique | list %}
 {% set partner_b_provides = object.allocated_functional_exchanges | selectattr('source.owner.owner.uuid', "equalto", partner_b.uuid) | list %}
 {% set partner_b_source_uuids = partner_b_provides | map(attribute="source.owner.uuid") | unique | list %}
-
+{% set exchange_items_by_direction = {} %}
 {% macro describe_provided_functional_exchanges(exchanges, source, target, sources) %}
   <p>
     {{ linked_name_with_icon(source) | safe }} may use the interface to
@@ -80,35 +76,37 @@
       </tr>
     </thead>
     <tbody>
-      {% for src_uuid in sources %}
-        {% set filtered_exchanges = exchanges | selectattr('source.owner.uuid', "equalto", src_uuid) | list %}
-        {% for exchange in filtered_exchanges %}
+      {% for src_uuid in sources -%}
+        {%- set filtered_exchanges = exchanges | selectattr('source.owner.uuid', "equalto", src_uuid) | list -%}
+        {%- for exchange in filtered_exchanges -%}
           <tr>
-            {% if loop.first %}
+            {%- if loop.first %}
               <td rowspan="{{ filtered_exchanges | length }}">
                 {{ linked_name_with_icon(exchange.source.owner) | safe }}
               </td>
-            {% endif %}
+            {%- endif -%}
             <td>
-              {% if exchange.exchange_items %}
-                {% if exchange.exchange_items | length > 1 %}
+              {%- if exchange.exchange_items -%}
+                {%- if exchange.exchange_items | length > 1 -%}
                   <ul>
-                    {% for exi in exchange.exchange_items %}
-                      <li><a href="#exi-{{ exi.uuid }}">{{ exi.name }}</a></li>
-                    {% endfor %}
+                    {%- set key = (exchange.source.owner.uuid, exchange.target.owner.uuid) -%}
+                    {%- set _ = exchange_items_by_direction.setdefault(key, exchange.exchange_items) -%}
+                    {%- for exi in exchange.exchange_items -%}
+                      <li>{{ linked_name_with_icon(exi) | safe }}</li>
+                    {%- endfor -%}
                   </ul>
-                {% else %}
-                  {% set exi = exchange.exchange_items[0] %}
-                  <a href="#exi-{{ exi.uuid }}">{{ exi.name }}</a>
-                {% endif %}
-              {% else %}
+                {%- else -%}
+                  {%- set exi = exchange.exchange_items[0] -%}
+                  {{ linked_name_with_icon(exi) | safe }}
+                {%- endif -%}
+              {%- else -%}
                 {{ linked_name_with_icon(exchange) | safe }}
-              {% endif %}
+              {%- endif -%}
             </td>
             <td>{{ linked_name_with_icon(exchange.target.owner) | safe }}</td>
           </tr>
-        {% endfor %}
-      {% endfor %}
+        {%- endfor -%}
+      {%- endfor -%}
     </tbody>
   </table>
 {% endmacro %}
@@ -126,33 +124,54 @@
 <p>
   This section identifies Exchange Items / Messages used within the interface.
 </p>
-{% for exi in object.exchange_items %}
-  <h4 id="exi-{{ exi.uuid }}">Exchange Item {{ exi.name }}</h4>
-  {{ description(exi) | safe }}
-  {% for el in exi.elements %}
-    {{ add_class_dependencies(el.abstract_type, classes[direction]) }}
-  {% endfor %}
-{% endfor %}
-
-{# {%- set classes = {} -%}
+{%- set classes = {} -%}
 {%- set inserted = [] -%}
-{% for direction, eis in exchange_items_by_direction.items() %}
-    {% set _ = classes.setdefault(direction, []) %}
-    {{ heading(4, model.by_uuid(direction[0]).name + " → " + model.by_uuid(direction[1]).name, session) }}
-    {% for ei in eis | unique %}
-        {{ heading(5, work_item_field(ei, "id") + " - " + ei.name, session) }}
-        {{ insert_or_link(ei, inserted) }}
+{%- for direction, eis in exchange_items_by_direction.items() -%}
+    {%- set _ = classes.setdefault(direction, []) -%}
+    <h4>{{ model.by_uuid(direction[0]).name + " → " + model.by_uuid(direction[1]).name }}</h4>
+    {% for ei in eis | unique(attribute="uuid") %}
+        {{ linked_name_with_icon(ei) }}
         {% for el in ei.elements %}
             {{ add_class_dependencies(el.abstract_type, classes[direction]) }}
         {% endfor %}
+    {% else %}
+    <p>There is no data defined for this direction.</p>
     {% endfor %}
-{% endfor %} #}
-{# {{ heading(3, "Message Description", session)}}
+{% endfor %}
+
+<h3>Message Description</h3>
 <p>This section provides a detailed description of each message used within the interface.</p>
-{% for direction, clss in classes.items() %}
-    {{ heading(4, model.by_uuid(direction[0]).name + " → " + model.by_uuid(direction[1]).name, session) }}
-    {% for cl in clss | unique %}
-        {{ heading(5, work_item_field(cl, "id") + " - " + cl.name, session) }}
-        {{ insert_or_link(cl, inserted) }}
-    {% endfor %}
-{% endfor %} #}
+{% set object_count = {} %}
+{% for direction, objects in classes.items() %}
+  {% for obj in objects | unique(attribute="uuid") %}
+  {% set _ = object_count.setdefault(obj.uuid, 0) %}
+  {% set _ = object_count.update({obj.uuid: object_count[obj.uuid] + 1}) %}
+  {% endfor %}
+{% endfor %}
+
+{% set multi_dir_clss = [] %}
+{% for uuid, count in object_count.items() %}
+  {% if count > 1 %}
+      {% set _ = multi_dir_clss.append(uuid) %}
+  {% endif %}
+{% endfor %}
+{%- if multi_dir_clss -%}
+  <h4>Generic Messages</h4>
+  <p>The following classes are used in multiple directions.</p>
+    {%- for uuid in multi_dir_clss | unique -%}
+      {%- set cl = model.by_uuid(uuid) -%}
+      <h5>{{ cl.name }}</h5>
+      {{ insert_work_item(cl, session) }}
+    {%- endfor -%}
+{%- endif -%}
+{%- for direction, clss in classes.items() -%}
+  <h4>{{ model.by_uuid(direction[0]).name + " → " + model.by_uuid(direction[1]).name }}</h4>
+  {%- for cl in clss | unique(attribute="uuid") -%}
+      {%- if cl.uuid not in multi_dir_clss -%}
+        <h5>{{ cl.name }}</h5>
+        {{ insert_work_item(cl, session) }}
+      {%- endif -%}
+  {%- else -%}
+    <p>There is no data defined for this direction.</p>
+  {%- endfor -%}
+{%- endfor -%}
