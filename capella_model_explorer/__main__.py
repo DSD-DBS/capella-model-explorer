@@ -166,6 +166,21 @@ def _find_exe(name: str) -> str:
 
 @click.group()
 @click.option(
+    "--log-level",
+    envvar="CME_LOG_LEVEL",
+    default="INFO",
+    type=click.Choice(
+        ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
+        case_sensitive=False,
+    ),
+)
+@click.option(
+    "--log-file",
+    envvar="CME_LOG_FILE",
+    type=click.Path(dir_okay=False),
+    help="Log to this file instead of stderr",
+)
+@click.option(
     "--log-config",
     "raw_log_config",
     envvar="CME_LOG_CONFIG",
@@ -173,6 +188,7 @@ def _find_exe(name: str) -> str:
     help=(
         "A JSON-encoded log config dictionary,"
         " as understood by 'logging.config.dictConfig()'."
+        " If passed, other '--log-*' arguments are ignored."
     ),
 )
 @click.pass_context
@@ -180,6 +196,8 @@ def main(
     ctx: click.Context,
     /,
     *,
+    log_level: str,
+    log_file: str | None,
     raw_log_config: str | None,
 ) -> None:
     """Command line interface to control the application."""
@@ -188,6 +206,19 @@ def main(
     if raw_log_config:
         obj["log_config"] = json.loads(raw_log_config)
     else:
+        if not log_file:
+            handler = {
+                "class": "logging.StreamHandler",
+                "stream": "ext://sys.stderr",
+                "formatter": "default",
+            }
+        else:
+            handler = {
+                "class": "logging.FileHandler",
+                "filename": log_file,
+                "formatter": "default",
+            }
+
         obj["log_config"] = {
             "version": 1,
             "formatters": {
@@ -209,15 +240,9 @@ def main(
                     },
                 },
             },
-            "handlers": {
-                "default": {
-                    "class": "logging.StreamHandler",
-                    "stream": "ext://sys.stderr",
-                    "formatter": "default",
-                },
-            },
+            "handlers": {"default": handler},
             "loggers": {
-                "": {"level": "INFO", "handlers": ["default"]},
+                "": {"level": log_level, "handlers": ["default"]},
                 "uvicorn": {"level": "NOTSET", "propagate": True},
                 "uvicorn.error": {"level": "NOTSET", "propagate": True},
                 "uvicorn.access": {"level": "NOTSET", "propagate": True},
