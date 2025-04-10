@@ -4,7 +4,6 @@
 
 from __future__ import annotations
 
-import copy
 import importlib
 import json
 import logging
@@ -23,9 +22,6 @@ import capella_model_explorer.constants as c
 from capella_model_explorer import app
 
 logger = logging.getLogger(__name__)
-
-DEFAULT_LOGCONF = copy.deepcopy(uvicorn.config.LOGGING_CONFIG)
-DEFAULT_LOGCONF["loggers"][""] = DEFAULT_LOGCONF["loggers"].pop("uvicorn")
 
 
 def _install_npm_pkgs() -> None:
@@ -192,7 +188,41 @@ def main(
     if raw_log_config:
         obj["log_config"] = json.loads(raw_log_config)
     else:
-        obj["log_config"] = DEFAULT_LOGCONF
+        obj["log_config"] = {
+            "version": 1,
+            "formatters": {
+                "default": {
+                    "()": "capella_model_explorer.core.Logfmter",
+                    "keys": [
+                        "at",
+                        "logger",
+                        "msg",
+                        "client_addr",
+                        "method",
+                        "path",
+                        "http_version",
+                        "status_code",
+                    ],
+                    "mapping": {
+                        "at": "levelname",
+                        "logger": "name",
+                    },
+                },
+            },
+            "handlers": {
+                "default": {
+                    "class": "logging.StreamHandler",
+                    "stream": "ext://sys.stderr",
+                    "formatter": "default",
+                },
+            },
+            "loggers": {
+                "": {"level": "INFO", "handlers": ["default"]},
+                "uvicorn": {"level": "NOTSET", "propagate": True},
+                "uvicorn.error": {"level": "NOTSET", "propagate": True},
+                "uvicorn.access": {"level": "NOTSET", "propagate": True},
+            },
+        }
 
 
 @main.command()
