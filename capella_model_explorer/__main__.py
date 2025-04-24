@@ -86,9 +86,9 @@ def run_local(*, rebuild: bool, log_config: dict[str, t.Any]) -> None:
         port=c.PORT,
         log_config=log_config,
         reload=c.LIVE_MODE,
-        reload_dirs=str(c.TEMPLATES_DIR),
-        reload_excludes="git_askpass.py",
-        reload_includes="*.j2",
+        reload_dirs=str(c.TEMPLATES_DIR) if c.LIVE_MODE else None,
+        reload_excludes="git_askpass.py" if c.LIVE_MODE else None,
+        reload_includes="*.j2" if c.LIVE_MODE else None,
     )
 
 
