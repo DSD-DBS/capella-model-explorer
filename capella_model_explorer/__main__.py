@@ -5,6 +5,7 @@
 from __future__ import annotations
 
 import importlib
+import json
 import logging
 import os
 import pathlib
@@ -12,15 +13,15 @@ import shlex
 import shutil
 import subprocess
 import time
+import typing as t
 
 import click
 import uvicorn
 
 import capella_model_explorer.constants as c
-from capella_model_explorer import app, core
+from capella_model_explorer import app
 
 logger = logging.getLogger(__name__)
-core.setup_logging(logger)
 
 
 def _install_npm_pkgs() -> None:
@@ -30,7 +31,7 @@ def _install_npm_pkgs() -> None:
     subprocess.check_call(cmd)
 
 
-def run_container() -> None:
+def run_container(*, log_config: dict[str, t.Any]) -> None:
     docker = _find_exe("docker")
     cmd = [
         docker,
@@ -45,6 +46,7 @@ def run_container() -> None:
         f"CME_PORT={c.PORT}",
         "-e",
         f"CME_ROUTE_PREFIX={c.ROUTE_PREFIX}",
+        f"-eCME_LOG_CONFIG={json.dumps(log_config)}",
         "-p",
         f"{c.PORT}:{c.PORT}",
     ]
@@ -69,7 +71,7 @@ def run_container() -> None:
     subprocess.check_call(cmd)
 
 
-def run_local(*, rebuild: bool) -> None:
+def run_local(*, rebuild: bool, log_config: dict[str, t.Any]) -> None:
     """Run the application locally."""
     if not pathlib.Path(c.TEMPLATES_DIR).is_dir():
         raise SystemExit(f"Templates directory not found: {c.TEMPLATES_DIR}")
@@ -82,6 +84,7 @@ def run_local(*, rebuild: bool) -> None:
         app="capella_model_explorer.app:app",
         host=c.HOST,
         port=c.PORT,
+        log_config=log_config,
         reload=c.LIVE_MODE,
         reload_dirs=str(c.TEMPLATES_DIR),
         reload_excludes="git_askpass.py",
@@ -89,7 +92,7 @@ def run_local(*, rebuild: bool) -> None:
     )
 
 
-def run_local_dev() -> None:
+def run_local_dev(*, log_config: dict[str, t.Any]) -> None:
     logger.info("Running the application locally with full reload...")
     if not pathlib.Path(c.TEMPLATES_DIR).is_dir():
         raise SystemExit(f"Templates directory not found: {c.TEMPLATES_DIR}")
@@ -104,6 +107,7 @@ def run_local_dev() -> None:
                 app="capella_model_explorer.app:app",
                 host=c.HOST,
                 port=c.PORT,
+                log_config=log_config,
                 reload=True,
                 reload_dirs=".",
                 reload_excludes=[
@@ -161,8 +165,89 @@ def _find_exe(name: str) -> str:
 
 
 @click.group()
-def main() -> None:
+@click.option(
+    "--log-level",
+    envvar="CME_LOG_LEVEL",
+    default="INFO",
+    type=click.Choice(
+        ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
+        case_sensitive=False,
+    ),
+)
+@click.option(
+    "--log-file",
+    envvar="CME_LOG_FILE",
+    type=click.Path(dir_okay=False),
+    help="Log to this file instead of stderr",
+)
+@click.option(
+    "--log-config",
+    "raw_log_config",
+    envvar="CME_LOG_CONFIG",
+    default=None,
+    help=(
+        "A JSON-encoded log config dictionary,"
+        " as understood by 'logging.config.dictConfig()'."
+        " If passed, other '--log-*' arguments are ignored."
+    ),
+)
+@click.pass_context
+def main(
+    ctx: click.Context,
+    /,
+    *,
+    log_level: str,
+    log_file: str | None,
+    raw_log_config: str | None,
+) -> None:
     """Command line interface to control the application."""
+    obj = ctx.ensure_object(dict)
+
+    if raw_log_config:
+        obj["log_config"] = json.loads(raw_log_config)
+    else:
+        if not log_file:
+            handler = {
+                "class": "logging.StreamHandler",
+                "stream": "ext://sys.stderr",
+                "formatter": "default",
+            }
+        else:
+            handler = {
+                "class": "logging.FileHandler",
+                "filename": log_file,
+                "formatter": "default",
+            }
+
+        obj["log_config"] = {
+            "version": 1,
+            "formatters": {
+                "default": {
+                    "()": "capella_model_explorer.core.Logfmter",
+                    "keys": [
+                        "at",
+                        "logger",
+                        "msg",
+                        "client_addr",
+                        "method",
+                        "path",
+                        "http_version",
+                        "status_code",
+                    ],
+                    "mapping": {
+                        "at": "levelname",
+                        "logger": "name",
+                    },
+                },
+            },
+            "handlers": {"default": handler},
+            "loggers": {
+                "": {"level": log_level, "handlers": ["default"]},
+                "uvicorn": {"level": "NOTSET", "propagate": True},
+                "uvicorn.error": {"level": "NOTSET", "propagate": True},
+                "uvicorn.access": {"level": "NOTSET", "propagate": True},
+            },
+        }
 
 
 @main.command()
@@ -239,7 +324,10 @@ def main() -> None:
     default=False,
     help="Don't rebuild already existing assets.",
 )
+@click.pass_context
 def run(
+    ctx: click.Context,
+    /,
     *,
     container: bool,
     dev: bool,
@@ -266,12 +354,13 @@ def run(
         raise click.UsageError(
             "Options --container and --dev are mutually exclusive."
         )
+
     if container:
-        run_container()
+        run_container(log_config=ctx.obj["log_config"])
     elif dev:
-        run_local_dev()
+        run_local_dev(log_config=ctx.obj["log_config"])
     else:
-        run_local(rebuild=not skip_rebuild)
+        run_local(rebuild=not skip_rebuild, log_config=ctx.obj["log_config"])
 
 
 @main.command()

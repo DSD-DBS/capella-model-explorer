@@ -21,10 +21,9 @@ from fasthtml import common as fh
 from fasthtml import ft
 
 import capella_model_explorer.constants as c
-from capella_model_explorer import components, core, reports, state
+from capella_model_explorer import components, reports, state
 
-logger = logging.getLogger("uvicorn")
-core.setup_logging(logger)
+logger = logging.getLogger(__name__)
 
 
 @contextlib.asynccontextmanager

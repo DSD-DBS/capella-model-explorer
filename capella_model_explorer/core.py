@@ -4,11 +4,15 @@
 from __future__ import annotations
 
 import base64
+import contextlib
+import copy
 import hashlib
 import logging
 import pathlib
 
-import capella_model_explorer.constants as c
+import logfmter
+
+ACCESS_LOGGER = "uvicorn.access"
 
 
 def compute_file_hash(file_path: str):
@@ -22,37 +26,23 @@ def compute_file_hash(file_path: str):
     return base64.urlsafe_b64encode(hasher.digest()).decode("utf-8")
 
 
-class ColoredFormatter(logging.Formatter):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+class Logfmter(logfmter.Logfmter):
+    def format(self, record: logging.LogRecord) -> str:
+        record = copy.deepcopy(record)
 
-    def format(self, record):
-        reset_seq = "\033[0m"
-        levelname = record.levelname
-        msg = record.msg
-        if levelname in c.LOGGING_COLORS:
-            levelname_colored = (
-                f"{c.LOGGING_COLORS[levelname]}{levelname:8}{reset_seq}"
-            )
-            msg_color = c.LOGGING_COLORS[levelname] + msg + reset_seq
-        else:
-            levelname_colored = levelname
-            msg_color = msg
-        record.levelname = levelname_colored
-        record.msg = msg_color
+        if record.name == ACCESS_LOGGER:
+            assert record.args is not None
+            (
+                record.client_addr,
+                record.method,
+                record.path,
+                record.http_version,
+                record.status_code,
+            ) = record.args
+            record.msg = "Request completed"
+            record.args = ()
+
+        with contextlib.suppress(AttributeError):
+            del record.color_message  # type: ignore[attr-defined]
+
         return super().format(record)
-
-
-def setup_logging(logger: logging.Logger):
-    logger.setLevel("INFO")
-    formatter = ColoredFormatter(
-        "%(asctime)s.%(msecs)03d|%(levelname)-8s | %(message)s",
-        datefmt="%Y-%m-%d|%H:%M:%S",
-    )
-    if not logger.hasHandlers():
-        console_handler = logging.StreamHandler()
-        console_handler.setFormatter(formatter)
-        logger.addHandler(console_handler)
-    else:
-        for handler in logger.handlers:
-            handler.setFormatter(formatter)
