@@ -130,7 +130,7 @@ def breadcrumbs(
         ),
         id="breadcrumbs",
         aria_label="Breadcrumb",
-        cls="flex",
+        cls="flex grow",
         **({"hx_swap_oob": "true"} if oob else {}),
     )
 
@@ -262,6 +262,14 @@ def page_header() -> ft.Nav:
             title="Print report",
             cls="hidden hover:cursor-pointer",
         ),
+        ft.Button(
+            icons.theme_system(id="dark-mode-icon-system"),
+            icons.theme_dark(id="dark-mode-icon-dark", cls=("hidden",)),
+            icons.theme_light(id="dark-mode-icon-light", cls=("hidden",)),
+            id="dark-mode-button",
+            title="Toggle dark mode",
+            cls="cursor-pointer",
+        ),
         id="page-header",
         cls=(
             "bg-primary-500",
@@ -269,8 +277,8 @@ def page_header() -> ft.Nav:
             "dark:border-b",
             "dark:border-neutral-700",
             "flex",
+            "gap-2",
             "h-12",
-            "justify-between",
             "min-h-12",
             "max-h-12",
             "px-4",

@@ -22,6 +22,8 @@
   --color-primary-950: hsl(var(--primary-color-hue) 46.2% 5.1%);
 }
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @source './*.css';
 
 .template-container ul > li > a > img,
