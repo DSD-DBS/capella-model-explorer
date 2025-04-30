@@ -1,15 +1,11 @@
 # Copyright DB InfraGO AG and contributors
 # SPDX-License-Identifier: Apache-2.0
 
-import logging
 import time
 
 from starlette import testclient
 
 from capella_model_explorer import app
-
-logger = logging.getLogger(__name__)
-logger.setLevel("INFO")
 
 
 def _idle_time_minutes(text: str) -> float:
