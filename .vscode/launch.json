@@ -1,0 +1,15 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run with default settings",
+      "type": "debugpy",
+      "request": "launch",
+      "console": "integratedTerminal",
+      "module": "capella_model_explorer",
+      "args": [
+        "run"
+      ]
+    }
+  ]
+}
