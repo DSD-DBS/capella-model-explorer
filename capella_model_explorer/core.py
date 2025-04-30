@@ -28,7 +28,7 @@ def compute_file_hash(file_path: str):
 
 class Logfmter(logfmter.Logfmter):
     def format(self, record: logging.LogRecord) -> str:
-        record = copy.deepcopy(record)
+        record = copy.copy(record)
 
         if record.name == ACCESS_LOGGER:
             assert record.args is not None
