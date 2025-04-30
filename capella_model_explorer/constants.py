@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import dataclasses
+import importlib.resources as imr
 import pathlib
 import sys
 import typing as t
@@ -62,9 +63,6 @@ favicon_hash = core.compute_file_hash(favicon_path)
 main_css_path = "static/css/main.min.css"
 main_css_hash = core.compute_file_hash(main_css_path)
 
-theme_path = "static/js/theme.js"
-theme_hash = core.compute_file_hash(theme_path)
-
 HEADERS: t.Final[list[fh.Link | ft.Script]] = [
     fh.HighlightJS(langs=["python"]),
     fh.Link(
@@ -86,8 +84,7 @@ HEADERS: t.Final[list[fh.Link | ft.Script]] = [
         src=f"{ROUTE_PREFIX}/static/js/plotly-3.0.0.min.js",
     ),
     ft.Script(
-        charset="utf-8",
-        src=f"{ROUTE_PREFIX}/{theme_path}?v={theme_hash}",
+        imr.read_text(__name__.rsplit(".", 1)[0], "inline-dark-mode.js")
     ),
     ft.Style(f":root {{ --primary-color-hue: {PRIMARY_COLOR_HUE}; }}"),
 ]
