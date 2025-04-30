@@ -16,7 +16,6 @@ import jinja2
 import prometheus_client
 import starlette
 import starlette.middleware
-import starlette.responses
 from fasthtml import common as fh
 from fasthtml import ft
 
