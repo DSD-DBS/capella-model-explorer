@@ -46,3 +46,10 @@ class Logfmter(logfmter.Logfmter):
             del record.color_message  # type: ignore[attr-defined]
 
         return super().format(record)
+
+
+class SuppressWebsocketNoise(logging.Filter):
+    def filter(self, record: logging.LogRecord) -> bool:
+        return not (
+            record.name == "uvicorn.error" and hasattr(record, "websocket")
+        )

@@ -211,12 +211,14 @@ def main(
                 "class": "logging.StreamHandler",
                 "stream": "ext://sys.stderr",
                 "formatter": "default",
+                "filters": ["denoise"],
             }
         else:
             handler = {
                 "class": "logging.FileHandler",
                 "filename": log_file,
                 "formatter": "default",
+                "filters": ["denoise"],
             }
 
         obj["log_config"] = {
@@ -239,6 +241,11 @@ def main(
                         "logger": "name",
                     },
                 },
+            },
+            "filters": {
+                "denoise": {
+                    "()": "capella_model_explorer.core.SuppressWebsocketNoise",
+                }
             },
             "handlers": {"default": handler},
             "loggers": {
