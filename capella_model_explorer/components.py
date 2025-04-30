@@ -669,20 +669,3 @@ def template_sidebar(
             "space-y-4",
         ),
     )
-
-
-def theme_button(theme: t.Literal["dark", "light"]) -> ft.Button:
-    return ft.Button(
-        icons.dark_theme() if theme == "dark" else icons.light_theme(),
-        id="theme-button",
-        cls=(
-            "bg-neutral-200",
-            "h-10",
-            "hover:bg-neutral-100",
-            "place-content-center",
-            "place-items-center",
-            "rounded-full",
-            "w-10",
-        ),
-        onclick="toggleTheme()",
-    )

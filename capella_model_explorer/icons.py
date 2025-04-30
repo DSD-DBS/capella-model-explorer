@@ -3,8 +3,6 @@
 
 from __future__ import annotations
 
-import typing as t
-
 from fasthtml import svg
 
 
@@ -141,70 +139,6 @@ def file_stack() -> svg.Svg:
         stroke_width="2",
         stroke_linecap="round",
         stroke_linejoin="round",
-    )
-
-
-def lock_icon(state: t.Literal["open", "closed"]) -> svg.Svg:
-    if state == "open":
-        d = (
-            "M13.5 10.5V6.75a4.5 4.5 0 1 1 9 0v3.75M3.75 21.75h10.5a2.25 2.25"
-            " 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H3.75a2.25 2.25"
-            " 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"
-        )
-    else:
-        d = (
-            "M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75"
-            " 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25"
-            " 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25"
-            " 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"
-        )
-    return svg.Svg(
-        svg.Path(
-            d=d,
-            clip_rule="evenodd",
-            stroke_linecap="round",
-            stroke_linejoin="round",
-        ),
-        viewbox="0 0 24 24",
-        fill="none",
-        stroke="currentColor",
-        cls="size-6 flex-none text-neutral-400 stroke-2",
-    )
-
-
-def dark_theme() -> svg.Svg:
-    return svg.Svg(
-        svg.Path(
-            d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z",
-        ),
-        width="24",
-        height="24",
-        viewBox="0 0 24 24",
-        stroke_width="2",
-        stroke_linecap="round",
-        stroke_linejoin="round",
-        cls="stroke-blue-500 fill-none",
-    )
-
-
-def light_theme() -> svg.Svg:
-    return svg.Svg(
-        svg.Circle(cx="12", cy="12", r="4"),
-        svg.Path(d="M12 2v2"),
-        svg.Path(d="M12 20v2"),
-        svg.Path(d="m4.93 4.93 1.41 1.41"),
-        svg.Path(d="m17.66 17.66 1.41 1.41"),
-        svg.Path(d="M2 12h2"),
-        svg.Path(d="M20 12h2"),
-        svg.Path(d="m6.34 17.66-1.41 1.41"),
-        svg.Path(d="m19.07 4.93-1.41 1.41"),
-        width="24",
-        height="24",
-        viewBox="0 0 24 24",
-        stroke_width="2",
-        stroke_linecap="round",
-        stroke_linejoin="round",
-        cls="stroke-blue-500 fill-none",
     )
 
 
