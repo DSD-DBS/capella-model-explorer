@@ -223,6 +223,7 @@ def main(
 
         obj["log_config"] = {
             "version": 1,
+            "disable_existing_loggers": False,
             "formatters": {
                 "default": {
                     "()": "capella_model_explorer.core.Logfmter",
