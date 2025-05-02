@@ -166,6 +166,12 @@ def _find_exe(name: str) -> str:
 
 @click.group()
 @click.option(
+    "--log-logfmt / --log-no-logfmt",
+    envvar="CME_LOGFMT",
+    default=True,
+    help="Use the logfmt output format for logging",
+)
+@click.option(
     "--log-level",
     envvar="CME_LOG_LEVEL",
     default="INFO",
@@ -196,6 +202,7 @@ def main(
     ctx: click.Context,
     /,
     *,
+    log_logfmt: bool,
     log_level: str,
     log_file: str | None,
     raw_log_config: str | None,
@@ -221,28 +228,33 @@ def main(
                 "filters": ["denoise"],
             }
 
+        if log_logfmt:
+            formatter = {
+                "()": "capella_model_explorer.core.Logfmter",
+                "keys": [
+                    "at",
+                    "logger",
+                    "msg",
+                    "client_addr",
+                    "method",
+                    "path",
+                    "http_version",
+                    "status_code",
+                ],
+                "mapping": {
+                    "at": "levelname",
+                    "logger": "name",
+                },
+            }
+        else:
+            formatter = {
+                "format": "%(asctime)s.%(msecs)03d <%(name)s> %(levelname)s: %(message)s",
+            }
+
         obj["log_config"] = {
             "version": 1,
             "disable_existing_loggers": False,
-            "formatters": {
-                "default": {
-                    "()": "capella_model_explorer.core.Logfmter",
-                    "keys": [
-                        "at",
-                        "logger",
-                        "msg",
-                        "client_addr",
-                        "method",
-                        "path",
-                        "http_version",
-                        "status_code",
-                    ],
-                    "mapping": {
-                        "at": "levelname",
-                        "logger": "name",
-                    },
-                },
-            },
+            "formatters": {"default": formatter},
             "filters": {
                 "denoise": {
                     "()": "capella_model_explorer.core.SuppressWebsocketNoise",
