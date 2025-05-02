@@ -15,10 +15,9 @@ import jinja2
 import markupsafe
 import pydantic as p
 import yaml
-from fasthtml import ft
 
 import capella_model_explorer.constants as c
-from capella_model_explorer import app, components, icons, state
+from capella_model_explorer import app, state
 
 SVG_WRAP_MARKUP = markupsafe.Markup(
     '<div class="svg-container relative inline-block cursor-pointer hover:opacity-[.5]"'
@@ -159,38 +158,6 @@ class TemplateCategory(p.BaseModel):
     templates: list[Template] = p.Field(
         default_factory=list, title="Templates in this category"
     )
-
-
-def home() -> tuple[ft.Title, ft.Main]:
-    """Show reports home/ landing page with all reports in categories."""
-    page_content = (
-        ft.Main(
-            ft.Div(
-                components.model_information(),
-                components.reports_page(),
-                cls="flex flex-col space-y-4 place-items-center mb-4",
-            ),
-            ft.Div(
-                ft.A(
-                    ft.Div("Contribute on GitHub"),
-                    icons.github_logo(),
-                    href="https://github.com/DSD-DBS/capella-model-explorer",
-                    target="_blank",
-                    cls=(
-                        "dark:text-gray-300",
-                        "flex",
-                        "hover:underline",
-                        "max-w-fit",
-                        "place-items-center",
-                        "space-x-2",
-                    ),
-                ),
-                cls="w-full pl-8 h-8 py-2 my-8",
-            ),
-            cls="grow w-full overflow-y-auto place-items-center",
-        ),
-    )
-    return components.application_shell(page_content)
 
 
 def template_by_id(id_: str) -> Template | None:

@@ -20,7 +20,7 @@ from fasthtml import common as fh
 from fasthtml import ft
 
 import capella_model_explorer.constants as c
-from capella_model_explorer import components, reports, state
+from capella_model_explorer import components, icons, reports, state
 
 logger = logging.getLogger(__name__)
 
@@ -87,16 +87,40 @@ def metrics() -> t.Any:
 
 
 @app.get("/")
-def prefix_redirect() -> t.Any:
+def prefix_redirect(request) -> t.Any:
     if c.ROUTE_PREFIX:
         return fh.RedirectResponse(url=app.url_path_for("main_home"))
-    return home()
+    return home(request)
 
 
 @ar.get("/", name="main_home")
-def home() -> t.Any:
+def home(request) -> t.Any:
     """Show home/ landing page with all reports in categories."""
-    return reports.home()
+    page_content = (
+        ft.Div(
+            components.model_information(),
+            components.reports_page(),
+            cls="flex flex-col space-y-4 place-items-center mx-auto mb-4",
+        ),
+        ft.Div(
+            ft.A(
+                ft.Div("Contribute on GitHub"),
+                icons.github_logo(),
+                href="https://github.com/DSD-DBS/capella-model-explorer",
+                target="_blank",
+                cls=(
+                    "dark:text-gray-300",
+                    "flex",
+                    "hover:underline",
+                    "max-w-fit",
+                    "place-items-center",
+                    "space-x-2",
+                ),
+            ),
+            cls="w-full pl-8 h-8 py-2 mx-auto my-8",
+        ),
+    )
+    return _maybe_wrap_content(request, None, None, page_content)
 
 
 @ar.get("/model-object-list")
@@ -108,7 +132,7 @@ def model_object_list(
     assert template is not None
     return components.model_elements_list(
         template=template,
-        selected_model_element_uuid=selected_model_element_uuid,
+        selected_id=selected_model_element_uuid,
         search=search,
     )
 
@@ -137,25 +161,21 @@ def rendered_report(template_id: str, model_element_uuid: str = "") -> t.Any:
     except Exception:
         full_traceback = traceback.format_exc()
         print(full_traceback)
-        return components.template_container(
-            ft.Div(
-                ft.Div("Error rendering template:", cls="text-xl"),
-                fh.Pre(
-                    full_traceback,
-                    cls="text-xs prose dark:prose-invert",
-                ),
-                cls="dark:text-neutral-100 grow content-center",
-            )
-        )
-    content = components.template_container(
-        ft.Div(
-            fh.NotStr(rendered_template),
-            ft.Script(
-                "document.getElementById('root').classList.remove('h-screen');"
-                "document.getElementById('print-button').classList.remove('hidden');"
+        return ft.Div(
+            ft.Div("Error rendering template:", cls="text-xl"),
+            fh.Pre(
+                full_traceback,
+                cls="text-xs prose dark:prose-invert",
             ),
-            cls="prose svg-display dark:prose-invert",
+            cls="dark:text-neutral-100 grow content-center",
         )
+    content = ft.Div(
+        fh.NotStr(rendered_template),
+        ft.Script(
+            "document.getElementById('root').classList.remove('h-screen');"
+            "document.getElementById('print-button').classList.remove('hidden');"
+        ),
+        cls="prose svg-display dark:prose-invert",
     )
     max_age = 31536000 if state.model.info.resources["\x00"].rev_hash else 0
     return (
@@ -167,93 +187,73 @@ def rendered_report(template_id: str, model_element_uuid: str = "") -> t.Any:
 
 @ar.get("/template/{template_id}")
 @ar.get("/report/{template_id}/{model_element_uuid}")
-def template_page(template_id: str, model_element_uuid: str = "") -> t.Any:
+def template_page(
+    request: starlette.requests.Request,
+    template_id: str,
+    model_element_uuid: str | None = None,
+) -> t.Any:
     template = reports.template_by_id(template_id)
     if template is None:
         template_path = pathlib.Path(template_id.replace("|", "/"))
-        return components.application_shell(
-            ft.Div(
-                ft.Div("Template not found:", cls="text-xl"),
-                fh.Code(template_path),
-                cls="dark:text-neutral-100 grow content-center",
-            )
+        content = ft.Div(
+            ft.Div("Template not found:", cls="text-xl"),
+            fh.Code(template_path),
+            cls="dark:text-neutral-100 grow content-center",
         )
-    report = ft.Span(
-        "Select a model element.",
-        cls="text-slate-600 dark:text-slate-500 p-4 italic",
-    )
-    script = "document.getElementById('root').classList.add('h-screen');\n"
-    if template.instances and template.instance_count == 1:
+        return _maybe_wrap_content(request, None, None, content)
+
+    if template.single:
+        placeholder = components.report_placeholder(template, None)
+    elif model_element_uuid:
+        placeholder = components.report_placeholder(
+            template, model_element_uuid
+        )
+    elif len(template.instances) == 1:
         model_element_uuid = template.instances[0]["uuid"]
-        report = components.report_loader(template_id, model_element_uuid)
-    elif template.single:
-        # request rendering of template w/o specific model element
-        url = render_template.to(
-            template_id=template.id, model_element_uuid=""
+        placeholder = components.report_placeholder(
+            template, model_element_uuid
         )
-        if model_element_uuid:
-            # request rendering of template with specified model element
-            url = render_template.to(
-                template_id=template.id,
-                model_element_uuid=model_element_uuid,
-            )
-        ctxt = "{swap:'outerHTML', target:'#template_container'}"
-        script += f"htmx.ajax('GET', '{url}', {ctxt});"
-    if (
-        not model_element_uuid
-        and not template.single
-        and template.instance_count == 1
-    ):
-        # when there is only one element in the model element, select it
-        model_element_uuid = template.instances[0]["uuid"]
-    if not template.single:
-        script += (
-            pathlib.Path("static/js/select-model-element-by-uuid.js")
-            .read_text(encoding="utf8")
-            .replace("{uuid}", model_element_uuid)
-        )
-    page_content = (
-        ft.Div(
-            ft.Div(
-                components.template_sidebar(
-                    template=template,
-                    selected_model_element_uuid=model_element_uuid,
-                ),
-                id="template-sidebar",
-                cls="fixed min-w-96 w-96 p-4 print:hidden",
-            ),
-            ft.Div(
-                report,
-                id="template_container",
-                cls=(
-                    "bg-white",
-                    "border",
-                    "border-neutral-200",
-                    "dark:bg-neutral-800",
-                    "dark:border-neutral-700",
-                    "dark:shadow-neutral-700",
-                    "dark:shadow-md",
-                    "flex",
-                    "grow",
-                    "m-4",
-                    "ml-96",
-                    "rounded-lg",
-                    "items-center",
-                    "justify-center",
-                    "shadow-blue-300",
-                    "shadow-md",
-                ),
-            ),
-            ft.Script(script),
-            id="template-page-content",
-            cls=("flex", "flex-row", "w-full", "h-full", "print:bg-white"),
+    else:
+        placeholder = components.report_placeholder(None, None)
+
+    page_content = ft.Div(
+        components.template_sidebar(
+            template=template,
+            selected_model_element_uuid=model_element_uuid,
+        ),
+        components.template_container(placeholder),
+        id="template-page-content",
+        cls=(
+            "flex",
+            "min-h-full",
+            "print:bg-white",
+            "print:min-h-auto",
+            "w-full",
         ),
     )
-    return components.application_shell(page_content, "left")
+    return _maybe_wrap_content(
+        request, template, model_element_uuid, page_content
+    )
+
+
+def _maybe_wrap_content(
+    request: starlette.requests.Request,
+    template: reports.Template | None,
+    element: str | None,
+    content: t.Any,
+) -> t.Any:
+    if request.headers.get("HX-Request") == "true":
+        return content, components.breadcrumbs(template, element, oob=True)
+    return components.application_shell(
+        content, template=template, element=element
+    )
 
 
 @ar.get("/render")
-def render_template(template_id: str, model_element_uuid: str = "") -> t.Any:
+def render_template(
+    template_id: str,
+    model_element_uuid: str | None = None,
+) -> t.Any:
     """Request the rendering of a template.
 
     Returns a template container with loading spinner that itself (htmx)
@@ -261,12 +261,9 @@ def render_template(template_id: str, model_element_uuid: str = "") -> t.Any:
     template.
     """
     template = reports.template_by_id(template_id)
-    return components.template_container(
-        components.report_loader(template_id, model_element_uuid)
-    ), components.breadcrumbs(
-        template=template,
-        model_element_uuid=model_element_uuid,
-        oob=True,
+    return (
+        components.report_placeholder(template, model_element_uuid),
+        components.breadcrumbs(template, model_element_uuid, oob=True),
     )
 
 
