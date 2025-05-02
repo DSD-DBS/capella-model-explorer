@@ -32,6 +32,8 @@ class Defaults:
     templates_dir: t.Final[pathlib.Path] = pathlib.Path("templates")
 
 
+DEBUG_SPINNER = CONFIG("DEBUG_SPINNER", cast=bool, default=False)
+
 DOCKER_IMAGE_NAME: str = CONFIG(
     "DOCKER_IMAGE_NAME", default=Defaults.docker_image_name
 )
