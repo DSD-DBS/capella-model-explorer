@@ -225,6 +225,9 @@ def template_page(
         id="template-page-content",
         cls=(
             "flex",
+            "flex-col-reverse",
+            "justify-between",
+            "lg:flex-row",
             "min-h-full",
             "print:bg-white",
             "print:min-h-auto",
