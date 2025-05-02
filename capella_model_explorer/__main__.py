@@ -286,6 +286,7 @@ def main(
     " This option cannot be used together with --container.",
 )
 @click.option(
+    "-h",
     "--host",
     envvar="CME_HOST",
     default=c.Defaults.host,
@@ -294,6 +295,7 @@ def main(
     " Ignored when running with '--container'.",
 )
 @click.option(
+    "-p",
     "--port",
     envvar="CME_PORT",
     default=c.Defaults.port,
@@ -301,6 +303,7 @@ def main(
     help="The port to listen on.",
 )
 @click.option(
+    "-m",
     "--model",
     envvar="CME_MODEL",
     default=c.Defaults.model,
@@ -308,6 +311,7 @@ def main(
     help="The Capella model to load (file, URL or JSON string).",
 )
 @click.option(
+    "-t",
     "--templates-dir",
     envvar="CME_TEMPLATES_DIR",
     default=str(c.Defaults.templates_dir.resolve()),
