@@ -237,7 +237,7 @@ def model_elements_list(
                 )
                 for model_element in model_elements
             ),
-            cls="flex flex-col space-y-4 px-2 my-2",
+            cls="flex flex-col space-y-4 pl-2 pr-4 my-2",
         ),
         ft.Script(
             pathlib.Path("static/js/model_object_list.js").read_text(
@@ -382,7 +382,6 @@ def search_field(template: reports.Template, search: str) -> ft.Div:
                 "focus:outline-2",
                 "focus:outline-primary-500",
                 "grow",
-                "mx-2",
                 "outline",
                 "outline-1",
                 "outline-neutral-300",
@@ -409,6 +408,8 @@ def search_field(template: reports.Template, search: str) -> ft.Div:
             else "",
             "grid",
             "grid-cols-1",
+            "pl-2",
+            "pr-4",
         ),
     )
 
@@ -673,8 +674,9 @@ def template_sidebar(
             "flex-col",
             "h-full",
             "lg:w-96",
-            "p-4",
+            "pl-4",
             "print:hidden",
+            "py-4",
             "rounded-lg",
             "space-y-4",
             "sticky",
