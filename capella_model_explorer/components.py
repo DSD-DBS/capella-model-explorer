@@ -3,13 +3,13 @@
 
 from __future__ import annotations
 
+import base64
 import json
 import pathlib
 import typing as t
 
 import capellambse
 import capellambse_context_diagrams
-from fasthtml import common as fh
 from fasthtml import ft, svg
 
 import capella_model_explorer
@@ -136,13 +136,18 @@ def breadcrumbs(
 
 def model_information() -> ft.Div:
     """Render the model information including the badge."""
+    badge = "data:image/svg+xml;base64," + base64.standard_b64encode(
+        state.model.description_badge.encode("utf-8")
+    ).decode("ascii")
     return ft.Div(
         ft.H1(state.model.name, cls="text-xl"),
         ft.P(
             f"Capella version: {state.model.info.capella_version}",
         ),
-        ft.Div(
-            fh.NotStr(state.model.description_badge),
+        ft.Img(
+            src=badge,
+            alt="Model description badge",
+            cls="object-scale-down",
         ),
         cls=(
             "bg-white",
