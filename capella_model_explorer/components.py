@@ -151,7 +151,7 @@ def model_information() -> ft.Div:
             "dark:text-neutral-400",
             "flex",
             "flex-col",
-            "max-w-min",
+            "max-w-full",
             "m-2",
             "mt-4",
             "p-4",
@@ -245,7 +245,7 @@ def model_elements_list(
             )
         ),
         id="model_object_list",
-        cls="overflow-auto max-h-[calc(100vh-20rem)]",
+        cls="overflow-auto grow",
     )
 
 
@@ -673,7 +673,9 @@ def template_sidebar(
             "flex",
             "flex-col",
             "h-full",
+            "lg:max-h-[calc(100vh-12*var(--spacing))]",
             "lg:w-96",
+            "max-h-[calc(0.85*(100vh-12*var(--spacing)))]",
             "pl-4",
             "print:hidden",
             "py-4",
