@@ -9,7 +9,6 @@ import typing as t
 
 import capellambse
 import capellambse_context_diagrams
-import pydantic
 from fasthtml import common as fh
 from fasthtml import ft, svg
 
@@ -17,23 +16,26 @@ import capella_model_explorer
 from capella_model_explorer import app, core, icons, reports, state
 
 
-class _Breadcrumb(pydantic.BaseModel):
-    label: str
-    url: str
-
-
 def application_shell(
-    content: ft.Div,
-    align: t.Literal["left", "center", "right"] = "center",
+    *content: t.Any,
+    template: reports.Template | None,
+    element: str | None,
 ) -> tuple[ft.Title, ft.Main]:
     return (
         ft.Title(f"{state.model.name} - Model Explorer"),
-        ft.Main(
-            page_header(),
-            content,
+        ft.Div(
+            navbar(template, element),
+            ft.Main(
+                *content,
+                id="root",
+                cls=(
+                    "grow",
+                    "w-full",
+                    "overflow-y-auto",
+                ),
+            ),
             # placeholder for script injection per outerHTML swap
             ft.Script(id="script"),
-            id="root",
             cls=(
                 "bg-neutral-100",
                 "dark:bg-neutral-900",
@@ -41,13 +43,14 @@ def application_shell(
                 "flex-col",
                 "h-screen",
                 "min-h-screen",
-                f"place-items-{align}",
+                "print:h-auto",
+                "print:min-h-auto",
             ),
         ),
     )
 
 
-def breadcrumb(breadcrumb: _Breadcrumb) -> ft.Li:
+def breadcrumb(*, label: str, url: str) -> ft.Li:
     return (
         ft.Li(
             ft.Div(
@@ -59,8 +62,8 @@ def breadcrumb(breadcrumb: _Breadcrumb) -> ft.Li:
                     cls="h-full w-6 stroke-1 stroke-primary-400 dark:stroke-neutral-700",
                 ),
                 ft.A(
-                    breadcrumb.label,
-                    href=breadcrumb.url,
+                    label,
+                    href=url,
                     cls=(
                         "dark:hover:text-neutral-100",
                         "dark:text-neutral-400",
@@ -79,56 +82,48 @@ def breadcrumb(breadcrumb: _Breadcrumb) -> ft.Li:
 
 
 def breadcrumbs(
-    *,
     template: reports.Template | None = None,
-    model_element_uuid: str = "",
+    element_id: str | None = None,
+    /,
+    *,
     oob: bool = False,
 ) -> ft.Nav:
-    breadcrumbs_ = []
-    if template:
-        breadcrumbs_ = [
-            _Breadcrumb(
-                label=template.name,
-                url=app.app.url_path_for(
-                    "template_page", template_id=template.id
-                ),
-            ),
-        ]
-        if model_element_uuid:
-            model_element = state.model.by_uuid(model_element_uuid)
-            if model_element:
-                breadcrumbs_.append(
-                    _Breadcrumb(
-                        label=model_element.name,
-                        url=app.app.url_path_for(
-                            "template_page",
-                            template_id=template.id,
-                            model_element_uuid=model_element_uuid,
-                        ),
-                    )
-                )
+    components = []
 
-    home_item = (
-        ft.Li(
-            ft.Div(
-                ft.A(
-                    icons.home(),
-                    ft.Span("Home", cls="sr-only"),
-                    href=app.app.url_path_for("main_home"),
-                    hx_get=app.app.url_path_for("main_home"),
-                    hx_swap="outerHTML",
-                    hx_target="#root",
-                    hx_push_url="true",
+    if template is not None:
+        components.append(
+            ft.Li(
+                ft.Div(
+                    ft.A(
+                        icons.home(),
+                        ft.Span("Home", cls="sr-only"),
+                        href=app.app.url_path_for("main_home"),
+                        hx_get=app.app.url_path_for("main_home"),
+                        hx_target="#root",
+                        hx_push_url="true",
+                    ),
+                    cls="flex items-center",
                 ),
-                cls="flex items-center",
-            ),
-            cls="flex",
-        ),
-    )
+                cls="flex",
+            )
+        )
+
+        url = app.app.url_path_for("template_page", template_id=template.id)
+        components.append(breadcrumb(label=template.name, url=url))
+
+    if element_id is not None:
+        assert template is not None, "Model element passed without template"
+        element = state.model.by_uuid(element_id)
+        url = app.app.url_path_for(
+            "template_page",
+            template_id=template.id,
+            model_element_uuid=element_id,
+        )
+        components.append(breadcrumb(label=element.name, url=url))
+
     return ft.Nav(
         ft.Ol(
-            home_item,
-            *(breadcrumb(b) for b in breadcrumbs_),
+            *components,
             role="list",
             cls="flex space-x-4 rounded-md px-6",
         ),
@@ -216,7 +211,6 @@ def model_object_button(
             template_id=template.id,
             model_element_uuid=model_element["uuid"],
         ),
-        hx_swap="outerHTML",
         hx_target="#template_container",
     )
 
@@ -224,7 +218,7 @@ def model_object_button(
 def model_elements_list(
     *,
     template: reports.Template,
-    selected_model_element_uuid: str = "",
+    selected_id: str | None,
     search: str = "",
 ) -> ft.Div:
     search_words = search.lower().split()
@@ -239,12 +233,11 @@ def model_elements_list(
                 model_object_button(
                     template=template,
                     model_element=model_element,
-                    selected=model_element["uuid"]
-                    == selected_model_element_uuid,
+                    selected=model_element["uuid"] == selected_id,
                 )
                 for model_element in model_elements
             ),
-            cls="flex flex-col space-y-4 px-2 my-2",
+            cls="flex flex-col space-y-4 pl-2 pr-4 my-2",
         ),
         ft.Script(
             pathlib.Path("static/js/model_object_list.js").read_text(
@@ -256,9 +249,9 @@ def model_elements_list(
     )
 
 
-def page_header() -> ft.Nav:
+def navbar(template: reports.Template | None, element: str | None) -> ft.Nav:
     return ft.Nav(
-        breadcrumbs(),
+        breadcrumbs(template, element),
         ft.Button(
             icons.printer(),
             onclick="window.print();",
@@ -296,53 +289,54 @@ def page_header() -> ft.Nav:
     )
 
 
-def report_loader(
-    template_id: str,
-    model_element_uuid: str = "",
+def report_placeholder(
+    template: reports.Template | None,
+    model_element_uuid: str | None,
 ) -> t.Any:
-    template = reports.template_by_id(template_id)
-    assert template is not None
-    model_revision = state.model.info.resources["\x00"].rev_hash
-    if model_revision:
-        render_environment = json.dumps(
-            {
-                "model-explorer-version": capella_model_explorer.__version__,
-                "capellambse-version": capellambse.__version__,
-                "ctx-diags-version": capellambse_context_diagrams.__version__,
-                "template-hash": core.compute_file_hash(str(template.path)),
-                "model-revision": state.model.info.resources["\x00"].rev_hash,
-            }
+    if template is None:
+        ph_content = ft.Div(
+            ft.Span(
+                "Select a model element.",
+                cls="text-slate-600 dark:text-slate-500 p-4 italic m-auto",
+            ),
+            cls="flex justify-center place-items-center h-full w-full",
         )
-        hx_headers = json.dumps({"Render-Environment": render_environment})
+
     else:
-        hx_headers = None
-    return ft.Div(
-        icons.spinner(),
-        ft.Script(
-            "document.getElementById('root').classList.add('h-screen');"
-            "document.getElementById('print-button').classList.add('hidden');"
-        ),
-        cls=(
-            "h-full",
-            "justify-center",
-            "place-content-center",
-            "place-items-center",
-            "w-full",
-        ),
-        hx_trigger="load",
-        hx_get=app.rendered_report.to(
-            template_id=template_id,
-            model_element_uuid=model_element_uuid,
-        ),
-        hx_headers=hx_headers,
-        hx_push_url=app.app.url_path_for(
-            "template_page",
-            template_id=template_id,
-            model_element_uuid=model_element_uuid,
-        ),
-        hx_swap="outerHTML",
-        hx_target="#template_container",
-    )
+        if model_revision := state.model.info.resources["\x00"].rev_hash:
+            render_environment = json.dumps(
+                {
+                    "model-explorer-version": capella_model_explorer.__version__,
+                    "capellambse-version": capellambse.__version__,
+                    "ctx-diags-version": capellambse_context_diagrams.__version__,
+                    "template-hash": core.compute_file_hash(
+                        str(template.path)
+                    ),
+                    "model-revision": model_revision,
+                }
+            )
+            hx_headers = json.dumps({"Render-Environment": render_environment})
+        else:
+            hx_headers = None
+
+        ph_content = ft.Div(
+            icons.spinner(),
+            hx_trigger="load",
+            hx_get=app.rendered_report.to(
+                template_id=template.id,
+                model_element_uuid=model_element_uuid,
+            ),
+            hx_headers=hx_headers,
+            hx_push_url=app.app.url_path_for(
+                "template_page",
+                template_id=template.id,
+                model_element_uuid=model_element_uuid,
+            ),
+            hx_target="#template_container",
+            cls="flex justify-center place-items-center h-full w-full",
+        )
+
+    return ph_content
 
 
 def reports_page() -> ft.Div:
@@ -388,7 +382,6 @@ def search_field(template: reports.Template, search: str) -> ft.Div:
                 "focus:outline-2",
                 "focus:outline-primary-500",
                 "grow",
-                "mx-2",
                 "outline",
                 "outline-1",
                 "outline-neutral-300",
@@ -415,6 +408,8 @@ def search_field(template: reports.Template, search: str) -> ft.Div:
             else "",
             "grid",
             "grid-cols-1",
+            "pl-2",
+            "pr-4",
         ),
     )
 
@@ -570,7 +565,6 @@ def template_card(template: reports.Template) -> ft.A:
         ),
         href=url,
         hx_get=url,
-        hx_swap="outerHTML",
         hx_target="#root",
         hx_push_url="true",
     )
@@ -626,14 +620,14 @@ def template_container(content: t.Any) -> ft.Div:
         cls=(
             "bg-white",
             "dark:bg-neutral-800",
-            "dark:border-l",
+            "dark:border-b",
+            "dark:lg:border-l",
             "dark:border-neutral-700",
             "dark:shadow-neutral-700",
+            "min-h-full",
             "html-content",  # copied from v0.2.3
             "items-center",
             "justify-center",
-            "ml-96",
-            "overflow-x-auto",
             "p-4",
             "print:bg-white",
             "print:m-0",
@@ -649,7 +643,7 @@ def template_container(content: t.Any) -> ft.Div:
 def template_sidebar(
     *,
     template: reports.Template,
-    selected_model_element_uuid: str = "",
+    selected_model_element_uuid: str | None,
     search: str = "",
 ) -> ft.Div:
     sidebar_caption = (
@@ -670,14 +664,22 @@ def template_sidebar(
         search_field(template, search=search),
         model_elements_list(
             template=template,
-            selected_model_element_uuid=selected_model_element_uuid,
+            selected_id=selected_model_element_uuid,
             search=search,
         ),
+        id="template-sidebar",
         cls=(
             "dark:bg-neutral-900",
             "flex",
             "flex-col",
+            "h-full",
+            "lg:w-96",
+            "pl-4",
+            "print:hidden",
+            "py-4",
             "rounded-lg",
             "space-y-4",
+            "sticky",
+            "top-0",
         ),
     )
