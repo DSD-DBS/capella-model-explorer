@@ -143,7 +143,9 @@
 
 {% macro describe_function(object) %}
   <h1>{{ first_upper(object.name) }}</h1>
-  <small style="color: #aaa">UUID: {{ object.uuid }}</small>
+  <small class="print:hidden" style="opacity:0.5;"
+    >UUID: {{ object.uuid }}</small
+  >
 
   {% if object.owner %}
     <p>A function of {{ linked_name_with_icon(object.owner) | safe }}</p>
