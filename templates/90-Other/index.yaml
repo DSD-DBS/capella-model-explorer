@@ -6,7 +6,7 @@
   name: Generic object description
   description: Generic built-in template that shows all available information about a given object.
   category: other
-  single: true
+  single: false
 - id: req
   template: req.html.j2
   name: Requirement Modules
