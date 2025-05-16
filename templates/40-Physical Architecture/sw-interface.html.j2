@@ -2,7 +2,15 @@
     Copyright DB InfraGO AG and contributors
     SPDX-License-Identifier: Apache-2.0
 #}
-{% from 'common_macros.html.j2' import show_other_attributes, linked_name, linked_name_with_icon, description %}
+{%
+  from 'common_macros.html.j2' import
+  show_other_attributes,
+  linked_name,
+  linked_name_with_icon,
+  description,
+  display_property_values,
+  display_traceability
+%}
 
 {% macro describe_exchange(object) %}
   {%- set source_function = object.source.owner -%}
@@ -14,12 +22,6 @@
   {{ linked_name_with_icon(target) | safe }} so that the
   {{ linked_name_with_icon(target) | safe }} could
   {{ linked_name_with_icon(target_function)|safe }}.
-{% endmacro %}
-
-{% macro describe_functional_chain(object) %}
-{% endmacro %}
-
-{% macro describe_interface(object) %}
 {% endmacro %}
 
 <h1>Software Interface Control Document - {{ object.name }}</h1>
@@ -121,6 +123,49 @@
   interface.
 </p>
 
+{%- if object.allocating_physical_paths -%}
+  <h3>Allocating Physical Paths</h3>
+  <p>
+    This section provides a detailed description of each physical path used
+    within the interface.
+  </p>
+  {%- for path in object.allocating_physical_paths -%}
+    <h4>{{ path.name }}</h4>
+    <p>{{ description(path) | safe }}</p>
+    <h5>Involved links:</h5>
+    <ul>
+      {%- for link in path.involved_links -%}
+        <li>{{ linked_name_with_icon(link) | safe }}</li>
+      {%- endfor -%}
+    </ul>
+    <h5>Involved nodes:</h5>
+    <ul>
+      {%- for item in path.involved_items.map("type") -%}
+        <li>{{ linked_name_with_icon(item) | safe }}</li>
+      {%- endfor -%}
+    </ul>
+  {%- endfor -%}
+{%- endif -%}
+
+{{ display_property_values(object, heading="Additional properties") | safe }}
+
+{{ display_traceability(object) | safe }}
+
 <h2>Other attributes</h2>
-{% set excluded = ["allocated_functional_exchanges", "context_diagram", "parent", "name", "source", "target", "exchange_items"] %}
-{{ show_other_attributes(object, excluded) | safe }}
+{%
+  set excluded = [
+    "allocated_functional_exchanges",
+    "applied_property_value_groups",
+    "property_value_groups",
+    "context_diagram",
+    "parent",
+    "name",
+    "uuid",
+    "source",
+    "target",
+    "exchange_items",
+    "allocating_physical_paths",
+    "realized_component_exchanges"
+  ]
+%}
+{{ show_other_attributes(object, excluded=excluded) | safe }}
