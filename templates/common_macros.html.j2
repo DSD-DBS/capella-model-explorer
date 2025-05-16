@@ -75,7 +75,7 @@
         <th>Value</th>
       </tr>
     </thead>
-    {%- for attr in object.__dir__()|sort if not attr.startswith("_") and attr not in ["from_model", "pvmt"]+excluded -%}
+    {%- for attr in object.__dir__() | sort if not attr.startswith("_") and attr not in ["from_model", "pvmt"] + excluded -%}
       {% if attr in ["validation", "validate"] %}
 
       {% else %}
@@ -298,37 +298,54 @@
   {% endif %}
 {%- endmacro -%}
 
-{% macro display_property_values(object) %}
+{% macro display_property_values(object, heading="Property Value Packages") %}
   {% if object.property_value_groups %}
-    <h2>Other properties (PVMT)</h2>
+    {% set prefixes = [] %}
+    {% for group in object.property_value_groups %}
+      {% set prefix = group.name.split('.')[0] %}
+      {% if prefix not in prefixes %}
+        {% set _ = prefixes.append(prefix) %}
+      {% endif %}
+    {% endfor %}
+    <h2>{{ heading }}</h2>
     <p>
       The following properties were additionally assigned to {{ object.name }}:
     </p>
-    {# <p><b>{{ group.name | safe}}</b></p> #}
-    <table>
-      <thead>
-        <tr>
-          <th><b>Property</b></th>
-          <th><b>Value</b></th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for group in object.property_value_groups %}
-          {% for prop in group.property_values %}
-            {%- set prop_def = prop.applied_property_values | first -%}
-            {%- set unit_def = prop_def.property_values | selectattr("name", "equalto", "__UNIT__") | first if prop_def else "" -%}
-            {%- set unit = unit_def.value if unit_def else "" -%}
-            <tr>
-              <td>{{ linked_name_with_icon(prop) | safe }}</td>
-              <td>
-                {{ prop.value.name | safe if prop.value.name else prop.value }}
-                {{ unit }}
-              </td>
-            </tr>
-          {% endfor %}
-        {% endfor %}
-      </tbody>
-    </table>
+    {% for prefix in prefixes %}
+      <h3>{{ prefix }}</h3>
+      {% for group in object.property_value_groups %}
+        {% set parts = group.name.split('.') %}
+        {% if parts[0] == prefix %}
+          <h4>{{ parts[1] }}</h4>
+          <table>
+            <thead>
+              <tr>
+                <th>Property</th>
+                <th>Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for prop in group.property_values %}
+                {% set prop_def = prop.applied_property_values | first %}
+                {%
+                  set unit_def = prop_def.property_values
+                  | selectattr("name", "equalto", "__UNIT__")
+                  | first if prop_def else None
+                %}
+                {% set unit = unit_def.value if unit_def else "" %}
+                <tr>
+                  <td>{{ linked_name_with_icon(prop) | safe }}</td>
+                  <td>
+                    {{ prop.value.name if prop.value.name else prop.value }}
+                    {{ unit }}
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% endif %}
+      {% endfor %}
+    {% endfor %}
   {% endif %}
 {% endmacro %}
 

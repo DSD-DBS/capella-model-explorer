@@ -2,7 +2,15 @@
     Copyright DB InfraGO AG and contributors
     SPDX-License-Identifier: Apache-2.0
 #}
-{% from 'common_macros.html.j2' import show_other_attributes, linked_name %}
+{%
+  from 'common_macros.html.j2' import
+  show_other_attributes,
+  description,
+  linked_name,
+  linked_name_with_icon,
+  display_traceability,
+  display_property_values
+%}
 
 {% macro describe_exchange(object) %}
   {%- set source_function = object.source.owner -%}
@@ -15,32 +23,34 @@
   {{ linked_name(target_function)|safe }}.
 {% endmacro %}
 
-{% macro describe_functional_chain(object) %}
-{% endmacro %}
-
-{% macro describe_interface(object) %}
-{% endmacro %}
-
 <h1>Logical Interface {{ object.name }}</h1>
-
+<small class="print:hidden" style="opacity:0.5;"
+  >UUID: {{ object.uuid }}</small
+>
 <h2>Document Purpose</h2>
 <p>
-  This document specifies logical interface between
+  This document specifies a logical interface between
   {{ linked_name(object.source.owner) | safe }} and
   {{ linked_name(object.target.owner) | safe }}.
 </p>
 <p>
   Its purpose is to explain the need for interface and provide requirements so
   that the interface partners could find an appropriate interface definition
-  (solution)
+  (solution).
 </p>
-<h2>Enabled interactions</h2>
+{% if object.description -%}
+  <p>{{ object.description | safe }}</p>
+{%- endif %}
+{% if object.summary -%}
+  <p>{{ object.summary | safe }}</p>
+{%- endif %}
+<h2>Purpose of the interface</h2>
 <p>
   The figure below provides an overview of the behaviors that depend on this
   interface:
 </p>
 {{ object.context_diagram }}
-<p>This interface enables the following interactions:</p>
+<p>{{ object.name }} enables the following functional interactions:</p>
 <table>
   <thead>
     <tr>
@@ -83,6 +93,96 @@
   </tbody>
 </table>
 
+{% set fchains = object.allocated_functional_exchanges.map("involving_functional_chains") %}
+{%
+  set allocated_functions =
+  object.allocated_functional_exchanges.map("source.owner")
+  + object.allocated_functional_exchanges.map("target.owner")
+%}
+{%- if fchains -%}
+  <h2>Associated Functional Chains</h2>
+  <p>
+    {{ object.name }} can be associated to the following functional chains
+    through involvements of functions and interactions.
+  </p>
+  {%- for fchain in fchains -%}
+    <h3>{{ linked_name_with_icon(fchain) | safe }}</h3>
+    <p>{{ description(fchain) | safe }}</p>
+    {%- set involved_caps = model.search("CapabilityRealization").by_involved_chains(fchain) -%}
+    {%- if involved_caps -%}
+      <h4>Involving capabilities</h4>
+      <ul>
+        {%- for cap in involved_caps -%}
+          <li>{{ linked_name_with_icon(cap) | safe }}</li>
+        {%- endfor -%}
+      </ul>
+    {%- endif -%}
+    <h4>Involved functions and interactions</h4>
+    <table>
+      <thead>
+        <tr>
+          <th>Involved functions</th>
+          <th>Involved interactions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <ul>
+              {%- for fnc in fchain.involved_functions -%}
+                {%- if fnc.uuid in allocated_functions | map(attribute="uuid") -%}
+                  <li>{{ linked_name_with_icon(fnc) | safe }}</li>
+                {%- endif -%}
+              {%- endfor -%}
+            </ul>
+          </td>
+          <td>
+            <ul>
+              {%- for link in fchain.involved_links -%}
+                {%- if link.uuid in object.allocated_functional_exchanges | map(attribute="uuid") -%}
+                  <li>{{ linked_name_with_icon(link) | safe }}</li>
+                {%- endif -%}
+              {%- endfor -%}
+            </ul>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  {%- endfor -%}
+{%- endif -%}
+
+{% if object.constraints -%}
+  <h2>Constraints</h2>
+  <ul>
+    {%- for constraint in object.constraints -%}
+      <li>
+        <b>{{ linked_name_with_icon(constraint) | safe }}</b>:
+        {{ constraint.specification["capella:linkedText"] | safe }}
+      </li>
+    {%- endfor -%}
+  </ul>
+{%- endif %}
+
+{{ display_property_values(object, heading="Additional properties") | safe }}
+
+{{ display_traceability(object) | safe }}
+
 <h2>Other attributes</h2>
-{% set excluded = ["allocated_functional_exchanges", "context_diagram", "parent", "name", "source", "target", "exchange_items"] %}
-{{ show_other_attributes(object, excluded) | safe }}
+{%
+  set excluded = [
+    "allocated_functional_exchanges",
+    "constraints",
+    "context_diagram",
+    "uuid",
+    "parent",
+    "name",
+    "source",
+    "target",
+    "exchange_items",
+    "realizing_component_exchanges",
+    "applied_property_value_groups",
+    "applied_property_values",
+    "property_value_groups"
+  ]
+%}
+{{ show_other_attributes(object, excluded=excluded) | safe }}
