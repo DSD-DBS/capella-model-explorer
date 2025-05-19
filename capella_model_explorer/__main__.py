@@ -38,33 +38,24 @@ def run_container(*, log_config: dict[str, t.Any]) -> None:
         "run",
         "--rm",
         "-it",
-        "--name",
-        "cme",
-        "-e",
-        f"CME_LIVE_MODE={'1' if c.LIVE_MODE else '0'}",
-        "-e",
-        f"CME_PORT={c.PORT}",
-        "-e",
-        f"CME_ROUTE_PREFIX={c.ROUTE_PREFIX}",
+        "--name=cme",
+        f"-eCME_LIVE_MODE={'1' if c.LIVE_MODE else '0'}",
+        f"-eCME_PORT={c.PORT}",
+        f"-eCME_ROUTE_PREFIX={c.ROUTE_PREFIX}",
         f"-eCME_LOG_CONFIG={json.dumps(log_config)}",
-        "-p",
-        f"{c.PORT}:{c.PORT}",
+        f"-p{c.PORT}:{c.PORT}",
     ]
     model = pathlib.Path(c.MODEL)
-    if model.is_file() and str(model).lower().endswith(".aird"):
+    if model.is_file() and model.suffix.lower() == ".aird":
         model = model.parent
     if model.is_dir():
-        cmd.extend(
-            ["-v", f"{model.resolve()}:/model", "-e", "CME_MODEL=/model"]
-        )
+        cmd.append("-eCME_MODEL=/model")
+        cmd.append(f"-v{model.resolve()}:/model")
     else:
-        cmd.extend(["-e", f"CME_MODEL={c.MODEL}"])
-    if pathlib.Path(c.TEMPLATES_DIR).is_dir():
-        cmd.extend(
-            ["-v", f"{pathlib.Path(c.TEMPLATES_DIR).resolve()}:/templates"]
-        )
-    else:
-        raise SystemExit(f"Templates directory not found: {c.TEMPLATES_DIR}")
+        cmd.append(f"-eCME_MODEL={c.MODEL}")
+
+    templates_dir = pathlib.Path(c.TEMPLATES_DIR).resolve()
+    cmd.append(f"-v{templates_dir}:/templates")
 
     cmd.append(c.DOCKER_IMAGE_NAME)
     logger.info(shlex.join(cmd))
