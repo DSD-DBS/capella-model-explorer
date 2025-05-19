@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import base64
 import operator
 import pathlib
 import re
@@ -20,17 +21,11 @@ import capella_model_explorer.constants as c
 from capella_model_explorer import app, state
 
 SVG_WRAP_MARKUP = markupsafe.Markup(
-    '<div class="svg-container relative inline-block cursor-pointer hover:opacity-[.5]"'
-    ' onclick="openDiagramViewer(this)" data-diagram-title="{title}">'
-    "{svg_data}"
-    '<div class="text-wrap text-center absolute bottom-0 left-0'
-    " right-0 top-0 flex items-center justify-center bg-black"
-    " font-sans text-2xl text-white opacity-0 transition-opacity"
-    ' duration-300 hover:opacity-[.5] print:hidden">'
-    "Click to enlarge"
+    '<div class="svg-container relative inline-block cursor-pointer"'
+    ' onclick="openDiagramViewer(this)" data-img="{svg_data}">'
+    '<img src="{svg_data}" alt="{title}"'
+    ' class="transition hover:scale-105 hover:shadow-lg hover:shadow-normal-500/50">'
     "</div>"
-    "</div>"
-    '<div class="plotly-chart fixed left-1/2 top-1/2 z-[1000] hidden h-full w-full -translate-x-1/2 -translate-y-1/2 transform bg-black p-5 shadow-lg">&nbsp;</div>'
 )
 
 
@@ -208,11 +203,21 @@ def _make_href(
 
 def finalize(markup: t.Any) -> object:
     if isinstance(markup, m.AbstractDiagram):
-        svg = markupsafe.Markup(markup.render("svg"))
+        svg = markupsafe.Markup(
+            "data:image/svg+xml;base64,"
+            + base64.standard_b64encode(
+                markup.render("svg").encode(),
+            ).decode()
+        )
         return SVG_WRAP_MARKUP.format(svg_data=svg, title=markup.name)
 
     if isinstance(markup, capellambse.diagram.Diagram):
-        svg = markupsafe.Markup(m.diagram.convert_format(None, "svg", markup))
+        svg = markupsafe.Markup(
+            "data:image/svg+xml;base64,"
+            + base64.standard_b64encode(
+                m.diagram.convert_format(None, "svg", markup).encode(),
+            ).decode()
+        )
         return SVG_WRAP_MARKUP.format(svg_data=svg, title=markup.name)
 
     markup = markupsafe.escape(markup)
