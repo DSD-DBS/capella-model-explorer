@@ -1,0 +1,111 @@
+{#
+    Copyright DB InfraGO AG and contributors
+    SPDX-License-Identifier: Apache-2.0
+#}
+{%
+  from 'common_macros.html.j2' import
+  description,
+  linked_name_with_icon,
+  show_other_attributes,
+  display_traceability
+%}
+
+<h1>FunctionalChain {{ object.name }}</h1>
+{{ object.context_diagram }}
+<p>{{ description(object) | safe }}</p>
+{%- if object.layer.xtype.endswith("PhysicalArchitecture") -%}
+  {%- set cap_type = "CapabilityRealization" -%}
+{%- elif object.layer.xtype.endswith("LogicalArchitecture") -%}
+  {%- set cap_type = "Capability" -%}
+{% else %}
+  {%- set cap_type = "OperationalCapability" -%}
+{% endif -%}
+{%- set involved_caps = model.search(cap_type).by_involved_chains(object) -%}
+{%- if involved_caps -%}
+  <h2>Involving capabilities</h2>
+  <p>
+    The following capabilities are involving the functional chain
+    {{ object.name }}:
+  </p>
+  <ul>
+    {%- for cap in involved_caps -%}
+      <li>{{ linked_name_with_icon(cap) | safe }}</li>
+    {%- endfor -%}
+  </ul>
+{%- endif -%}
+
+{%- if object.involving_chains -%}
+  <h2>Involving chains</h2>
+  <p>
+    The following functional chains involve the functional chain
+    {{ object.name }}:
+  </p>
+  <ul>
+    {%- for fchain in object.involving_chains -%}
+      <li>{{ linked_name_with_icon(fchain) | safe }}</li>
+    {%- endfor -%}
+  </ul>
+{%- endif -%}
+
+<h2>Involved functions</h2>
+<p>
+  The following functions are involved in the functional chain
+  {{ object.name }}:
+</p>
+{%- if object.involved_functions -%}
+  <ul>
+    {%- for fnc in object.involved_functions -%}
+      <li>{{ linked_name_with_icon(fnc) | safe }}</li>
+    {%- endfor -%}
+  </ul>
+{%- else -%}
+  <p><span style="color: red;">No functions involved.</span></p>
+{%- endif -%}
+
+<h2>Involved interactions</h2>
+<p>
+  The following interactions are involved in the functional chain
+  {{ object.name }}:
+</p>
+{%- if object.involved_links -%}
+  <ul>
+    {%- for link in object.involved_links -%}
+      <li>{{ linked_name_with_icon(link) | safe }}</li>
+    {%- endfor -%}
+  </ul>
+{%- else -%}
+  <p><span style="color: red;">No interactions involved.</span></p>
+{%- endif -%}
+
+<h2>Involved chains</h2>
+<p>
+  The following functional chains are involved in the functional chain
+  {{ object.name }}:
+</p>
+{%- if object.involved_chains -%}
+  <ul>
+    {%- for fchain in object.involved_chains -%}
+      <li>{{ linked_name_with_icon(fchain) | safe }}</li>
+    {%- endfor -%}
+  </ul>
+{%- else -%}
+  <p><span style="color: red;">No functional chains involved.</span></p>
+{%- endif -%}
+
+{{ display_traceability(object) | safe }}
+
+<h2>Other attributes</h2>
+{%
+  set excluded = [
+    "constraints",
+    "context_diagram",
+    "parent",
+    "name",
+    "involved",
+    "involved_links",
+    "involved_functions",
+    "involving_chains",
+    "involvements"
+  ]
+%}
+{{ show_other_attributes(object, excluded=excluded) | safe }}
