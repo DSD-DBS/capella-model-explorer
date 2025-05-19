@@ -33,3 +33,9 @@
   scope:
     type: ComponentExchange
     below: pa
+- template: ../functional-chain.html.j2
+  id: functional-chain
+  name: Functional Chain
+  description: Defines a functional chain of involved functions and exchanges
+  scope:
+    type: FunctionalChain
