@@ -30,23 +30,32 @@ dependencies = [
   "capellambse>=0.6.13,<0.7",
   "click>=8.1.8,<9",
   "jinja2>=3.1.5,<4",
+  "logfmter>=0.0.9",
   "prometheus-client>=0.21.1,<0.22",
   "python-fasthtml>=0.12.1,<0.13",
   "uvicorn>=0.34.0,<0.35",
-  "logfmter>=0.0.9",
 ]
 
 [project.urls]
 Homepage = "https://github.com/DSD-DBS/capella-model-explorer"
 Documentation = "https://dsd-dbs.github.io/capella-model-explorer"
 
-[project.optional-dependencies]
-dev = ["pre-commit", "python-dotenv"]
-docs = ["furo", "sphinx", "sphinx-copybutton"]
-test = ["coverage", "pytest", "pytest-cov"]
-
 [project.scripts]
 cme = "capella_model_explorer.__main__:main"
+
+[dependency-groups]
+dev = [
+  "coverage>=7.8.0",
+  "pre-commit>=4.2.0",
+  "pytest>=8.3.5",
+  "pytest-cov>=6.1.1",
+  "python-dotenv>=1.1.0",
+]
+docs = [
+    "furo>=2024.8.6",
+    "sphinx>=8.2.3",
+    "sphinx-copybutton>=0.5.2",
+]
 
 [tool.coverage.run]
 branch = true

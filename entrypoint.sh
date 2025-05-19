@@ -4,5 +4,4 @@
 # SPDX-License-Identifier: Apache-2.0
 
 export CME_TEMPLATES_DIR="/templates"
-. /app/.venv/bin/activate
-exec cme run --skip-rebuild "$@"
+exec /app/bin/cme run --skip-rebuild "$@"
