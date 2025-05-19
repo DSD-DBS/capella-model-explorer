@@ -185,7 +185,7 @@ def rendered_report(template_id: str, model_element_uuid: str = "") -> t.Any:
     )
 
 
-@ar.get("/template/{template_id}")
+@ar.get("/report/{template_id}")
 @ar.get("/report/{template_id}/{model_element_uuid}")
 def template_page(
     request: starlette.requests.Request,
