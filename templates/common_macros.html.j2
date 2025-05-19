@@ -853,3 +853,67 @@
     {% endif %}
   {% endfor %}
 {% endmacro %}
+
+{%- macro render_functional_chains(chains) -%}
+  {%- for chain in chains -%}
+    <h3>{{ linked_name_with_icon(chain) }}</h3>
+    {{ chain.context_diagram }}
+    <p>{{ description(chain) | safe }}</p>
+  {%- endfor -%}
+{%- endmacro -%}
+
+{%- macro render_functional_chain(object, type_name, label) -%}
+  {%- if object.layer.xtype.endswith("PhysicalArchitecture") -%}
+    {%- set cap_type = "CapabilityRealization" -%}
+  {%- elif object.layer.xtype.endswith("LogicalArchitecture") -%}
+    {%- set cap_type = "Capability" -%}
+  {%- else -%}
+    {%- set cap_type = "OperationalCapability" -%}
+  {%- endif -%}
+
+  <h1>{{ type_name }} {{ object.name }}</h1>
+  {{ object.context_diagram }}
+  <p>{{ description(object) | safe }}</p>
+
+  {%- set caps = object._model.search(cap_type).by_involved_chains(object) -%}
+  {%- if caps -%}
+    <h2>Involving capabilities</h2>
+    <p>
+      The following capabilities are involving the {{ label }}
+      {{ object.name }}:
+    </p>
+    <ul>
+      {%- for cap in caps -%}
+        <li>{{ linked_name_with_icon(cap) | safe }}</li>
+      {%- endfor -%}
+    </ul>
+  {%- endif -%}
+  {%-
+    set relations = [
+      {"attr": "involving_chains", "title": "Involving chains", "item": "chains", "mode": "involve"},
+      {"attr": "involved_chains", "title": "Involved chains", "item": "chains", "mode": "involved"},
+      {"attr": "involved_functions", "title": "Involved functions", "item": "functions", "mode": "involved"},
+      {"attr": "involved_links", "title": "Involved interactions", "item": "interactions", "mode": "involved"}
+    ]
+  -%}
+  {%- for rel in relations -%}
+    <h2>{{ rel.title }}</h2>
+    <p>
+      {%- if rel.mode == "involve" -%}
+        The following {{ rel.item }} involve the {{ label }} {{ object.name }}:
+      {%- else -%}
+        The following {{ rel.item }} are involved in the {{ label }}
+        {{ object.name }}:
+      {%- endif -%}
+    </p>
+    {%- if object[[rel.attr] | first] -%}
+      <ul>
+        {%- for item in object[[rel.attr] | first] -%}
+          <li>{{ linked_name_with_icon(item) | safe }}</li>
+        {%- endfor -%}
+      </ul>
+    {%- else -%}
+      <p><span style="color: red;">No {{ rel.item }}.</span></p>
+    {%- endif -%}
+  {%- endfor -%}
+{%- endmacro %}
