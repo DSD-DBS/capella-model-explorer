@@ -11,6 +11,7 @@
   render_capability_section,
   render_exchange_items_catalog,
   render_involved_actors_section,
+  render_functional_chains,
   render_interfaces_section,
   show_other_attributes
 %}
@@ -69,7 +70,11 @@
 <h2>5 System Functions</h2>
 {{ render_allocated_functions(object) | safe }}
 
-<h2>6 System Interfaces</h2>
+<h2>6 Functional Chains</h2>
+{% set chains = model.sa.all_functional_chains %}
+{{ render_functional_chains(chains) | safe }}
+
+<h2>7 System Interfaces</h2>
 {% set interfaces = object.related_exchanges %}
 {% set exchange_items_catalog = [] %}
 {{ render_interfaces_section(object, interfaces, exchange_items_catalog) | safe }}

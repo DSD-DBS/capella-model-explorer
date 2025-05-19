@@ -859,3 +859,11 @@
     {% endif %}
   {% endfor %}
 {% endmacro %}
+
+{%- macro render_functional_chains(chains) -%}
+  {%- for chain in chains -%}
+    <h3>{{ linked_name_with_icon(chain) }}</h3>
+    {{ chain.context_diagram }}
+    <p>{{ description(chain) | safe }}</p>
+  {%- endfor -%}
+{%- endmacro -%}
