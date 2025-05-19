@@ -121,17 +121,14 @@ def build_css(*, watch: bool) -> subprocess.Popen | None:
     logger.info("Building style sheet...")
 
     _install_npm_pkgs()
-    exe = shutil.which("node_modules/.bin/tailwindcss")
-    if exe is None:
-        raise SystemExit("tailwindcss failed to install, please try again")
-    exe = os.path.realpath(exe)
 
     input_css = pathlib.Path("static/css/input.css")
     if not input_css.is_file():
         raise SystemExit(f"Input CSS file not found: {input_css}")
 
     tailwind_cmd = [
-        exe,
+        "npx",
+        "@tailwindcss/cli",
         "--minify",
         "--input",
         str(input_css),
