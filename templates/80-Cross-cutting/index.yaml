@@ -32,10 +32,3 @@
     type: Region
     filters:
       states: not_empty
-
-- template: functional-chain.html.j2
-  id: functional-chain
-  name: Functional Chain
-  description: Defines a functional chain of involved functions and exchanges
-  scope:
-    type: FunctionalChain

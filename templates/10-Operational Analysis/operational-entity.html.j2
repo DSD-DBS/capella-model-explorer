@@ -112,5 +112,24 @@
 
 <h2>Other attributes</h2>
 
-{% set filtered = ["description", "realizing_system_components", "realizing_components", "xtype", "is_actor", "is_human", "entities", "owner", "parent", "parts", "requirements", "state_machines", "activities", "capabilities", "name", "realization_view"] %}
-{{ show_other_attributes(object, excluded=filtered) | safe }}
+{%-
+  set excluded = [
+    "name",
+    "description",
+    "owner",
+    "parent",
+    "xtype",
+    "is_actor",
+    "is_human",
+    "parts",
+    "entities",
+    "activities",
+    "capabilities",
+    "state_machines",
+    "realization_view"
+    "requirements",
+    "realizing_system_components",
+    "realizing_components"
+  ]
+-%}
+{{ show_other_attributes(object, excluded=excluded) | safe }}

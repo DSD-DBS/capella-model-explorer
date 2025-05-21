@@ -9,6 +9,7 @@
   scope:
     type: PhysicalComponent
     below: pa
+
 - template: physical-link.html.j2
   id: physical-link
   name: Physical Interface
@@ -17,6 +18,7 @@
   scope:
     type: PhysicalLink
     below: pa
+
 - template: physical-function.html.j2
   id: physical-function
   name: Physical Functions
@@ -25,6 +27,7 @@
   scope:
     type: PhysicalFunction
     below: pa
+
 - template: sw-interface.html.j2
   id: sw-interface
   name: Software Interfaces
@@ -33,3 +36,10 @@
   scope:
     type: ComponentExchange
     below: pa
+
+- template: ../functional-chain.html.j2
+  id: functional-chain
+  name: Functional Chain
+  description: Defines a functional chain of involved functions and exchanges
+  scope:
+    type: FunctionalChain
