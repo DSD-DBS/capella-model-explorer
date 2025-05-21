@@ -32,67 +32,37 @@
   <p style="color:red">No post-condition defined</p>
 {% endif %}
 
-{% if object.extends %}
-  <p>
-    The capability {{ object.name }} extends the following operational
-    capabilities:
-  </p>
-  <ul>
-    {%- for ext in object.extends -%}
-      <li>{{ linked_name_with_icon(ext.target) | safe }}</li>
-    {%- endfor -%}
-  </ul>
-{% endif %}
-
-{% if object.extended_by %}
-  <p>
-    The capability {{ object.name }} is further extended by the following
-    operational capabilities:
-  </p>
-  <ul>
-    {%- for ext in object.extended_by -%}
-      <li>{{ linked_name_with_icon(ext.source) | safe }}</li>
-    {%- endfor -%}
-  </ul>
-{% endif %}
-
 <h2>Context Diagram</h2>
 <p>
-  The diagram below provides an overview over the entities immediately involved
-  in the Capability and related Capabilities.
+  The diagram below provides an overview over the components immediately
+  involved in the Capability and related Capabilities.
 </p>
 {{ render_diagram(object, "context_diagram") }}
 
-<h2>Involved Entities and Activities</h2>
-{%-
-  set entities = (
-    object.involved_entities | list
-    + object.involved_activities | map(attribute="owner") | list
-  ) | unique(attribute="uuid") | list
--%}
+<h2>Functional Requirements</h2>
 {{
   render_data_flow_and_involved_activities(
     object,
-    object.involved_activities,
-    entities,
-    "The diagram below provides an overview of the operational activities that are required to realize the Capability.",
-    "To enable the Capability, the following entities and activities are involved:",
-    "operational Capability",
-    "activities",
-    "entities",
-    "Entity"
+    object.involved_functions,
+    object.involved_components,
+    "The diagram below provides an overview of the Logical System (green) and actor (blue) functions that are required to realize the Capability.",
+    "This section provides a summary of what functions are required from the Logical System and the actors to enable the CapabilityRealization.",
+    "CapabilityRealization",
+    "functions",
+    "components",
+    "LogicalComponent"
   )
 }}
-{%- set related_processes = (object.involved_processes + object.owned_processes) | unique(attribute="uuid") | list -%}
-{%- if related_processes -%}
-  <h2>Related Processes</h2>
+{%- set related_chains = (object.involved_chains + object.owned_chains) | unique(attribute="uuid") | list -%}
+{%- if related_chains -%}
+  <h2>Related Functional Chains</h2>
   <p>
-    The following operational processes are related to the Capability
+    The following functional chains are related to the Capability
     {{ object.name }}:
   </p>
   <ul>
-    {%- for process in related_processes -%}
-      <li>{{ linked_name_with_icon(process) | safe }}</li>
+    {%- for chain in related_chains -%}
+      <li>{{ linked_name_with_icon(chain) | safe }}</li>
     {%- endfor -%}
   </ul>
 {%- endif -%}
@@ -109,7 +79,7 @@
 
 {{ display_traceability(object)| safe }}
 
-<h2>Other object attributes</h2>
+<h2>Other properties of "{{ object.name }}"</h2>
 
 {%-
   set excluded = [
@@ -118,12 +88,11 @@
     "data_flow_view",
     "description",
     "diagrams",
-    "entity_involvements",
-    "involved_activities",
-    "involved_entities",
-    "involved_processes",
+    "involved_chains",
+    "involved_components",
+    "involved_functions",
     "name",
-    "owned_processes",
+    "owned_chains",
     "parent",
     "postcondition",
     "precondition",

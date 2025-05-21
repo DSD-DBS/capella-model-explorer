@@ -2,14 +2,21 @@
     Copyright DB InfraGO AG and contributors
     SPDX-License-Identifier: Apache-2.0
 #}
-{% from 'common_macros.html.j2' import show_other_attributes, linked_name_with_icon %}
+{%
+  from 'common_macros.html.j2' import
+  show_other_attributes,
+  description,
+  render_reqs_by_type,
+  linked_name,
+  linked_name_with_icon,
+  render_data_flow_and_involved_activities,
+  render_related_diagrams,
+  render_constraints,
+  display_traceability
+%}
 
 <h1>{{ object.name }}</h1>
-{% if object.description %}
-  <p>{{ object.description }}</p>
-{% else %}
-  <p style="color:red">No description available.</p>
-{% endif %}
+{{ description(object) | safe }}
 
 <b>Pre-condition</b>:
 {% if object.precondition %}
@@ -25,59 +32,94 @@
   <p style="color:red">No post-condition defined</p>
 {% endif %}
 
-<h2>Context Diagram</h2>
-<p>
-  The diagram below provides an overview over the entities immediately involved
-  in the Capability and related Capabilities.
-</p>
+{% if object.extends %}
+  <p>The capability {{ object.name }} extends the following capabilities:</p>
+  <ul>
+    {%- for ext in object.extends -%}
+      <li>{{ linked_name_with_icon(ext.target) | safe }}</li>
+    {%- endfor -%}
+  </ul>
+{% endif %}
 
-{{ render_diagram(object, "context_diagram") }}
-
-<h2>Data Flow Diagram</h2>
-
-<p>
-  The diagram below provides an overview of the System (green) and actor (blue)
-  functions that are required to realize the Capability.
-</p>
-
-{{ render_diagram(object, "data_flow_view") }}
-
-<h2>Functional Requirements</h2>
-
-<p>
-  This section provides a summary of what functions are required from the
-  System and the actors to enable the system Capability.
-</p>
-
-{% set real_entities = object.involved_functions | selectattr("owner") | map(attribute="owner") | unique(attribute="uuid") %}
-
-{% for entity in real_entities %}
-  <h3>{{ entity.name }}</h3>
+{% if object.extended_by %}
   <p>
-    To enable the system Capability <b>{{ object.name }}</b> the
-    {{ linked_name_with_icon(entity) | safe }} shall:
+    The capability {{ object.name }} is further extended by the following
+    capabilities:
   </p>
   <ul>
-    {% for fnc in object.involved_functions %}
-      {% if fnc.owner == entity %}
-        <li>{{ linked_name_with_icon(fnc) | safe }}</li>
-      {% endif %}
-    {% endfor %}
+    {%- for ext in object.extended_by -%}
+      <li>{{ linked_name_with_icon(ext.source) | safe }}</li>
+    {%- endfor -%}
   </ul>
-{% endfor %}
+{% endif %}
+
+<h2>Context Diagram</h2>
+<p>
+  The diagram below provides an overview over the components immediately
+  involved in the Capability and related Capabilities.
+</p>
+{{ render_diagram(object, "context_diagram") }}
+
+<h2>Functional Requirements</h2>
+{{
+  render_data_flow_and_involved_activities(
+    object,
+    object.involved_functions,
+    object.involved_components,
+    "The diagram below provides an overview of the System (green) and actor (blue) functions that are required to realize the Capability.",
+    "This section provides a summary of what functions are required from the System and the actors to enable the system Capability.",
+    "Capability",
+    "functions",
+    "components",
+    "Component"
+  )
+}}
+{%- set related_chains = (object.involved_chains + object.owned_chains) | unique(attribute="uuid") | list -%}
+{%- if related_chains -%}
+  <h2>Related Functional Chains</h2>
+  <p>
+    The following functional chains are related to the Capability
+    {{ object.name }}:
+  </p>
+  <ul>
+    {%- for chain in related_chains -%}
+      <li>{{ linked_name_with_icon(chain) | safe }}</li>
+    {%- endfor -%}
+  </ul>
+{%- endif -%}
+
+{{ render_related_diagrams(object) | safe }}
+
+{{ render_constraints(object) | safe }}
+
+{% if object.requirements %}
+  <h2>Linked Requirement objects</h2>
+  {% set types = model.search("RequirementType") | map(attribute="long_name") | unique | list %}
+  {{ render_reqs_by_type(object.requirements, types) | safe }}
+{% endif %}
+
+{{ display_traceability(object)| safe }}
 
 <h2>Other properties of "{{ object.name }}"</h2>
 
 {%-
   set excluded = [
+    "constraints",
     "context_diagram",
     "data_flow_view",
     "description",
+    "diagrams",
+    "involved_chains",
+    "involved_components",
     "involved_functions",
     "name",
+    "owned_chains",
     "parent",
     "postcondition",
     "precondition",
+    "realizing_capabilities",
+    "requirements",
+    "visible_on_diagrams",
     "xtype",
   ]
 -%}

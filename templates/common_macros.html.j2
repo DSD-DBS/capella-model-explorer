@@ -934,3 +934,91 @@
     </ul>
   {%- endif -%}
 {%- endmacro -%}
+
+{%- macro render_constraints(object) -%}
+  {%- set excluded_constraints = [object.precondition, object.postcondition] -%}
+  {%- set constraints = object.constraints | reject("in", excluded_constraints) | list -%}
+  {% if constraints -%}
+    <h2>Constraints</h2>
+    <ul>
+      {%- for constraint in constraints -%}
+        <li>
+          <b>{{ linked_name_with_icon(constraint) | safe }}</b>:
+          {%- set spec = constraint | attr("specification", {}) -%}
+          {%- if spec -%}
+            {{ spec["capella:linkedText"] | safe }}
+          {%- else -%}
+            <span style="color:red">No specification available.</span>
+          {%- endif -%}
+        </li>
+      {%- endfor -%}
+    </ul>
+  {%- endif %}
+{%- endmacro -%}
+
+{%-
+  macro render_data_flow_and_involved_activities(
+    object,
+    activities,
+    entities_initial,
+    diagram_desc,
+    summary_text,
+    cap_label,
+    activity_plural,
+    entity_plural,
+    entity_singular
+  )
+-%}
+  {%- if activities -%}
+    <h3>Data Flow Diagram</h3>
+    <p>{{ diagram_desc }}</p>
+    {{ render_diagram(object, "data_flow_view") }}
+    <p>{{ summary_text }}</p>
+  {%- else -%}
+    <p style="color:red">No {{ activity_plural }} are involved.</p>
+  {%- endif %}
+  {%- set owners = activities | map(attribute='owner') | list -%}
+  {%- set entities = entities_initial | list + owners -%}
+  {%- set entities = entities | unique(attribute='uuid') -%}
+
+  {%- if entities -%}
+    {%- for entity in entities -%}
+      {%- set acts = activities | selectattr('owner','equalto',entity) | list -%}
+      <h3>{{ linked_name(entity) }}</h3>
+      {%- if acts -%}
+        <p>
+          To enable the {{ cap_label }} <b>{{ object.name }}</b> the
+          {{ linked_name_with_icon(entity) | safe }} shall:
+        </p>
+        <ul>
+          {%- for act in acts -%}
+            <li>{{ linked_name_with_icon(act) | safe }}</li>
+          {%- endfor -%}
+        </ul>
+      {%- else -%}
+        <p style="color:red">
+          Involvement of {{ linked_name_with_icon(entity) | safe }} is expected
+          but specific {{ activity_plural }} are not yet identified.
+        </p>
+      {%- endif -%}
+    {%- endfor -%}
+  {%- else -%}
+    <p style="color:red">No {{ entity_plural }} are involved.</p>
+  {%- endif -%}
+  {%- set no_owner = activities | selectattr('owner','none') | list -%}
+  {%- if no_owner -%}
+    <h3>
+      {{ activity_plural | capitalize }} without owning
+      {{ entity_singular | capitalize }}
+    </h3>
+    <p>
+      There are involved {{ activity_plural }} that are not yet assigned to a
+      {{ entity_singular | lower }}:
+    </p>
+    <ul>
+      {%- for act in no_owner -%}
+        <li>{{ linked_name_with_icon(act) | safe }}</li>
+      {%- endfor -%}
+    </ul>
+  {%- endif -%}
+{%- endmacro %}

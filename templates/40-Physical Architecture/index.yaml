@@ -1,6 +1,13 @@
 # Copyright DB InfraGO AG and contributors
 # SPDX-License-Identifier: Apache-2.0
 
+- template: physical-capability.html.j2
+  id: physical-capability
+  name: Physical Capability
+  description: Specifies what the physical system should be capable of and how it needs to interact with external actors.
+  scope:
+    type: CapabilityRealization
+    below: pa
 - template: physical-component.html.j2
   id: physical-component
   name: Physical Component
