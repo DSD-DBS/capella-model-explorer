@@ -2,7 +2,17 @@
     Copyright DB InfraGO AG and contributors
     SPDX-License-Identifier: Apache-2.0
 #}
-{% from 'common_macros.html.j2' import show_other_attributes, description, render_reqs_by_type, linked_name, linked_name_with_icon, display_traceability %}
+{%
+  from 'common_macros.html.j2' import
+  show_other_attributes,
+  description,
+  render_reqs_by_type,
+  linked_name,
+  linked_name_with_icon,
+  render_related_diagrams,
+  render_constraints,
+  display_traceability
+%}
 
 <h1>{{ object.name }}</h1>
 {{ description(object) | safe }}
@@ -55,7 +65,12 @@
 
 <h2>Involved Entities and Activities</h2>
 To enable the Capability, the following entities and activities are involved:
-{%- set entities = object.involved_entities | list + object.involved_activities | map(attribute="owner") | unique(attribute="uuid") | list -%}
+{%-
+  set entities = (
+    object.involved_entities | list
+    + object.involved_activities | map(attribute="owner") | list
+  ) | unique(attribute="uuid") | list
+-%}
 {%- if entities -%}
   <ul>
     {%- for entity in entities -%}
@@ -101,16 +116,23 @@ To enable the Capability, the following entities and activities are involved:
 
   {{ render_diagram(object, "data_flow_view") }}
 {%- endif -%}
-
-{% if object.diagrams %}
-  <h2>Other related diagrams</h2>
+{%- set related_processes = (object.involved_processes + object.owned_processes) | unique(attribute="uuid") | list -%}
+<h2>Related Processes</h2>
+{%- if related_processes -%}
+  <p>
+    The following operational processes are related to the Capability
+    {{ object.name }}:
+  </p>
   <ul>
-    {% for diagram in object.diagrams %}
-      <h3>{{ diagram.name }}</h3>
-      {{ diagram }}
-    {% endfor %}
+    {%- for process in related_processes -%}
+      <li>{{ linked_name_with_icon(process) | safe }}</li>
+    {%- endfor -%}
   </ul>
-{% endif %}
+{%- endif -%}
+
+{{ render_related_diagrams(object) | safe }}
+
+{{ render_constraints(object) | safe }}
 
 {% if object.requirements %}
   <h2>Linked Requirement objects</h2>
@@ -124,6 +146,7 @@ To enable the Capability, the following entities and activities are involved:
 
 {%-
   set excluded = [
+    "constraints",
     "context_diagram",
     "data_flow_view",
     "description",
@@ -131,11 +154,15 @@ To enable the Capability, the following entities and activities are involved:
     "entity_involvements",
     "involved_activities",
     "involved_entities",
+    "involved_processes",
     "name",
+    "owned_processes",
     "parent",
     "postcondition",
     "precondition",
     "realizing_capabilities",
+    "requirements",
+    "visible_on_diagrams",
     "xtype",
   ]
 -%}
