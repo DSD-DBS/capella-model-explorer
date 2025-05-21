@@ -868,22 +868,20 @@
   {%- endfor -%}
 {%- endmacro -%}
 
-{%- macro get_cap_type(obj) -%}
-  {%- if obj.layer.xtype.endswith("PhysicalArchitecture") -%}
-    CapabilityRealization
-  {%- elif obj.layer.xtype.endswith("LogicalArchitecture") -%}
-    Capability
+{%- macro render_functional_chain(object, type_name, label) -%}
+  {%- if object.layer.xtype.endswith("PhysicalArchitecture") -%}
+    {%- set cap_type = "CapabilityRealization" -%}
+  {%- elif object.layer.xtype.endswith("LogicalArchitecture") -%}
+    {%- set cap_type = "Capability" -%}
   {%- else -%}
-    OperationalCapability
+    {%- set cap_type = "OperationalCapability" -%}
   {%- endif -%}
-{%- endmacro %}
 
-{%- macro render_functional_chain(model, object, type_name, cap_type, label) -%}
   <h1>{{ type_name }} {{ object.name }}</h1>
   {{ object.context_diagram }}
   <p>{{ description(object) | safe }}</p>
 
-  {%- set caps = model.search(cap_type).by_involved_chains(object) -%}
+  {%- set caps = object._model.search(cap_type).by_involved_chains(object) -%}
   {%- if caps -%}
     <h2>Involving capabilities</h2>
     <p>

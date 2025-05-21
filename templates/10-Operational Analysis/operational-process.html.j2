@@ -4,17 +4,12 @@
 #}
 {%
   from 'common_macros.html.j2' import
-  get_cap_type,
   render_functional_chain,
   display_traceability,
   show_other_attributes
 %}
-{%- set cap_type = get_cap_type(object) -%}
-{{
-  render_functional_chain(
-    model, object, "OperationalProcess", cap_type, "operational process"
-  )
-}}
+
+{{ render_functional_chain(object, "OperationalProcess", "operational process") }}
 
 {{ display_traceability(object) | safe }}
 
