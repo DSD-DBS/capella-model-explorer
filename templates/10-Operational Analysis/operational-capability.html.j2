@@ -123,4 +123,4 @@ To enable the Capability, the following entities and activities are involved:
 <h2>Other object attributes</h2>
 
 {% set filtered = ["description", "xtype", "postcondition", "precondition", "context_diagram", "data_flow_view", "diagrams", "entity_involvements", "involved_entities", "name", "parent", "realizing_capabilities", "involved_activities"] %}
-{{ show_other_attributes(object, filtered) | safe }}
+{{ show_other_attributes(object, excluded=filtered) | safe }}

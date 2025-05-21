@@ -69,4 +69,4 @@
 <h2>Other properties of "{{ object.name }}"</h2>
 
 {% set excluded = ["involved_functions", "postcondition", "precondition", "description", "name", "data_flow_view", "context_diagram", "xtype", "parent"] %}
-{{ show_other_attributes(object, excluded) | safe }}
+{{ show_other_attributes(object, excluded=excluded) | safe }}

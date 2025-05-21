@@ -56,7 +56,7 @@
   {% else %}
     <h1>Unnamed ({{ object.__class__.__name__ }})</h1>
   {% endif %}
-  {{ show_other_attributes(object, object_diff, display_modified_changes=display_modified_changes) | safe }}
+  {{ show_other_attributes(object, object_diff=object_diff, display_modified_changes=display_modified_changes) | safe }}
 {% else %}
   <h1 style="color: red">Object not found</h1>
 {% endif %}

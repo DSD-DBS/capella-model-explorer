@@ -113,4 +113,4 @@
 <h2>Other attributes</h2>
 
 {% set filtered = ["description", "realizing_system_components", "realizing_components", "xtype", "is_actor", "is_human", "entities", "owner", "parent", "parts", "requirements", "state_machines", "activities", "capabilities", "name", "realization_view"] %}
-{{ show_other_attributes(object, filtered) | safe }}
+{{ show_other_attributes(object, excluded=filtered) | safe }}

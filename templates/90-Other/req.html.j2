@@ -21,6 +21,5 @@
     {{ render_reqs_by_type(folder.requirements, types) | safe }}
   {% endfor %}
 {% endif %}
-{% from 'common_macros.html.j2' import show_other_attributes %}
 {% set filtered = ["parent", "owner", "requirements", "long_name", "to_reqif"] %}
-{{ show_other_attributes(object, filtered) | safe }}
+{{ show_other_attributes(object, excluded=filtered) | safe }}
