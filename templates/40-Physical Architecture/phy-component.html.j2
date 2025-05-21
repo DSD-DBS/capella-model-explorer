@@ -88,21 +88,21 @@
 {% endif %}
 
 <h2>Other Properties</h2>
-{%
+{%-
   set excluded = [
-      "description",
-      "context_diagram",
-      "owner",
-      "parent",
       "allocated_functions",
+      "context_diagram",
+      "description",
       "diagrams",
       "name",
+      "owner",
+      "parent",
       "parts",
+      "ports",
       "realizing_components",
+      "related_exchanges",
       "state_machines",
       "xtype",
-      "ports",
-      "related_exchanges",
   ]
-%}
+-%}
 {{ show_other_attributes(object, excluded=excluded) | safe }}

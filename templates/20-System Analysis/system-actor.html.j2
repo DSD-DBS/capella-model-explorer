@@ -98,5 +98,25 @@
 
 <h2>Other attributes</h2>
 
-{% set excluded = ["is_actor", "is_human", "name", "xtype", "allocated_functions", "description", "owner", "parent", "parts", "realized_components", "realized_entities", "realized_operational_entities", "realizing_components", "realizing_logical_components", "related_exchanges", "context_diagram", "requirements"] %}
+{%-
+  set excluded = [
+    "allocated_functions",
+    "context_diagram",
+    "description",
+    "is_actor",
+    "is_human",
+    "name",
+    "owner",
+    "parent",
+    "parts",
+    "realized_components",
+    "realized_entities",
+    "realized_operational_entities",
+    "realizing_components",
+    "realizing_logical_components",
+    "related_exchanges",
+    "requirements",
+    "xtype",
+  ]
+-%}
 {{ show_other_attributes(object, excluded=excluded) | safe }}

@@ -48,5 +48,13 @@
 
 <h2>Other attributes</h2>
 
-{%- set excluded = ["name", "xtype", "description", "exchanges", "elements"] -%}
+{%-
+  set excluded = [
+    "description",
+    "elements",
+    "exchanges",
+    "name",
+    "xtype",
+  ]
+-%}
 {{ show_other_attributes(object, excluded=excluded) | safe }}

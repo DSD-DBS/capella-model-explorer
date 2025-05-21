@@ -21,5 +21,13 @@
     {{ render_reqs_by_type(folder.requirements, types) | safe }}
   {% endfor %}
 {% endif %}
-{% set filtered = ["parent", "owner", "requirements", "long_name", "to_reqif"] %}
-{{ show_other_attributes(object, excluded=filtered) | safe }}
+{%-
+  set excluded = [
+    "long_name",
+    "owner",
+    "parent",
+    "requirements",
+    "to_reqif",
+  ]
+-%}
+{{ show_other_attributes(object, excluded=excluded) | safe }}
