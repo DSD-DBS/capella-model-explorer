@@ -152,5 +152,12 @@
 {% endfor %}
 
 <h2>Other properties of "{{ object.name }}"</h2>
-{% set excluded = ["name", "xtype", "transitions", "states"] %}
+{%-
+  set excluded = [
+    "name",
+    "states",
+    "transitions",
+    "xtype",
+  ]
+-%}
 {{ show_other_attributes(object, excluded=excluded) | safe }}

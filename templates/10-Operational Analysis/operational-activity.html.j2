@@ -161,5 +161,22 @@
 {{ display_traceability(object, show_upper=False) | safe }}
 
 <h2>Other properties of "{{ object.name }}"</h2>
-{% set excluded = ["name", "available_in_states", "related_exchanges", "requirements", "realizing_system_functions", "inputs", "outputs", "context_diagram", "xtype", "parent", "owner", "owning_entity", "realization_view", "description"] %}
+{%-
+  set excluded = [
+    "available_in_states",
+    "context_diagram",
+    "description",
+    "inputs",
+    "name",
+    "outputs",
+    "owner",
+    "owning_entity",
+    "parent",
+    "realization_view",
+    "realizing_system_functions",
+    "related_exchanges",
+    "requirements",
+    "xtype",
+  ]
+-%}
 {{ show_other_attributes(object, excluded=excluded) | safe }}

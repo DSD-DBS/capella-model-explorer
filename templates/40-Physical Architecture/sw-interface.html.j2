@@ -152,20 +152,20 @@
 {{ display_traceability(object) | safe }}
 
 <h2>Other attributes</h2>
-{%
+{%-
   set excluded = [
     "allocated_functional_exchanges",
+    "allocating_physical_paths",
     "applied_property_value_groups",
-    "property_value_groups",
     "context_diagram",
-    "parent",
+    "exchange_items",
     "name",
-    "uuid",
+    "parent",
+    "property_value_groups",
+    "realized_component_exchanges",
     "source",
     "target",
-    "exchange_items",
-    "allocating_physical_paths",
-    "realized_component_exchanges"
+    "uuid",
   ]
-%}
+-%}
 {{ show_other_attributes(object, excluded=excluded) | safe }}
