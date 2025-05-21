@@ -62,4 +62,4 @@
 <h2>Other object attributes</h2>
 
 {% set filtered = ["name", "description", "xtype", "allocated_functional_exchanges", "context_diagram", "parent", "realizing_component_exchanges", "realized_component_exchanges"] %}
-{{ show_other_attributes(object, filtered) | safe }}
+{{ show_other_attributes(object, excluded=filtered) | safe }}
