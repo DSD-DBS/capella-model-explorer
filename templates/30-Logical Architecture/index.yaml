@@ -1,6 +1,14 @@
 # Copyright DB InfraGO AG and contributors
 # SPDX-License-Identifier: Apache-2.0
 
+- template: logical-capability.html.j2
+  id: logical-capability
+  name: Logical Capability
+  description: Specifies what the logical system should be capable of and how it needs to interact with external actors.
+  scope:
+    type: CapabilityRealization
+    below: la
+
 - template: logical-component.html.j2
   name: Logical Components
   id: logical-component
