@@ -25,7 +25,7 @@
   {{ linked_name(target_function)|safe }}.
 {% endmacro %}
 
-<h1>Logical Interface {{ object.name }}</h1>
+<h1>Logical Interface {{ linked_name(object) }}</h1>
 <small class="print:hidden" style="opacity:0.5;"
   >UUID: {{ object.uuid }}</small
 >

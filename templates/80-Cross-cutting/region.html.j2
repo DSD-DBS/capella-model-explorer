@@ -2,7 +2,7 @@
     Copyright DB InfraGO AG and contributors
     SPDX-License-Identifier: Apache-2.0
 #}
-{% from 'common_macros.html.j2' import show_other_attributes, description %}
+{% from 'common_macros.html.j2' import linked_name, show_other_attributes, description %}
 
 {% macro render_name_with_icon(obj) %}
   <a href="hlink://{{ obj.uuid }}">
@@ -147,7 +147,7 @@
 <h2>Related Diagrams</h2>
 
 {% for diagram in object.diagrams %}
-  <h3>{{ diagram.name }}</h3>
+  <h3>{{ linked_name(diagram) }}</h3>
   {{ diagram }}
 {% endfor %}
 

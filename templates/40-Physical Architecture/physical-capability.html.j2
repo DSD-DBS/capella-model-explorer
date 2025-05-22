@@ -18,45 +18,24 @@
 <h1>{{ linked_name(object) }}</h1>
 {{ description(object) | safe }}
 
-<b>Pre-condition</b>:
+<br /><b>Pre-condition</b>:
 {% if object.precondition %}
   <p>{{ object.precondition.specification['capella:linkedText']|safe }}</p>
 {% else %}
   <p style="color:red">No pre-condition defined</p>
 {% endif %}
 
-<b>Post-condition</b>:
+<br /><b>Post-condition</b>:
 {% if object.postcondition %}
   <p>{{ object.postcondition.specification['capella:linkedText']|safe }}</p>
 {% else %}
   <p style="color:red">No post-condition defined</p>
 {% endif %}
 
-{%- if object.extends -%}
-  <p>The capability {{ object.name }} extends the following capabilities:</p>
-  <ul>
-    {%- for ext in object.extends -%}
-      <li>{{ linked_name_with_icon(ext.target) | safe }}</li>
-    {%- endfor -%}
-  </ul>
-{%- endif -%}
-
-{% if object.extended_by %}
-  <p>
-    The capability {{ object.name }} is further extended by the following
-    capabilities:
-  </p>
-  <ul>
-    {%- for ext in object.extended_by -%}
-      <li>{{ linked_name_with_icon(ext.source) | safe }}</li>
-    {%- endfor -%}
-  </ul>
-{% endif %}
-
 <h2>Context Diagram</h2>
 <p>
-  The diagram below provides an overview over the components immediately
-  involved in the Capability and related Capabilities.
+  The diagram below provides an overview over the entities immediately involved
+  in the Capability and related Capabilities.
 </p>
 
 {{ object.context_diagram }}
@@ -67,14 +46,14 @@
     "Functional Requirements",
     object.involved_functions,
     object.involved_components,
-    "The diagram below provides an overview of the System (green) and actor
+    "The diagram below provides an overview of the Physical System (green) and actor
     (blue) functions that are required to realize the Capability.",
     "This section provides a summary of what functions are required from the
-    System and the actors to enable the system Capability.",
-    "Capability",
+    Physical System and the actors to enable the CapabilityRealization.",
+    "CapabilityRealization",
     "functions",
     "components",
-    "Component"
+    "PhysicalComponent"
   )
 }}
 {%- set related_processes = object.involved_chains + object.owned_chains -%}
@@ -119,8 +98,7 @@
     "constraints",
     "context_diagram",
     "data_flow_view",
-    "entity_involvements",
-    "involved_entities",
+    "involved_components",
     "realizing_capabilities",
     "involved_functions",
     "owned_chains",

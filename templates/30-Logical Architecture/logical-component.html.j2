@@ -4,6 +4,7 @@
 #}
 {%
   from 'common_macros.html.j2' import
+  linked_name,
   description,
   display_property_label,
   linked_name_with_icon,
@@ -15,7 +16,7 @@
   show_other_attributes
 %}
 
-<h1>Definition of {{ object.name }}</h1>
+<h1>Definition of {{ linked_name(object) }}</h1>
 {{ description(object) | safe }}
 
 <h2>Capabilities</h2>

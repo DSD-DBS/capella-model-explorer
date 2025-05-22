@@ -4,7 +4,7 @@
 #}
 {% from 'common_macros.html.j2' import show_other_attributes, description, typed_name, linked_name, linked_name_with_icon, display_traceability, render_requirements_table %}
 
-<h1>{{ object.name }}</h1>
+<h1>{{ linked_name(object) }}</h1>
 {{ description(object) | safe }}
 {%- set owner_label = '<span style="color: red">Unidentified entity</span>' -%}
 {%- if object.owner -%}{%- set owner_label = linked_name_with_icon(object.owner) -%}{%- endif -%}
