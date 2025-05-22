@@ -203,7 +203,11 @@
 {%- endmacro -%}
 
 {%- macro linked_name(object) -%}
-  <a href="{{ object | make_href }}">{{ object.name  | trim }}</a>
+  {%- if object -%}
+    <a href="{{ object | make_href }}">{{ object.name | trim }}</a>
+  {%- else -%}
+    <em>Deleted object</em>
+  {%- endif -%}
 {%- endmacro -%}
 
 {% macro draw_icon(obj, size) %}
