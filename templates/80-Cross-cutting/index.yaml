@@ -7,6 +7,7 @@
   description: Specifies structure of a data class. A class may be used to describe anything from a simple object relationship to a message on a bus.
   scope:
     type: Class
+
 - template: diagrams.html.j2
   name: Diagrams
   id: diagram
@@ -14,12 +15,14 @@
   scope:
     type: DRepresentationDescriptor
     attr: diagrams
+
 - template: exchange-item.html.j2
   name: Exchange Item
   id: exchange-item
   description: Specifies an exchange item, i.e. energy / material / information.
   scope:
     type: ExchangeItem
+
 - template: region.html.j2
   id: logical-state-machine
   name: State Machine Regions

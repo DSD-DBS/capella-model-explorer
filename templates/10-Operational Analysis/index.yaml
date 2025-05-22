@@ -8,6 +8,7 @@
   scope:
     type: OperationalCapability
     below: oa
+
 - template: operational-entity.html.j2
   id: operational-entity
   name: Operational Entity
@@ -16,6 +17,7 @@
   scope:
     type: Entity
     below: oa
+
 - template: operational-activity.html.j2
   id: operational-activity
   name: Operational Activity
@@ -23,4 +25,13 @@
   isExperimental: true
   scope:
     type: OperationalActivity
+    below: oa
+
+- template: operational-process.html.j2
+  id: operational-process
+  name: Operational Process
+  description: Specifies an operational Process.
+  isExperimental: true
+  scope:
+    type: OperationalProcess
     below: oa

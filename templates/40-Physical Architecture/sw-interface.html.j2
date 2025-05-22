@@ -4,6 +4,7 @@
 #}
 {%
   from 'common_macros.html.j2' import
+  linked_name,
   show_other_attributes,
   linked_name,
   linked_name_with_icon,
@@ -24,7 +25,7 @@
   {{ linked_name_with_icon(target_function)|safe }}.
 {% endmacro %}
 
-<h1>Software Interface Control Document - {{ object.name }}</h1>
+<h1>Software Interface Control Document - {{ linked_name(object) }}</h1>
 <h2>Introduction</h2>
 <p>
   This Interface Control Document only covers software message based
@@ -130,7 +131,7 @@
     within the interface.
   </p>
   {%- for path in object.allocating_physical_paths -%}
-    <h4>{{ path.name }}</h4>
+    <h4>{{ linked_name(path) }}</h4>
     <p>{{ description(path) | safe }}</p>
     <h5>Involved links:</h5>
     <ul>
@@ -152,20 +153,20 @@
 {{ display_traceability(object) | safe }}
 
 <h2>Other attributes</h2>
-{%
+{%-
   set excluded = [
-    "allocated_functional_exchanges",
-    "applied_property_value_groups",
-    "property_value_groups",
-    "context_diagram",
-    "parent",
     "name",
     "uuid",
+    "parent",
     "source",
     "target",
+    "allocated_functional_exchanges",
+    "context_diagram",
     "exchange_items",
     "allocating_physical_paths",
-    "realized_component_exchanges"
+    "realized_component_exchanges",
+    "applied_property_value_groups",
+    "property_value_groups"
   ]
-%}
+-%}
 {{ show_other_attributes(object, excluded=excluded) | safe }}

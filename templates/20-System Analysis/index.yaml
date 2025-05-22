@@ -8,6 +8,7 @@
   scope:
     type: Capability
     below: sa
+
 - template: system_function.html.j2
   id: system-function
   name: System Function
@@ -16,6 +17,7 @@
   scope:
     type: SystemFunction
     below: sa
+
 - template: system-actor.html.j2
   id: system-actors
   name: System Actors
@@ -25,6 +27,7 @@
     below: sa
     filters:
       is_actor: true
+
 - template: system-definition.html.j2
   id: system-definition
   name: System Definition
@@ -32,6 +35,7 @@
   single: true
   isExperimental: true
   isDocument: true
+
 - template: system-interface.html.j2
   id: system-interfaces
   name: System Interfaces
@@ -39,6 +43,14 @@
   scope:
     type: ComponentExchange
     below: sa
+
+- template: ../functional-chain.html.j2
+  id: functional-chain
+  name: Functional Chain
+  description: Defines a functional chain of involved functions and exchanges
+  scope:
+    type: FunctionalChain
+
 - template: mod-rules-compliance.html.j2
   id: mod-rules-compliance
   name: SA Modeling Rules Compliance Report

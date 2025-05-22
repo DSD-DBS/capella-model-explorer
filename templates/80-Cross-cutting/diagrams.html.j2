@@ -2,9 +2,15 @@
     Copyright DB InfraGO AG and contributors
     SPDX-License-Identifier: Apache-2.0
 #}
-{% from 'common_macros.html.j2' import show_other_attributes, description, linked_name_with_icon %}
+{%
+  from 'common_macros.html.j2' import
+  show_other_attributes,
+  linked_name,
+  description,
+  linked_name_with_icon
+%}
 
-<h1>{{ object.name }}</h1>
+<h1>{{ linked_name(object) }}</h1>
 {{ object }}
 
 <h2>Description</h2>

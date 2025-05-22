@@ -129,7 +129,22 @@
 {% else %}
   <p style="color:red">No properties are owned by this object.</p>
 {% endif %}
-{% set handled_attrs = ["from_model", "pvmt", "owned_properties", "properties", "parent", "generalizations", "super", "tree_view", "xtype", "name", "uuid", "description"] %}
 
 <h2>Other Object Attributes</h2>
-{{ show_other_attributes(object, excluded=handled_attrs) | safe }}
+{%-
+  set excluded = [
+    "name",
+    "description"
+    "uuid",
+    "xtype",
+    "parent",
+    "from_model",
+    "owned_properties",
+    "properties",
+    "generalizations",
+    "super",
+    "tree_view",
+    "pvmt"
+  ]
+-%}
+{{ show_other_attributes(object, excluded=excluded) | safe }}

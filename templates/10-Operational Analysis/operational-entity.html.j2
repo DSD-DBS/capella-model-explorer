@@ -2,9 +2,18 @@
     Copyright DB InfraGO AG and contributors
     SPDX-License-Identifier: Apache-2.0
 #}
-{% from 'common_macros.html.j2' import show_other_attributes, description, render_reqs_by_type, typed_name, display_traceability, linked_name_with_icon %}
+{%
+  from 'common_macros.html.j2' import
+  linked_name,
+  show_other_attributes,
+  description,
+  render_reqs_by_type,
+  typed_name,
+  display_traceability,
+  linked_name_with_icon
+%}
 
-<h1>{{ object.name }}</h1>
+<h1>{{ linked_name(object) }}</h1>
 {{ description(object) | safe }}
 
 <p style="margin-top:1.5em; ">
@@ -30,7 +39,7 @@
     <i>{{ object.name }}</i>:
   </p>
   {% for stm in object.state_machines %}
-    <h3>{{ stm.name }}</h3>
+    <h3>{{ linked_name(stm) }}</h3>
     {% if stm.regions | length > 1 %}
       <p>The state machine has the following regions:</p>
       <ul>
@@ -112,5 +121,24 @@
 
 <h2>Other attributes</h2>
 
-{% set filtered = ["description", "realizing_system_components", "realizing_components", "xtype", "is_actor", "is_human", "entities", "owner", "parent", "parts", "requirements", "state_machines", "activities", "capabilities", "name", "realization_view"] %}
-{{ show_other_attributes(object, excluded=filtered) | safe }}
+{%-
+  set excluded = [
+    "name",
+    "description",
+    "owner",
+    "parent",
+    "xtype",
+    "is_actor",
+    "is_human",
+    "parts",
+    "entities",
+    "activities",
+    "capabilities",
+    "state_machines",
+    "realization_view"
+    "requirements",
+    "realizing_system_components",
+    "realizing_components"
+  ]
+-%}
+{{ show_other_attributes(object, excluded=excluded) | safe }}

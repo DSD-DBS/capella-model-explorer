@@ -20,19 +20,19 @@
 </p>
 
 {{ display_property_values(object ) | safe }}
-{%
-  set covered = [
+{%-
+  set excluded = [
+    "name",
+    "xtype",
+    "owner",
+    "parent",
+    "context_diagram",
     "ends",
     "linkEnds",
-    "name",
-    "owner",
     "source",
     "target",
-    "xtype",
     "applied_property_value_groups",
-    "property_value_groups",
-    "parent",
-    "context_diagram"
+    "property_value_groups"
   ]
-%}
-{{ show_other_attributes(object, excluded=covered) | safe }}
+-%}
+{{ show_other_attributes(object, excluded=excluded) | safe }}
