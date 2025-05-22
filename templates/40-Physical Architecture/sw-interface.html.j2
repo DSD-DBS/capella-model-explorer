@@ -130,7 +130,7 @@
     within the interface.
   </p>
   {%- for path in object.allocating_physical_paths -%}
-    <h4>{{ path.name }}</h4>
+    <h4>{{ linked_name(path) }}</h4>
     <p>{{ description(path) | safe }}</p>
     <h5>Involved links:</h5>
     <ul>
