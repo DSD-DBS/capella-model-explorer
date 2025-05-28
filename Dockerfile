@@ -8,6 +8,7 @@ ENV HOME=/home
 ENV PATH=$HOME/.local/bin:/app/bin:$PATH
 ENV VIRTUAL_ENV=/app
 ENV MODEL_ENTRYPOINT=/model
+ENV CME_LIVE_MODE=0
 EXPOSE 8000
 
 RUN apt-get update && \
