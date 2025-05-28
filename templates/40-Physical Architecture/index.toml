@@ -1,0 +1,34 @@
+# Copyright DB InfraGO AG and contributors
+# SPDX-License-Identifier: Apache-2.0
+
+[[templates]]
+path = "phy-component.html.j2"
+id = "physical-component"
+name = "Physical Component"
+description = "Defines a Physical Component"
+flags = ["experimental"]
+scope = { type = "PhysicalComponent", below = "pa" }
+
+[[templates]]
+path = "physical-link.html.j2"
+id = "physical-link"
+name = "Physical Interface"
+description = "Defines a Physical Interface between 2 components"
+flags = ["experimental"]
+scope = { type = "PhysicalLink", below = "pa" }
+
+[[templates]]
+path = "physical-function.html.j2"
+id = "physical-function"
+name = "Physical Functions"
+description = "Defines function of a physical component or an actor"
+flags = ["experimental"]
+scope = { type = "PhysicalFunction", below = "pa" }
+
+[[templates]]
+path = "sw-interface.html.j2"
+id = "sw-interface"
+name = "Software Interfaces"
+description = "Defines interfaces between software components"
+flags = ["experimental"]
+scope = { type = "ComponentExchange", below = "pa" }
