@@ -26,8 +26,8 @@ classifiers = [
   "Programming Language :: Python :: 3.13",
 ]
 dependencies = [
-  "capellambse-context-diagrams>=0.7.3,<0.8",
-  "capellambse>=0.6.13,<0.7",
+  "capellambse-context-diagrams>=0.7.11,<0.8",
+  "capellambse>=0.7.0,<0.8",
   "click>=8.1.8,<9",
   "jinja2>=3.1.5,<4",
   "logfmter>=0.0.9",

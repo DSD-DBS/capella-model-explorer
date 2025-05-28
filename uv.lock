@@ -150,8 +150,8 @@ docs = [
 
 [package.metadata]
 requires-dist = [
-    { name = "capellambse", specifier = ">=0.6.13,<0.7" },
-    { name = "capellambse-context-diagrams", specifier = ">=0.7.3,<0.8" },
+    { name = "capellambse", specifier = ">=0.7.0,<0.8" },
+    { name = "capellambse-context-diagrams", specifier = ">=0.7.11,<0.8" },
     { name = "click", specifier = ">=8.1.8,<9" },
     { name = "jinja2", specifier = ">=3.1.5,<4" },
     { name = "logfmter", specifier = ">=0.0.9" },
@@ -176,7 +176,7 @@ docs = [
 
 [[package]]
 name = "capellambse"
-version = "0.6.19"
+version = "0.7.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "awesomeversion" },
@@ -190,31 +190,31 @@ dependencies = [
     { name = "svgwrite" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/5c/93/0e690b1fab9586859e76ba89e9e70a489c1d67a900dad6f3aa607b7dccb5/capellambse-0.6.19.tar.gz", hash = "sha256:29d205916922121263162d69d21e4f8107145bffd6baaa64c3d698d11d816fb2", size = 5692202, upload-time = "2025-05-26T11:48:30.71Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/08/12/20a2fc772150353c204178f7db727080386474ad92f960aaa491ebf3bd59/capellambse-0.7.0.tar.gz", hash = "sha256:4628500ef88b75c1e0b68e2abec12a6b3882aeadf82fa57ee7baaa33f30d2b4d", size = 5476890, upload-time = "2025-05-28T12:52:44.657Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/ad/d2/1e77f47dc556705560306f81fb9130275e8e6b6c2d70ddd122b697f8a63a/capellambse-0.6.19-cp310-abi3-macosx_10_13_x86_64.whl", hash = "sha256:5aed7502812e4dc19a69bddd99ed894c67575ec0079876cc84d8b077fe36f1dc", size = 632512, upload-time = "2025-05-26T11:48:12.769Z" },
-    { url = "https://files.pythonhosted.org/packages/e0/0e/5c585ad415c3c902861e80c4c6e75b8e88af7b28f4d12d8e164a909a8c9e/capellambse-0.6.19-cp310-abi3-macosx_11_0_arm64.whl", hash = "sha256:ad33dc8265042c6be61c63c7b649be86c679c181ab3d65ca3d254d62adaa1cc2", size = 625947, upload-time = "2025-05-26T11:48:15.345Z" },
-    { url = "https://files.pythonhosted.org/packages/43/0d/bbfa9ffd1a78ca9f7df3d9acca5aaa293d0e62c10b91efff6e6b809e33e7/capellambse-0.6.19-cp310-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:f8106345ba230bc21432ade2872bd4910129d3513742567f9caca6ce20f91dac", size = 654548, upload-time = "2025-05-26T11:48:17.275Z" },
-    { url = "https://files.pythonhosted.org/packages/b5/4f/430a22253616fa2c4f748e17ca4bde486727d9f505d1572e5ee0c0220aca/capellambse-0.6.19-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:4073e743a46246daf135fcfb5b68e7ad66c9611d3b268a9d2f9e2c3d4ea616b2", size = 656697, upload-time = "2025-05-26T11:48:19.382Z" },
-    { url = "https://files.pythonhosted.org/packages/b7/cf/9f88098010aad363dad984c4589947a2a4d4e7e12417ea2309542b5e13d1/capellambse-0.6.19-cp310-abi3-musllinux_1_2_aarch64.whl", hash = "sha256:1e43ca29d736d87d8f211bf028d948677f2eea4008e6d09e24de1a0b20e108ac", size = 719235, upload-time = "2025-05-26T11:48:21.335Z" },
-    { url = "https://files.pythonhosted.org/packages/cf/2b/2a7ff7aef3beaffb6bf4918fd695451031a85af20d05bb15aac860321957/capellambse-0.6.19-cp310-abi3-musllinux_1_2_x86_64.whl", hash = "sha256:3ae0d33c8c900905960c1be2218683e1f0b4d16b9c0e9672d041538ddd44fba1", size = 735043, upload-time = "2025-05-26T11:48:23.607Z" },
-    { url = "https://files.pythonhosted.org/packages/51/f8/95846d8d5a418f02b97927dfaf538eb5e6f9f6322cca10384be886c9728e/capellambse-0.6.19-cp310-abi3-win32.whl", hash = "sha256:0ab6849155c6a6b533d3b6b7efa1a2d63bcdd719ad49f888ebcda638ab28366a", size = 514137, upload-time = "2025-05-26T11:48:25.562Z" },
-    { url = "https://files.pythonhosted.org/packages/bb/77/c6fd66f03c8bab20126d8b2f47c64d94f75f319ba7b6cc2c499f14eaac32/capellambse-0.6.19-cp310-abi3-win_amd64.whl", hash = "sha256:edeba94c0d06773febe6ecbe367f0d8417e4e61cb3877edd32a39b0451f794fe", size = 519372, upload-time = "2025-05-26T11:48:27.059Z" },
-    { url = "https://files.pythonhosted.org/packages/d2/97/6f9212cfcfb8f93d12d9fb4b07ddbddadc615376b4b5132ac6b30a2e3d88/capellambse-0.6.19-py3-none-any.whl", hash = "sha256:165e1f2e70cdb0f60bc834fbd0d8dab67a128896585d4ab5cec44b2380b728f2", size = 381243, upload-time = "2025-05-26T11:48:28.981Z" },
+    { url = "https://files.pythonhosted.org/packages/62/d6/6c1eab5811f5be9d84397a47ba170b47c5c294fa111edfcda7b68297e25f/capellambse-0.7.0-cp310-abi3-macosx_10_13_x86_64.whl", hash = "sha256:cadb77a5e5fa9fd3284aa9199d02c9272bb54daca31bbda5401058011f359acb", size = 672446, upload-time = "2025-05-28T12:52:30.274Z" },
+    { url = "https://files.pythonhosted.org/packages/85/91/27fbe7e28e6c3c5225fe664dbc2acd428aa98aa628eb714730be0bff30f0/capellambse-0.7.0-cp310-abi3-macosx_11_0_arm64.whl", hash = "sha256:91cfd0c426b0b8d17d1ed4479ce202ccd4c5686338ee982e701649a5f19b0fee", size = 665881, upload-time = "2025-05-28T12:52:32.482Z" },
+    { url = "https://files.pythonhosted.org/packages/9d/7a/801ac4151e09f9ee50524d76e74def85aefa9b35b76ac21497e4dc004319/capellambse-0.7.0-cp310-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:07208649ec92bf24d60acf45e2086233d33702f6b7c13cdda5d6c745890f3c60", size = 694485, upload-time = "2025-05-28T12:52:33.873Z" },
+    { url = "https://files.pythonhosted.org/packages/4d/b9/c8dcb9fc89a70a8dbab69d8ebe4f42ced98470f2e6d6da1d1e0c883b8fae/capellambse-0.7.0-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:dcc1c42f0c2e5f5c6a178a7cd04d9dfe856a2629f85ddc2d7460bf98edbc40ec", size = 696632, upload-time = "2025-05-28T12:52:35.44Z" },
+    { url = "https://files.pythonhosted.org/packages/83/da/fdbf798856e90ea0d188570241563272ec95467f1e3f391610860d5818bb/capellambse-0.7.0-cp310-abi3-musllinux_1_2_aarch64.whl", hash = "sha256:5aefe241abac9dc74e6ee57d015740a1247b506fe2d6a225370a8f0b9d7ce849", size = 759175, upload-time = "2025-05-28T12:52:36.813Z" },
+    { url = "https://files.pythonhosted.org/packages/ad/be/b010ce63643602eba064140fe3b4909123ccd136fba665eca41f9bea3413/capellambse-0.7.0-cp310-abi3-musllinux_1_2_x86_64.whl", hash = "sha256:8f6577c5fd66006eeaf1101ec0b801093a70f56540bfe820980f05c52f17e6a0", size = 774985, upload-time = "2025-05-28T12:52:38.23Z" },
+    { url = "https://files.pythonhosted.org/packages/13/66/0c52cac2f2abc1b0252f88f513e0ef934bd83105d0c9bd9fc6fc0a20b35b/capellambse-0.7.0-cp310-abi3-win32.whl", hash = "sha256:9ed10995ed335ead468760b9dca711dd0c880538b084af778beef02fc60a1e58", size = 554319, upload-time = "2025-05-28T12:52:39.998Z" },
+    { url = "https://files.pythonhosted.org/packages/a2/73/4f47e5405415efb4badeda0b81ce8d6e58b60d2344b874a29c8b5e632754/capellambse-0.7.0-cp310-abi3-win_amd64.whl", hash = "sha256:233f512a35f78eea6d85e177fe8eca348ff8f2ee81980949b685f7f543a0101d", size = 559553, upload-time = "2025-05-28T12:52:41.344Z" },
+    { url = "https://files.pythonhosted.org/packages/a1/0b/eaf42e9a5fabda83782d587623dc63ecb2bcbebbc2e8cb9dc167492a7f51/capellambse-0.7.0-py3-none-any.whl", hash = "sha256:b4582a50ae885a6cadcbe879919e6c3b0a428edd6a78326623bed39cbd4739f7", size = 421056, upload-time = "2025-05-28T12:52:42.886Z" },
 ]
 
 [[package]]
 name = "capellambse-context-diagrams"
-version = "0.7.10"
+version = "0.7.11"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "capellambse" },
     { name = "pydantic" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/74/30/e1415f2e332182e47469933b0654cab9142403fcea09021c81b917389908/capellambse_context_diagrams-0.7.10.tar.gz", hash = "sha256:7aedd28a5380dfac8ea479c6069fdffc628fe48e87b2b8adbde19d54626e5a99", size = 493410, upload-time = "2025-05-22T09:41:42.808Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/7b/62/eae04e01921fe98c0322e2873db2e0ff74f1ff4afb03e9881da75d905530/capellambse_context_diagrams-0.7.11.tar.gz", hash = "sha256:199029aaa0889d8b956a8b1959c317ac580a8686f5959feb0dc1ceb4eeb3023c", size = 493398, upload-time = "2025-05-28T12:49:02.115Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/c0/95/dbbe673fad96202362007f63145eab7ff0e3f27157f759b6f62bbc99c1ea/capellambse_context_diagrams-0.7.10-py3-none-any.whl", hash = "sha256:535f84b8eaddbf3b26fb82949aa70e6203030bab65ed9282c1cc9dce3867534c", size = 61925, upload-time = "2025-05-22T09:41:41.055Z" },
+    { url = "https://files.pythonhosted.org/packages/e2/11/0212f36047c37beaf08268f618d483345cfeda78410174f870efa782c2c1/capellambse_context_diagrams-0.7.11-py3-none-any.whl", hash = "sha256:18c53f5a86874fe973670e26e74091c68eba7b5907b0ddd4d9eed08a0e94e728", size = 61931, upload-time = "2025-05-28T12:49:00.081Z" },
 ]
 
 [[package]]
