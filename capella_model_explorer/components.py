@@ -400,8 +400,8 @@ def template_card(template: reports.Template) -> ft.A:
     url = app.app.url_path_for("template_page", template_id=template.id)
 
     chips = []
-    if template.isExperimental:
-        c = ft.Div(
+    if reports.TemplateFlags.EXPERIMENTAL in template.flags:
+        b = ft.Div(
             icons.badge_experimental(),
             ft.P("Experimental"),
             cls=(
@@ -424,10 +424,10 @@ def template_card(template: reports.Template) -> ft.A:
                 "text-yellow-800",
             ),
         )
-        chips.append(c)
+        chips.append(b)
 
-    if template.isStable:
-        c = ft.Div(
+    if reports.TemplateFlags.STABLE in template.flags:
+        b = ft.Div(
             icons.badge_stable(),
             ft.P("Stable"),
             cls=(
@@ -450,10 +450,10 @@ def template_card(template: reports.Template) -> ft.A:
                 "text-xs",
             ),
         )
-        chips.append(c)
+        chips.append(b)
 
-    if template.isDocument:
-        c = ft.Div(
+    if reports.TemplateFlags.DOCUMENT in template.flags:
+        b = ft.Div(
             icons.badge_document(),
             ft.P("Document"),
             cls=(
@@ -476,7 +476,7 @@ def template_card(template: reports.Template) -> ft.A:
                 "text-xs",
             ),
         )
-        chips.append(c)
+        chips.append(b)
 
     if chips:
         chip_container = ft.Div(
