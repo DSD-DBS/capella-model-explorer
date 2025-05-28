@@ -45,6 +45,11 @@
   communications between the sub-systems / components / system elements /
   actors of the System under Consideration.
 </p>
+
+<h2>Context Diagram</h2>
+<p>The following shows {{ object.name }} in its system-level context:</p>
+{{ object.context_diagram | safe }}
+
 <h2>Interface Partners</h2>
 {% set partner_a = object.source.owner %}
 {% set partner_b = object.target.owner %}
