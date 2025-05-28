@@ -159,8 +159,19 @@ def rendered_report(template_id: str, model_element_uuid: str = "") -> t.Any:
             object_diff={},
         )
     except Exception:
+        elem_repr = ""
+        try:
+            if model_element is not None:
+                elem_repr = model_element._short_repr_()
+        except Exception:
+            pass
+        logger.exception(
+            "Error rendering template %r with object %s",
+            template_id,
+            elem_repr or repr(model_element_uuid),
+        )
+
         full_traceback = traceback.format_exc()
-        print(full_traceback)
         return ft.Div(
             ft.Div("Error rendering template:", cls="text-xl"),
             fh.Pre(
