@@ -413,6 +413,93 @@ def search_field(template: reports.Template, search: str) -> ft.Div:
 
 def template_card(template: reports.Template) -> ft.A:
     url = app.app.url_path_for("template_page", template_id=template.id)
+
+    chips = []
+    if template.isExperimental:
+        c = ft.Div(
+            icons.badge_experimental(),
+            ft.P("Experimental"),
+            cls=(
+                "bg-yellow-100",
+                "border",
+                "border-yellow-800",
+                "dark:border-yellow-600",
+                "dark:bg-yellow-900",
+                "dark:text-yellow-300",
+                "flex",
+                "flex-row",
+                "font-medium",
+                "max-h-7",
+                "me-2",
+                "px-2.5",
+                "py-1",
+                "rounded-full",
+                "space-x-2",
+                "text-xs",
+                "text-yellow-800",
+            ),
+        )
+        chips.append(c)
+
+    if template.isStable:
+        c = ft.Div(
+            icons.badge_stable(),
+            ft.P("Stable"),
+            cls=(
+                "bg-green-100",
+                "border",
+                "border-green-800",
+                "dark:bg-green-700",
+                "dark:border-green-500",
+                "dark:text-green-200",
+                "flex",
+                "flex-row",
+                "font-medium",
+                "max-h-7",
+                "me-2",
+                "px-2.5",
+                "py-1",
+                "rounded-full",
+                "space-x-2",
+                "text-green-800",
+                "text-xs",
+            ),
+        )
+        chips.append(c)
+
+    if template.isDocument:
+        c = ft.Div(
+            icons.badge_document(),
+            ft.P("Document"),
+            cls=(
+                "bg-blue-200",
+                "border",
+                "border-blue-800",
+                "dark:bg-blue-700",
+                "dark:border-blue-400",
+                "dark:text-blue-200",
+                "flex",
+                "flex-row",
+                "font-medium",
+                "max-h-7",
+                "me-2",
+                "px-2.5",
+                "py-1",
+                "rounded-full",
+                "space-x-2",
+                "text-blue-800",
+                "text-xs",
+            ),
+        )
+        chips.append(c)
+
+    if chips:
+        chip_container = ft.Div(
+            *chips, cls="flex flex-row grow place-items-end p-4"
+        )
+    else:
+        chip_container = None
+
     return ft.A(
         ft.Div(
             ft.Div(
@@ -458,88 +545,7 @@ def template_card(template: reports.Template) -> ft.A:
                 "text-neutral-800",
             ),
         ),
-        ft.Div(
-            ft.Div(
-                icons.badge_experimental(),
-                ft.P("Experimental"),
-                cls="hidden"
-                if not template.isExperimental
-                else (
-                    "bg-yellow-100",
-                    "border",
-                    "border-yellow-800",
-                    "dark:border-yellow-600",
-                    "dark:bg-yellow-900",
-                    "dark:text-yellow-300",
-                    "flex",
-                    "flex-row",
-                    "font-medium",
-                    "max-h-7",
-                    "me-2",
-                    "px-2.5",
-                    "py-1",
-                    "rounded-full",
-                    "space-x-2",
-                    "text-xs",
-                    "text-yellow-800",
-                ),
-            ),
-            ft.Div(
-                icons.badge_stable(),
-                ft.P("Stable"),
-                cls="hidden"
-                if not template.isStable
-                else (
-                    "bg-green-100",
-                    "border",
-                    "border-green-800",
-                    "dark:bg-green-700",
-                    "dark:border-green-500",
-                    "dark:text-green-200",
-                    "flex",
-                    "flex-row",
-                    "font-medium",
-                    "max-h-7",
-                    "me-2",
-                    "px-2.5",
-                    "py-1",
-                    "rounded-full",
-                    "space-x-2",
-                    "text-green-800",
-                    "text-xs",
-                ),
-            ),
-            ft.Div(
-                icons.badge_document(),
-                ft.P("Document"),
-                cls="hidden"
-                if not template.isDocument
-                else (
-                    "bg-blue-200",
-                    "border",
-                    "border-blue-800",
-                    "dark:bg-blue-700",
-                    "dark:border-blue-400",
-                    "dark:text-blue-200",
-                    "flex",
-                    "flex-row",
-                    "font-medium",
-                    "max-h-7",
-                    "me-2",
-                    "px-2.5",
-                    "py-1",
-                    "rounded-full",
-                    "space-x-2",
-                    "text-blue-800",
-                    "text-xs",
-                ),
-            ),
-            cls="hidden"
-            if not template.isDocument
-            and not template.isExperimental
-            and not template.isStable
-            else "flex flex-row grow place-items-end p-4",
-        ),
+        chip_container,
         cls=(
             "_template-card",
             "active:border-blue-600",
