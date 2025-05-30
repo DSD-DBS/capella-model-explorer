@@ -185,7 +185,7 @@ def rendered_report(template_id: str, model_element_uuid: str = "") -> t.Any:
     )
 
 
-@ar.get("/template/{template_id}")
+@ar.get("/report/{template_id}")
 @ar.get("/report/{template_id}/{model_element_uuid}")
 def template_page(
     request: starlette.requests.Request,
@@ -209,9 +209,12 @@ def template_page(
             template, model_element_uuid
         )
     elif len(template.instances) == 1:
-        model_element_uuid = template.instances[0]["uuid"]
-        placeholder = components.report_placeholder(
-            template, model_element_uuid
+        return fh.RedirectResponse(
+            app.url_path_for(
+                "template_page",
+                template_id=template.id,
+                model_element_uuid=template.instances[0]["uuid"],
+            )
         )
     else:
         placeholder = components.report_placeholder(None, None)
