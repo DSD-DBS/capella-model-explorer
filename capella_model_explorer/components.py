@@ -332,11 +332,6 @@ def report_placeholder(
                 model_element_uuid=model_element_uuid,
             ),
             hx_headers=hx_headers,
-            hx_push_url=app.app.url_path_for(
-                "template_page",
-                template_id=template.id,
-                model_element_uuid=model_element_uuid,
-            ),
             hx_target="#template_container",
             cls="flex justify-center place-items-center h-full w-full",
         )
