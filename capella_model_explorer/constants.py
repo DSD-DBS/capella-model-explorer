@@ -64,7 +64,6 @@ js_bundle_path = "static/bundle/app.js"
 js_bundle_hash = core.compute_file_hash(js_bundle_path)
 
 HEADERS: t.Final[list[fh.Link | ft.Script]] = [
-    fh.HighlightJS(langs=["python"]),
     fh.Link(
         rel="stylesheet",
         href=f"{ROUTE_PREFIX}/{css_bundle_path}?v={css_bundle_hash}",
@@ -79,10 +78,14 @@ HEADERS: t.Final[list[fh.Link | ft.Script]] = [
         charset="utf-8",
         src=f"{ROUTE_PREFIX}/{js_bundle_path}?v={js_bundle_hash}",
     ),
+    fh.HighlightJS(langs=["python"]),
     ft.Script(
         imr.read_text(__name__.rsplit(".", 1)[0], "inline-dark-mode.js")
     ),
-    ft.Style(f":root {{ --primary-color-hue: {PRIMARY_COLOR_HUE}; }}"),
+    ft.Style(
+        f":root {{ --primary-color-hue: {PRIMARY_COLOR_HUE}; }}\n"
+        ":not(:defined) { visibility: hidden; }"
+    ),
 ]
 if sys.stderr.isatty():
     LOGGING_COLORS = {

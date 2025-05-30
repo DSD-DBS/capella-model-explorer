@@ -63,6 +63,7 @@ else:
 
 
 app = _app_cls(
+    htmx=False,
     hdrs=c.HEADERS,
     key_fname=pathlib.Path(tempfile.gettempdir()) / ".sesskey",
     live=c.LIVE_MODE,
@@ -202,6 +203,7 @@ def template_page(
     request: starlette.requests.Request,
     template_id: str,
     model_element_uuid: str | None = None,
+    search: str = "",
 ) -> t.Any:
     template = reports.template_by_id(template_id)
     if template is None:
@@ -230,10 +232,26 @@ def template_page(
     else:
         placeholder = components.report_placeholder(None, None)
 
+    if (
+        request.headers.get("HX-Request") == "true"
+        and request.headers.get("HX-Target") != "root"
+    ):
+        return (
+            components.template_container(placeholder),
+            components.template_sidebar(
+                template=template,
+                selected_model_element_uuid=model_element_uuid,
+                search=search,
+                oob=True,
+            ),
+            components.breadcrumbs(template, model_element_uuid, oob=True),
+        )
+
     page_content = ft.Div(
         components.template_sidebar(
             template=template,
             selected_model_element_uuid=model_element_uuid,
+            search=search,
         ),
         components.template_container(placeholder),
         id="template-page-content",
@@ -248,8 +266,17 @@ def template_page(
             "w-full",
         ),
     )
-    return _maybe_wrap_content(
-        request, template, model_element_uuid, page_content
+
+    if request.headers.get("HX-Request") == "true":
+        return (
+            page_content,
+            components.breadcrumbs(template, model_element_uuid, oob=True),
+        )
+
+    return components.application_shell(
+        page_content,
+        template=template,
+        element=model_element_uuid,
     )
 
 

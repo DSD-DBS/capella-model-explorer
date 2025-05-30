@@ -6,6 +6,11 @@
 import "bigger-picture/dist/bigger-picture.css";
 import BiggerPicture from "bigger-picture/dist/bigger-picture.mjs";
 
+import "htmx.org";
+import "./htmx.js";
+import "idiomorph/dist/idiomorph.js";
+import "idiomorph/dist/idiomorph-ext.js";
+
 import "./compiled.css";
 
 window.openDiagramViewer = function (svgContainer) {
