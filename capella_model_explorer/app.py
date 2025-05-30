@@ -100,7 +100,15 @@ def home(request) -> t.Any:
         ft.Div(
             components.model_information(),
             components.reports_page(),
-            cls="flex flex-col space-y-4 place-items-center mx-auto mb-4",
+            cls=(
+                "colors-surface-container",
+                "flex",
+                "flex-col",
+                "space-y-4",
+                "place-items-center",
+                "mx-auto",
+                "mb-4",
+            ),
         ),
         ft.Div(
             ft.A(
@@ -219,26 +227,38 @@ def template_page(
     else:
         placeholder = components.report_placeholder(None, None)
 
-    page_content = ft.Div(
-        components.template_sidebar(
-            template=template,
-            selected_model_element_uuid=model_element_uuid,
+    if request.headers.get("HX-Request") == "true":
+        return (
+            components.template_container(placeholder),
+            components.template_sidebar(
+                template=template,
+                selected_model_element_uuid=model_element_uuid,
+                oob=True,
+            ),
+            components.breadcrumbs(template, model_element_uuid, oob=True),
+        )
+
+    return components.application_shell(
+        ft.Div(
+            components.template_sidebar(
+                template=template,
+                selected_model_element_uuid=model_element_uuid,
+            ),
+            components.template_container(placeholder),
+            id="template-page-content",
+            cls=(
+                "flex",
+                "flex-col-reverse",
+                "justify-between",
+                "lg:flex-row",
+                "min-h-full",
+                "print:bg-white",
+                "print:min-h-auto",
+                "w-full",
+            ),
         ),
-        components.template_container(placeholder),
-        id="template-page-content",
-        cls=(
-            "flex",
-            "flex-col-reverse",
-            "justify-between",
-            "lg:flex-row",
-            "min-h-full",
-            "print:bg-white",
-            "print:min-h-auto",
-            "w-full",
-        ),
-    )
-    return _maybe_wrap_content(
-        request, template, model_element_uuid, page_content
+        template=template,
+        element=model_element_uuid,
     )
 
 

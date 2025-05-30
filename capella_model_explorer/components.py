@@ -10,6 +10,7 @@ import typing as t
 
 import capellambse
 import capellambse_context_diagrams
+from fasthtml import components as fc
 from fasthtml import ft, svg
 
 import capella_model_explorer
@@ -150,72 +151,40 @@ def model_information() -> ft.Div:
             cls="object-scale-down",
         ),
         cls=(
-            "bg-white",
-            "dark:bg-neutral-800/50",
-            "dark:shadow-none",
-            "dark:text-neutral-400",
-            "flex",
-            "flex-col",
+            "colors-surface",
             "max-w-full",
             "m-2",
             "mt-4",
             "p-4",
-            "place-items-center",
             "rounded-lg",
-            "shadow-primary-500",
-            "shadow-xs",
-            "svg-display",
             "text-center",
-            "text-neutral-700",
         ),
     )
 
 
 def model_object_button(
-    *, template: reports.Template, model_element: dict, selected: bool = False
-) -> ft.A:
-    return ft.A(
-        ft.Div(model_element["name"]),
-        ft.Div(model_element["uuid"], cls="text-xs text-sky-700")
-        if state.show_uuids
-        else None,
-        id=f"model-element-{model_element['uuid']}",
-        aria_selected="true" if selected else "false",
-        cls=(
-            "aria-selected:bg-primary-500",
-            "aria-selected:dark:hover:bg-primary-500",
-            "aria-selected:dark:text-white",
-            "aria-selected:text-white",
-            "bg-neutral-200",
-            "break-words",
-            "cursor-pointer",
-            "dark:bg-neutral-800",
-            "dark:hover:bg-neutral-700",
-            "dark:text-neutral-400",
-            "duration-300",
-            "flex",
-            "flex-col",
-            "hover:bg-primary-50",
-            "hover:scale-[1.02]",
-            "model_object_btn",
-            "p-4",
-            "place-items-left",
-            "rounded-md",
-            "shadow-sm",
-            "text-left",
-            "transition",
-            "w-full",
-        ),
+    *,
+    template: reports.Template,
+    element: dict[t.Any, t.Any],
+    selected: bool,
+):
+    if state.show_uuids:
+        uuid = ft.Span(element["uuid"], slot="description")
+    else:
+        uuid = None
+    return fc.Mdui_list_item(
+        element["name"],
+        uuid,
+        id=f"model-element-{element['uuid']}",
+        rounded=True,
+        active=selected,
         hx_trigger="click",
-        hx_get=app.render_template.to(
-            template_id=template.id,
-            model_element_uuid=model_element["uuid"],
-        ),
-        hx_push_url=app.app.url_path_for(
+        hx_get=app.app.url_path_for(
             "template_page",
             template_id=template.id,
-            model_element_uuid=model_element["uuid"],
+            model_element_uuid=element["uuid"],
         ),
+        hx_push_url="true",
         hx_target="#template_container",
     )
 
@@ -225,52 +194,49 @@ def model_elements_list(
     template: reports.Template,
     selected_id: str | None,
     search: str = "",
-) -> ft.Div:
+):
     search_words = search.lower().split()
     model_elements = [
         obj
         for obj in sorted(template.instances, key=lambda x: x["name"])
         if (n := obj["name"].lower()) and all(w in n for w in search_words)
     ]
-    return ft.Div(
-        ft.Div(
-            *(
-                model_object_button(
-                    template=template,
-                    model_element=model_element,
-                    selected=model_element["uuid"] == selected_id,
-                )
-                for model_element in model_elements
-            ),
-            cls="flex flex-col space-y-4 pl-2 pr-4 my-2",
-        ),
-        ft.Script(
-            pathlib.Path("static/js/model_object_list.js").read_text(
-                encoding="utf8"
+    return fc.Mdui_list(
+        *(
+            model_object_button(
+                template=template,
+                element=el,
+                selected=el["uuid"] == selected_id,
             )
-        ),
-        id="model_object_list",
-        cls="overflow-auto grow",
+            for el in model_elements
+        )
     )
 
 
 def navbar(template: reports.Template | None, element: str | None) -> ft.Nav:
     return ft.Nav(
         breadcrumbs(template, element),
-        ft.Button(
-            icons.printer(),
+        fc.Mdui_button_icon(
+            icon="print--outlined",
             onclick="window.print();",
-            id="print-button",
             title="Print report",
-            cls="hidden hover:cursor-pointer",
+            cls=(
+                "text-neutral-300",
+                "hover:text-neutral-50",
+                "dark:text-neutral-400",
+                "dark:hover:text-neutral-100",
+            ),
         ),
-        ft.Button(
-            icons.theme_system(id="dark-mode-icon-system"),
-            icons.theme_dark(id="dark-mode-icon-dark", cls=("hidden",)),
-            icons.theme_light(id="dark-mode-icon-light", cls=("hidden",)),
+        fc.Mdui_button_icon(
+            icon="brightness_auto--outlined",
             id="dark-mode-button",
             title="Toggle dark mode",
-            cls="cursor-pointer",
+            cls=(
+                "text-neutral-300",
+                "hover:text-neutral-50",
+                "dark:text-neutral-400",
+                "dark:hover:text-neutral-100",
+            ),
         ),
         id="page-header",
         cls=(
@@ -281,11 +247,11 @@ def navbar(template: reports.Template | None, element: str | None) -> ft.Nav:
             "flex",
             "gap-2",
             "h-12",
-            "min-h-12",
             "max-h-12",
+            "min-h-12",
+            "print:hidden",
             "px-4",
             "py-0",
-            "print:hidden",
             "sticky",
             "top-0",
             "w-full",
@@ -340,87 +306,98 @@ def report_placeholder(
 
 
 def reports_page() -> ft.Div:
+    categories = []
+    for i, cat in enumerate(state.template_categories):
+        if i > 0:
+            categories.append(fc.Mdui_divider(middle=True))
+        categories.append(template_category(cat))
     return ft.Div(
-        *(template_category(t) for t in state.template_categories),
+        *categories,
         id="reports-index",
-        cls=(
-            "bg-white",
-            "dark:bg-neutral-800/50",
-            "dark:shadow-none",
-            "flex",
-            "flex-col",
-            "m-2",
-            "p-4",
-            "place-items-center",
-            "rounded-lg",
-            "shadow-primary-500",
-            "shadow-xs",
-            "space-y-16",
-        ),
+        cls=("colors-surface", "m-2", "p-4", "rounded-lg"),
     )
 
 
-def search_field(template: reports.Template, search: str) -> ft.Div:
+def search_field(template: reports.Template, search: str) -> ft.Div | None:
     search_field_threshold = 3
+    if template.instance_count <= search_field_threshold:
+        return None
     return ft.Div(
-        ft.Input(
-            icons.magnifying_glass(),
-            type="search",
+        fc.Mdui_text_field(
+            variant="outlined",
+            label="Search",
             id="instance-search",
             name="search",
-            placeholder="Search",
             value=search,
-            cls=(
-                "-outline-offset-1",
-                "bg-white",
-                "block",
-                "col-start-1",
-                "dark:bg-neutral-800",
-                "dark:focus:outline-white",
-                "dark:text-neutral-400",
-                "focus:-outline-offset-2",
-                "focus:outline-2",
-                "focus:outline-primary-500",
-                "grow",
-                "outline",
-                "outline-1",
-                "outline-neutral-300",
-                "pl-8",
-                "placeholder:text-neutral-400",
-                "pr-3",
-                "py-1.5",
-                "rounded-md",
-                "row-start-1",
-                "text-neutral-900",
-            ),
-            hx_trigger="input changed delay:20ms, search",
+            icon="search",
+            clearable=True,
+            hx_trigger="input changed delay:300ms, search",
             hx_get=app.model_object_list.to(
                 template_id=template.id,
                 selected_model_element_uuid="",
             ),
             hx_swap="outerHTML",
             hx_target="#model_object_list",
-            autofocus="true",
         ),
-        cls=(
-            "hidden"
-            if template.instance_count <= search_field_threshold
-            else "",
-            "grid",
-            "grid-cols-1",
-            "pl-2",
-            "pr-4",
-        ),
+        cls=("grid", "grid-cols-1", "pl-2", "pr-4"),
     )
 
 
 def template_card(template: reports.Template) -> ft.A:
     url = app.app.url_path_for("template_page", template_id=template.id)
-    return ft.A(
+
+    # https://tailwindcss.com/docs/detecting-classes-in-source-files#dynamic-class-names
+    colors = ("colors-primary-container", "colors-primary")
+    if template.scope:
+        if template.scope.below == "oa":
+            colors = ("colors-layer-oa-container", "colors-layer-oa")
+        elif template.scope.below == "sa":
+            colors = ("colors-layer-sa-container", "colors-layer-sa")
+        elif template.scope.below == "la":
+            colors = ("colors-layer-la-container", "colors-layer-la")
+        elif template.scope.below == "pa":
+            colors = ("colors-layer-pa-container", "colors-layer-pa")
+
+    chips = []
+    if template.isExperimental:
+        chips.append(
+            fc.Mdui_chip(
+                "Experimental",
+                icon="science--rounded",
+                cls="chip-experimental",
+            )
+        )
+
+    if template.isStable:
+        chips.append(
+            fc.Mdui_chip(
+                "Stable",
+                icon="gpp_good--rounded",
+                cls="chip-stable",
+            )
+        )
+
+    if template.isDocument:
+        chips.append(
+            fc.Mdui_chip(
+                "Document",
+                icon="description",
+                cls="chip-document",
+            )
+        )
+
+    if chips:
+        chip_container = ft.Div(
+            *chips, cls="flex flex-row grow place-items-end p-4"
+        )
+    else:
+        chip_container = None
+
+    return fc.Mdui_card(
         ft.Div(
             ft.Div(
                 template.name,
-                cls="text-neutral-100 dark:text-neutral-400 text-2xl",
+                cls="text-2xl",
             ),
             ft.Div(
                 icons.file_stack()
@@ -431,137 +408,39 @@ def template_card(template: reports.Template) -> ft.A:
                     cls="hidden" if template.instance_count <= 1 else "block",
                 ),
                 cls=(
-                    "dark:text-neutral-400",
                     "flex",
                     "flex-row",
                     "items-top",
                     "pt-2",
                     "space-x-2",
-                    "text-primary-50",
                 ),
             ),
             cls=(
                 "_template-card-header",
-                "bg-primary-500",
-                "dark:bg-neutral-900",
                 "flex",
                 "flex-row",
                 "justify-between",
                 "p-4",
                 "rounded-t-lg",
+                colors[1],
             ),
         ),
         ft.P(
             template.description,
             cls=(
                 "_template-card-description",
-                "dark:text-neutral-300",
                 "p-4",
                 "text-left",
-                "text-neutral-800",
             ),
         ),
-        ft.Div(
-            ft.Div(
-                icons.badge_experimental(),
-                ft.P("Experimental"),
-                cls="hidden"
-                if not template.isExperimental
-                else (
-                    "bg-yellow-100",
-                    "border",
-                    "border-yellow-800",
-                    "dark:border-yellow-600",
-                    "dark:bg-yellow-900",
-                    "dark:text-yellow-300",
-                    "flex",
-                    "flex-row",
-                    "font-medium",
-                    "max-h-7",
-                    "me-2",
-                    "px-2.5",
-                    "py-1",
-                    "rounded-full",
-                    "space-x-2",
-                    "text-xs",
-                    "text-yellow-800",
-                ),
-            ),
-            ft.Div(
-                icons.badge_stable(),
-                ft.P("Stable"),
-                cls="hidden"
-                if not template.isStable
-                else (
-                    "bg-green-100",
-                    "border",
-                    "border-green-800",
-                    "dark:bg-green-700",
-                    "dark:border-green-500",
-                    "dark:text-green-200",
-                    "flex",
-                    "flex-row",
-                    "font-medium",
-                    "max-h-7",
-                    "me-2",
-                    "px-2.5",
-                    "py-1",
-                    "rounded-full",
-                    "space-x-2",
-                    "text-green-800",
-                    "text-xs",
-                ),
-            ),
-            ft.Div(
-                icons.badge_document(),
-                ft.P("Document"),
-                cls="hidden"
-                if not template.isDocument
-                else (
-                    "bg-blue-200",
-                    "border",
-                    "border-blue-800",
-                    "dark:bg-blue-700",
-                    "dark:border-blue-400",
-                    "dark:text-blue-200",
-                    "flex",
-                    "flex-row",
-                    "font-medium",
-                    "max-h-7",
-                    "me-2",
-                    "px-2.5",
-                    "py-1",
-                    "rounded-full",
-                    "space-x-2",
-                    "text-blue-800",
-                    "text-xs",
-                ),
-            ),
-            cls="hidden"
-            if not template.isDocument
-            and not template.isExperimental
-            and not template.isStable
-            else "flex flex-row grow place-items-end p-4",
-        ),
+        chip_container,
         cls=(
-            "_template-card",
-            "active:border-blue-600",
-            "bg-white",
-            "dark:bg-neutral-800",
-            "dark:hover:bg-neutral-700",
-            "dark:shadow-neutral-900",
-            "dark:shadow-xs",
-            "duration-300",
             "flex",
             "flex-col",
-            "hover:bg-primary-50",
-            "hover:cursor-pointer",
-            "hover:scale-105",
             "m-4",
-            "rounded-lg",
-            "shadow-lg",
             "transition",
             "w-80",
+            colors[0],
         ),
         href=url,
         hx_get=url,
@@ -576,17 +455,7 @@ def template_category(
     return ft.Div(
         ft.P(
             f"{template_category.idx} Reports",
-            cls=(
-                "border-b",
-                "border-neutral-900",
-                "dark:border-neutral-700",
-                "dark:text-neutral-400",
-                "font-semibold",
-                "pb-2",
-                "text-2xl",
-                "text-center",
-                "text-neutral-800",
-            ),
+            cls=("font-semibold", "pb-2", "text-2xl", "text-center"),
         ),
         ft.Div(
             *[
@@ -645,6 +514,7 @@ def template_sidebar(
     template: reports.Template,
     selected_model_element_uuid: str | None,
     search: str = "",
+    oob: bool = False,
 ) -> ft.Div:
     sidebar_caption = (
         ft.Div(
@@ -684,4 +554,5 @@ def template_sidebar(
             "sticky",
             "top-0",
         ),
+        **({"hx_swap_oob": "true"} if oob else {}),
     )

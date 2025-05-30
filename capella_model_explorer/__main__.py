@@ -133,7 +133,6 @@ def build_bundle(
     tailwind_cmd = [
         "npx",
         "@tailwindcss/cli",
-        "--minify",
         "--input",
         str(input_css),
         "--output",
@@ -154,10 +153,14 @@ def build_bundle(
         return (subprocess.Popen(tailwind_cmd), subprocess.Popen(parcel_cmd))
 
     logger.info(shlex.join(tailwind_cmd))
-    subprocess.check_call(tailwind_cmd)
+    result = subprocess.run(tailwind_cmd, check=False)
+    if result.returncode != 0:
+        raise SystemExit("Build failed!")
 
     logger.info(shlex.join(parcel_cmd))
-    subprocess.check_call(parcel_cmd)
+    result = subprocess.run(parcel_cmd, check=False)
+    if result.returncode != 0:
+        raise SystemExit("Build failed!")
 
     return None
 
