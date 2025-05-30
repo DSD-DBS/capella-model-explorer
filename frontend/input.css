@@ -5,6 +5,9 @@
 
 @import "tailwindcss";
 
+@import "../node_modules/mdui/mdui.css" layer(theme);
+@import "./mdui-theme.css" layer(theme);
+
 @plugin '@tailwindcss/typography';
 
 @theme inline {
@@ -19,17 +22,133 @@
   --color-primary-800: hsl(var(--primary-color-hue) 48.5% 19%);
   --color-primary-900: hsl(var(--primary-color-hue) 49% 10%);
   --color-primary-950: hsl(var(--primary-color-hue) 46.2% 5.1%);
+
+  --radius-*: initial;
+  --radius-xs: var(--mdui-shape-corner-extra-small);
+  --radius-sm: var(--mdui-shape-corner-small);
+  --radius-md: var(--mdui-shape-corner-medium);
+  --radius-lg: var(--mdui-shape-corner-large);
+  --radius-xl: var(--mdui-shape-corner-extra-large);
+  --radius-2xl: var(--mdui-shape-corner-extra-large); /* FIXME remove this */
+  --radius-3xl: var(--mdui-shape-corner-extra-large); /* FIXME remove this */
+  --radius-4xl: var(--mdui-shape-corner-extra-large); /* FIXME remove this */
+  --radius-full: var(--mdui-shape-corner-full);
 }
 
-@custom-variant dark (&:where(.dark, .dark *));
+@custom-variant dark (&:where(.mdui-theme-dark, .mdui-theme-dark *));
+
+@font-face {
+  font-family: 'Material Icons';
+  font-style: normal;
+  font-weight: 400;
+  src: url(MaterialIcons-Regular.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Material Icons Outlined';
+  font-style: normal;
+  font-weight: 400;
+  src: url(MaterialIconsOutlined-Regular.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Material Icons Round';
+  font-style: normal;
+  font-weight: 400;
+  src: url(MaterialIconsRound-Regular.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Material Icons Sharp';
+  font-style: normal;
+  font-weight: 400;
+  src: url(MaterialIconsSharp-Regular.woff2) format('woff2');
+}
+
+@layer components { /* colors */
+  .colors-layer-oa {
+    background-color: rgb(var(--mdui-color-layer-oa));
+    color: rgb(var(--mdui-color-on-layer-oa));
+  }
+  .colors-layer-oa-container {
+    background-color: rgb(var(--mdui-color-layer-oa-container));
+    color: rgb(var(--mdui-color-on-layer-oa-container));
+  }
+
+  .colors-layer-sa {
+    background-color: rgb(var(--mdui-color-layer-sa));
+    color: rgb(var(--mdui-color-on-layer-sa));
+  }
+  .colors-layer-sa-container {
+    background-color: rgb(var(--mdui-color-layer-sa-container));
+    color: rgb(var(--mdui-color-on-layer-sa-container));
+  }
+
+  .colors-layer-la {
+    background-color: rgb(var(--mdui-color-layer-la));
+    color: rgb(var(--mdui-color-on-layer-la));
+  }
+  .colors-layer-la-container {
+    background-color: rgb(var(--mdui-color-layer-la-container));
+    color: rgb(var(--mdui-color-on-layer-la-container));
+  }
+
+  .colors-layer-pa {
+    background-color: rgb(var(--mdui-color-layer-pa));
+    color: rgb(var(--mdui-color-on-layer-pa));
+  }
+  .colors-layer-pa-container {
+    background-color: rgb(var(--mdui-color-layer-pa-container));
+    color: rgb(var(--mdui-color-on-layer-pa-container));
+  }
+
+  .colors-surface-container {
+    background-color: rgb(var(--mdui-color-surface-container));
+    color: rgb(var(--mdui-color-on-surface));
+  }
+
+  .colors-surface {
+    background-color: rgb(var(--mdui-color-surface));
+    color: rgb(var(--mdui-color-on-surface));
+  }
+
+  .colors-primary {
+    background-color: rgb(var(--mdui-color-primary));
+    color: rgb(var(--mdui-color-on-primary));
+  }
+  .colors-primary-container {
+    background-color: rgb(var(--mdui-color-primary-container));
+    color: rgb(var(--mdui-color-on-primary-container));
+  }
+}
+
+@layer components { /* chips */
+  .chip-document {
+    --mdui-color-primary: var(--mdui-color-on-chip-document-container);
+    --mdui-color-surface: var(--mdui-color-chip-document-container);
+
+    border: 1px rgb(var(--mdui-color-primary)) solid;
+  }
+
+  .chip-experimental {
+    --mdui-color-primary: var(--mdui-color-on-chip-experimental-container);
+    --mdui-color-surface: var(--mdui-color-chip-experimental-container);
+
+    border: 1px rgb(var(--mdui-color-primary)) solid;
+  }
+
+  .chip-stable {
+    --mdui-color-primary: var(--mdui-color-on-chip-stable-container);
+    --mdui-color-surface: var(--mdui-color-chip-stable-container);
+
+    border: 1px rgb(var(--mdui-color-primary)) solid;
+  }
+}
 
 .template-container ul > li > a > img,
 .template-container a > img {
   margin: 0 !important;
 }
-html.dark .layer-above,
-html.dark .svg-display img:not(.icon),
-html.dark .bp-inner img {
+html.mdui-theme-dark .layer-above,
+html.mdui-theme-dark .svg-display img:not(.icon),
+html.mdui-theme-dark .bp-inner img {
   filter: hue-rotate(180deg) invert(80%) saturate(200%);
 }
 
