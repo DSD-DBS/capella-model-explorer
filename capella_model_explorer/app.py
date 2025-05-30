@@ -112,7 +112,14 @@ def home(request) -> t.Any:
         ft.Div(
             components.model_information(),
             components.reports_page(),
-            cls="flex flex-col space-y-4 place-items-center mx-auto mb-4",
+            cls=(
+                "flex",
+                "flex-col",
+                "space-y-4",
+                "place-items-center",
+                "mx-auto",
+                "mb-4",
+            ),
         ),
         components.bottom_bar(),
     )
@@ -236,7 +243,6 @@ def template_page(
                 template=template,
                 selected_model_element_uuid=model_element_uuid,
                 search=search,
-                oob=True,
             ),
             components.breadcrumbs(template, model_element_uuid, oob=True),
         )
