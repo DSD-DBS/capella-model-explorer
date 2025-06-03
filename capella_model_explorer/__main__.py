@@ -339,6 +339,13 @@ def main(
     default=False,
     help="Don't rebuild already existing assets.",
 )
+@click.option(
+    "--debug-spinner",
+    envvar="CME_DEBUG_SPINNER",
+    is_flag=True,
+    default=False,
+    help="Keep the template loading spinner spinning until clicked",
+)
 @click.pass_context
 def run(
     ctx: click.Context,
@@ -354,6 +361,7 @@ def run(
     route_prefix: str,
     image: str,
     skip_rebuild: bool,
+    debug_spinner: bool,
 ) -> None:
     """Run the application."""
     os.environ["CME_HOST"] = host
@@ -363,6 +371,7 @@ def run(
     os.environ["CME_LIVE_MODE"] = "1" if live_mode else "0"
     os.environ["CME_ROUTE_PREFIX"] = route_prefix
     os.environ["CME_DOCKER_IMAGE_NAME"] = image
+    os.environ["CME_DEBUG_SPINNER"] = "01"[debug_spinner]
     importlib.reload(c)
 
     if container and dev:
