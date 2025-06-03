@@ -5,7 +5,6 @@ from __future__ import annotations
 
 import base64
 import json
-import pathlib
 import typing as t
 
 import capellambse
@@ -23,7 +22,7 @@ def application_shell(
 ) -> tuple[ft.Title, ft.Main]:
     return (
         ft.Title(f"{state.model.name} - Model Explorer"),
-        ft.Div(
+        ft.Body(
             navbar(template, element),
             ft.Main(
                 *content,
@@ -46,6 +45,7 @@ def application_shell(
                 "print:h-auto",
                 "print:min-h-auto",
             ),
+            hx_ext="morph",
         ),
     )
 
@@ -207,15 +207,13 @@ def model_object_button(
             "w-full",
         ),
         hx_trigger="click",
-        hx_get=app.render_template.to(
-            template_id=template.id,
-            model_element_uuid=model_element["uuid"],
-        ),
-        hx_push_url=app.app.url_path_for(
+        hx_get=app.app.url_path_for(
             "template_page",
             template_id=template.id,
             model_element_uuid=model_element["uuid"],
         ),
+        hx_push_url="true",
+        hx_include='[name="search"]',
         hx_target="#template_container",
     )
 
@@ -243,11 +241,6 @@ def model_elements_list(
                 for model_element in model_elements
             ),
             cls="flex flex-col space-y-4 pl-2 pr-4 my-2",
-        ),
-        ft.Script(
-            pathlib.Path("static/js/model_object_list.js").read_text(
-                encoding="utf8"
-            )
         ),
         id="model_object_list",
         cls="overflow-auto grow",
@@ -400,6 +393,7 @@ def search_field(template: reports.Template, search: str) -> ft.Div:
             ),
             hx_swap="outerHTML",
             hx_target="#model_object_list",
+            hx_preserve="true",
             autofocus="true",
         ),
         cls=(
@@ -645,6 +639,7 @@ def template_sidebar(
     template: reports.Template,
     selected_model_element_uuid: str | None,
     search: str = "",
+    oob: bool = False,
 ) -> ft.Div:
     sidebar_caption = (
         ft.Div(
@@ -684,4 +679,5 @@ def template_sidebar(
             "sticky",
             "top-0",
         ),
+        hx_swap_oob=oob and "morph",
     )
