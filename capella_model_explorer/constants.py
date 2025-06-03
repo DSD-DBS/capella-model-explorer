@@ -54,20 +54,20 @@ TEMPLATES_DIR: t.Final[pathlib.Path] = CONFIG(
     default=Defaults.templates_dir.resolve(),
 ).resolve()
 
-diagram_viewer_path = "static/js/diagramViewer.js"
-diagram_viewer_hash = core.compute_file_hash(diagram_viewer_path)
+css_bundle_path = "static/bundle/app.css"
+css_bundle_hash = core.compute_file_hash(css_bundle_path)
 
 favicon_path = "static/favicon.svg"
 favicon_hash = core.compute_file_hash(favicon_path)
 
-main_css_path = "static/css/main.min.css"
-main_css_hash = core.compute_file_hash(main_css_path)
+js_bundle_path = "static/bundle/app.js"
+js_bundle_hash = core.compute_file_hash(js_bundle_path)
 
 HEADERS: t.Final[list[fh.Link | ft.Script]] = [
     fh.HighlightJS(langs=["python"]),
     fh.Link(
         rel="stylesheet",
-        href=f"{ROUTE_PREFIX}/{main_css_path}?v={main_css_hash}",
+        href=f"{ROUTE_PREFIX}/{css_bundle_path}?v={css_bundle_hash}",
         type="text/css",
     ),
     fh.Link(
@@ -77,11 +77,7 @@ HEADERS: t.Final[list[fh.Link | ft.Script]] = [
     ),
     ft.Script(
         charset="utf-8",
-        src=f"{ROUTE_PREFIX}/{diagram_viewer_path}?v={diagram_viewer_hash}",
-    ),
-    ft.Script(
-        charset="utf-8",
-        src=f"{ROUTE_PREFIX}/static/js/plotly-3.0.0.min.js",
+        src=f"{ROUTE_PREFIX}/{js_bundle_path}?v={js_bundle_hash}",
     ),
     ft.Script(
         imr.read_text(__name__.rsplit(".", 1)[0], "inline-dark-mode.js")

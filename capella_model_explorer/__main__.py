@@ -67,8 +67,8 @@ def run_local(*, rebuild: bool, log_config: dict[str, t.Any]) -> None:
     if not pathlib.Path(c.TEMPLATES_DIR).is_dir():
         raise SystemExit(f"Templates directory not found: {c.TEMPLATES_DIR}")
 
-    if rebuild or not pathlib.Path(c.main_css_path).exists():
-        build_css(watch=False)
+    if rebuild or not pathlib.Path(c.css_bundle_path).exists():
+        build_bundle(watch=False)
 
     logger.info("Running the application locally...")
     uvicorn.run(
@@ -88,12 +88,13 @@ def run_local_dev(*, log_config: dict[str, t.Any]) -> None:
     if not pathlib.Path(c.TEMPLATES_DIR).is_dir():
         raise SystemExit(f"Templates directory not found: {c.TEMPLATES_DIR}")
 
-    tailwind_proc = build_css(watch=True)
-    assert tailwind_proc is not None
+    bundlers = build_bundle(watch=True)
+    assert bundlers is not None
+    tailwind_proc, parcel_proc = bundlers
     time.sleep(1)  # avoid direct uvicorn reload when css file is written
 
     try:
-        with tailwind_proc:
+        with tailwind_proc, parcel_proc:
             uvicorn.run(
                 app="capella_model_explorer.app:app",
                 host=c.HOST,
@@ -104,6 +105,7 @@ def run_local_dev(*, log_config: dict[str, t.Any]) -> None:
                 reload_excludes=[
                     "git_askpass.py",
                     "input.css",
+                    "compiled.css",
                 ],
                 reload_includes=[
                     "*.css",
@@ -114,37 +116,47 @@ def run_local_dev(*, log_config: dict[str, t.Any]) -> None:
             )
     except KeyboardInterrupt:
         tailwind_proc.terminate()
+        parcel_proc.terminate()
 
 
-def build_css(*, watch: bool) -> subprocess.Popen | None:
-    """Build style sheet using Tailwind CSS."""
-    logger.info("Building style sheet...")
-
+def build_bundle(
+    *, watch: bool
+) -> tuple[subprocess.Popen, subprocess.Popen] | None:
+    """Build the script and CSS bundles."""
+    logger.info("Building frontend bundles...")
     _install_npm_pkgs()
-    exe = shutil.which("node_modules/.bin/tailwindcss")
-    if exe is None:
-        raise SystemExit("tailwindcss failed to install, please try again")
-    exe = os.path.realpath(exe)
 
-    input_css = pathlib.Path("static/css/input.css")
+    input_css = pathlib.Path("frontend/input.css")
     if not input_css.is_file():
         raise SystemExit(f"Input CSS file not found: {input_css}")
 
     tailwind_cmd = [
-        exe,
-        "--minify",
+        "npx",
+        "@tailwindcss/cli",
         "--input",
         str(input_css),
         "--output",
-        c.main_css_path,
+        "frontend/compiled.css",
+        *(["--watch"] if watch else []),
+    ]
+    parcel_cmd = [
+        "npx",
+        "parcel",
+        "watch" if watch else "build",
+        "--dist-dir=static/bundle",
+        "frontend/app.js",
     ]
     if watch:
-        tailwind_cmd.append("--watch")
         logger.info(shlex.join(tailwind_cmd))
-        return subprocess.Popen(tailwind_cmd)
+        logger.info(shlex.join(parcel_cmd))
+        return (subprocess.Popen(tailwind_cmd), subprocess.Popen(parcel_cmd))
 
     logger.info(shlex.join(tailwind_cmd))
     subprocess.check_call(tailwind_cmd)
+
+    logger.info(shlex.join(parcel_cmd))
+    subprocess.check_call(parcel_cmd)
+
     return None
 
 
@@ -387,8 +399,8 @@ def run(
     help="Watch for changes and rebuild automatically.",
 )
 def build(*, watch: bool) -> None:
-    """Build style sheet using Tailwind CSS."""
-    build_css(watch=watch)
+    """Build the frontend script and style bundles."""
+    build_bundle(watch=watch)
 
 
 @main.command("pre-commit-setup")

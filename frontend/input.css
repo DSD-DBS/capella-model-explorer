@@ -1,0 +1,118 @@
+/*
+ * Copyright DB InfraGO AG and contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+@import "tailwindcss";
+
+@plugin '@tailwindcss/typography';
+
+@theme inline {
+  --color-primary-50: hsl(var(--primary-color-hue) 46.2% 94.9%);
+  --color-primary-100: hsl(var(--primary-color-hue) 49% 90%);
+  --color-primary-200: hsl(var(--primary-color-hue) 47.7% 79%);
+  --color-primary-300: hsl(var(--primary-color-hue) 48.1% 69%);
+  --color-primary-400: hsl(var(--primary-color-hue) 48.6% 58%);
+  --color-primary-500: hsl(var(--primary-color-hue) 50% 47.8%);
+  --color-primary-600: hsl(var(--primary-color-hue) 48.5% 38%);
+  --color-primary-700: hsl(var(--primary-color-hue) 48.6% 29%);
+  --color-primary-800: hsl(var(--primary-color-hue) 48.5% 19%);
+  --color-primary-900: hsl(var(--primary-color-hue) 49% 10%);
+  --color-primary-950: hsl(var(--primary-color-hue) 46.2% 5.1%);
+}
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+.template-container ul > li > a > img,
+.template-container a > img {
+  margin: 0 !important;
+}
+html.dark .layer-above,
+html.dark .svg-display img:not(.icon),
+html.dark .bp-inner img {
+  filter: hue-rotate(180deg) invert(80%) saturate(200%);
+}
+
+.html-content {
+  text-align: left;
+}
+.html-content a {
+  @apply no-underline;
+  @apply font-normal;
+}
+.html-content h1,
+.html-content h2,
+.html-content h3,
+.html-content h4,
+.html-content h5,
+.html-content h6 {
+  word-break: break-word;
+}
+
+.html-content svg {
+  display: block;
+  @apply h-auto max-w-full;
+  text-align: center;
+}
+
+.html-content h1 {
+  @apply mb-4 mt-5 text-4xl;
+}
+
+.html-content h2 {
+  @apply mb-3 mt-5 text-3xl;
+}
+
+.html-content h3 {
+  @apply mb-3 mt-5 text-2xl;
+}
+
+.html-content h4 {
+  @apply mb-3 mt-5 text-xl;
+}
+
+.html-content table {
+  @apply min-w-full divide-y divide-gray-400;
+}
+.html-content table tr {
+  border-bottom: 1px solid #ddd;
+}
+.html-content table tr:last-of-type {
+  border-bottom: none;
+}
+.html-content table tr td,
+.html-content table tr th {
+  vertical-align: top;
+  padding: 0 0.4em;
+  white-space: normal;
+  overflow-wrap: break-word;
+  word-break: normal;
+}
+.html-content table tr td:first-of-type,
+.html-content table tr th:first-of-type {
+  vertical-align: top;
+  padding: 0 0.4em;
+  word-break: normal;
+}
+.html-content table tr td p {
+  padding-top: 0;
+  margin-top: 0;
+}
+
+.html-content table tr td p:last-of-type {
+  margin-bottom: 0.2em;
+}
+
+.html-content table tr td ul {
+  padding-bottom: 0.6em;
+}
+
+.html-content p {
+  margin-top: 0.75em;
+  margin-bottom: 0.75em;
+  line-height: 1.5em;
+}
+.html-content p a,
+.html-content li a {
+  @apply italic text-gray-500 hover:underline;
+}
