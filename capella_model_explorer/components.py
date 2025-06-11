@@ -13,6 +13,7 @@ from fasthtml import ft, svg
 
 import capella_model_explorer
 from capella_model_explorer import app, core, icons, reports, state
+from capella_model_explorer import constants as c
 
 
 def application_shell(
@@ -319,7 +320,7 @@ def report_placeholder(
 
         ph_content = ft.Div(
             icons.spinner(),
-            hx_trigger="load",
+            hx_trigger="click" if c.DEBUG_SPINNER else "load",
             hx_get=app.rendered_report.to(
                 template_id=template.id,
                 model_element_uuid=model_element_uuid,
