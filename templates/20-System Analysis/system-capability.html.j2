@@ -31,7 +31,7 @@
   in the Capability and related Capabilities.
 </p>
 
-{{ object.context_diagram }}
+{{ render_diagram(object, "context_diagram") }}
 
 <h2>Data Flow Diagram</h2>
 
@@ -40,7 +40,7 @@
   functions that are required to realize the Capability.
 </p>
 
-{{ object.data_flow_view }}
+{{ render_diagram(object, "data_flow_view") }}
 
 <h2>Functional Requirements</h2>
 

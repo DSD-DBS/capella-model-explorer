@@ -51,7 +51,7 @@
   in the Capability and related Capabilities.
 </p>
 {# Q: should we resolve inherited activities and actors / explicitly indicate where an actor / activity got inherited #}
-{{ object.context_diagram }}
+{{ render_diagram(object, "context_diagram") }}
 
 <h2>Involved entities and activities</h2>
 To enable the Capability, the following entities and activities are involved:
@@ -99,7 +99,7 @@ To enable the Capability, the following entities and activities are involved:
     are required to realize the Capability.
   </p>
 
-  {{ object.data_flow_view }}
+  {{ render_diagram(object, "data_flow_view") }}
 {%- endif -%}
 
 {% if object.diagrams %}

@@ -70,7 +70,7 @@
   activity of interest and other activities.
 </p>
 
-{{ object.context_diagram }}
+{{ render_diagram(object, "context_diagram") }}
 
 {%- if object.inputs -%}
   <h2>Inputs</h2>

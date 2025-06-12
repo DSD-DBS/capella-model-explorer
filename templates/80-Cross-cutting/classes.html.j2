@@ -108,7 +108,7 @@
   {{ object.name }} and other objects.
 </p>
 
-{{ object.tree_view }}
+{{ render_diagram(object, "tree_view") }}
 {% set props = [] %}
 {% if object.super %}
   {% set props = props | list + object.super.properties | list %}

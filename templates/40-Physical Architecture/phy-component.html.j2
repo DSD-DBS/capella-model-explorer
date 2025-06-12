@@ -28,7 +28,7 @@
   The figure below provides an overview of <i>{{ object.name }}</i>'s boundary
   and depicts all the nodes that it is connected to.
 </p>
-{{ object.context_diagram.render(None, display_derived_interfaces=True) }}
+{{ render_diagram(object, "context_diagram", display_derived_interfaces=True) }}
 {{ render_connected_nodes_section(object, capabilities) | safe }}
 
 <h2>Allocated Functions</h2>

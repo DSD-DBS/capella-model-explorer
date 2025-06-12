@@ -10,7 +10,7 @@
   <p>A part of {{ linked_name(object.parent) | safe }}</p>
 {% endif %}
 
-{{ object.context_diagram }}
+{{ render_diagram(object, "context_diagram") }}
 
 <p>
   Connects {{ linked_name(object.ends[0].owner) | safe }} via

@@ -47,6 +47,7 @@ async def lifespan(_):
     )
     state.jinja_env.finalize = reports.finalize
     state.jinja_env.filters["make_href"] = reports.make_href_filter
+    state.jinja_env.globals["render_diagram"] = reports.diagram_placeholder
     state.jinja_env.tests["diagram"] = lambda obj: isinstance(
         obj, capellambse.model.AbstractDiagram | capellambse.diagram.Diagram
     )
@@ -300,6 +301,42 @@ def render_template(
     return (
         components.report_placeholder(template, model_element_uuid),
         components.breadcrumbs(template, model_element_uuid, oob=True),
+    )
+
+
+@ar.get("/diagram/{parent}/{attr}")
+def render_diagram(
+    parent: str,
+    attr: str,
+    params: dict[str, t.Any] | None = None,
+) -> t.Any:
+    """Request the rendering of a diagram."""
+    if params is None:
+        params = {}
+    try:
+        parent_obj = state.model.by_uuid(parent)
+    except KeyError:
+        return ft.Div(f"Model element not found: {parent}")
+    try:
+        diag = getattr(parent_obj, attr)
+    except AttributeError:
+        return ft.Div(f"Model element does not have attribute {attr!r}")
+    if not isinstance(diag, capellambse.model.AbstractDiagram):
+        return ft.Div(f"Attribute {attr!r} is not a diagram")
+
+    try:
+        rendered = reports.render_diagram(
+            diag.render("svg", **params), diag.name
+        )
+    except Exception:
+        logger.exception("Error rendering diagram %r on %r", attr, parent)
+        full_traceback = traceback.format_exc()
+        rendered = reports.SVG_ERROR_MARKUP.format(traceback=full_traceback)
+
+    return (
+        fh.NotStr(rendered),
+        fh.HttpHeader("Cache-Control", f"max-age={c.CACHE_MAX_AGE}"),
+        fh.HttpHeader("Vary", "Render-Environment"),
     )
 
 
