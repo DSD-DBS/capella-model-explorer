@@ -44,6 +44,12 @@ async def lifespan(_):
     )
     state.jinja_env.finalize = reports.finalize
     state.jinja_env.filters["make_href"] = reports.make_href_filter
+    state.jinja_env.tests["diagram"] = lambda obj: isinstance(
+        obj, capellambse.model.AbstractDiagram | capellambse.diagram.Diagram
+    )
+    state.jinja_env.tests["modelelement"] = lambda obj: isinstance(
+        obj, capellambse.model.ModelElement
+    )
     yield
 
 
