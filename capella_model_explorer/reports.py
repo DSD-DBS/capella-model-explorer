@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import base64
+import json
 import operator
 import pathlib
 import re
@@ -12,13 +13,15 @@ import typing as t
 
 import capellambse
 import capellambse.model as m
+import capellambse_context_diagrams
 import jinja2
 import markupsafe
 import pydantic as p
 import yaml
 
+import capella_model_explorer
 import capella_model_explorer.constants as c
-from capella_model_explorer import app, state
+from capella_model_explorer import app, core, state
 
 SVG_WRAP_MARKUP = markupsafe.Markup(
     '<div class="svg-container relative inline-block cursor-pointer"'
@@ -254,3 +257,18 @@ def load_templates() -> None:
             template = Template(**template_def)
             state.templates.append(template)
         _register_template_category(category)
+
+
+def compute_cache_key(template: Template | None, /) -> str:
+    data = {
+        "model-explorer-version": capella_model_explorer.__version__,
+        "capellambse-version": capellambse.__version__,
+        "ctx-diags-version": capellambse_context_diagrams.__version__,
+    }
+    if template is not None:
+        data["template-hash"] = core.compute_file_hash(str(template.path))
+    if model_revision := state.model.info.resources["\x00"].rev_hash:
+        data["model-revision"] = model_revision
+    else:
+        data["launch-id"] = c.LAUNCH_ID
+    return json.dumps(data)
