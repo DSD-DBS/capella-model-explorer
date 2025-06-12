@@ -27,9 +27,9 @@
   {% for property in props %}
     {{ display_property_label(obj, property) | safe }}
     {% set prop_props = [] %}
-    {% if property.kind != "UNSET" %}{% set _none = prop_props.append(["Kind", property.kind]) %}{% endif %}
-    {% if property.min_value %}{% set _none = prop_props.append(["Min. value", property.min_value]) %}{% endif %}
-    {% if property.max_value %}{% set _none = prop_props.append(["Max. value", property.max_value]) %}{% endif %}
+    {% if property.kind != "UNSET" %}{{ prop_props.append(["Kind", property.kind]) }}{% endif %}
+    {% if property.min_value %}{{ prop_props.append(["Min. value", property.min_value]) }}{% endif %}
+    {% if property.max_value %}{{ prop_props.append(["Max. value", property.max_value]) }}{% endif %}
     <div style="padding-left: 2.5em !important; padding-bottom: 0.6em;">
       {{ description(property) | safe }}
       {% if property.type.__class__.__name__ == "Enumeration" %}

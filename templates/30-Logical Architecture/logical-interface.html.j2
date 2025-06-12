@@ -13,10 +13,10 @@
 %}
 
 {% macro describe_exchange(object) %}
-  {%- set source_function = object.source.owner -%}
-  {%- set target_function = object.target.owner -%}
-  {%- set source = source_function.owner -%}
-  {%- set target = target_function.owner -%}
+  {% set source_function = object.source.owner %}
+  {% set target_function = object.target.owner %}
+  {% set source = source_function.owner %}
+  {% set target = target_function.owner %}
   The {{ linked_name(source) | safe }} shall provide
   {{ linked_name(object) | safe }} to {{ linked_name(target) | safe }} so that
   the {{ linked_name(target) | safe }} could
@@ -38,12 +38,12 @@
   that the interface partners could find an appropriate interface definition
   (solution).
 </p>
-{% if object.description -%}
+{% if object.description %}
   <p>{{ object.description | safe }}</p>
-{%- endif %}
-{% if object.summary -%}
+{% endif %}
+{% if object.summary %}
   <p>{{ object.summary | safe }}</p>
-{%- endif %}
+{% endif %}
 <h2>Purpose of the interface</h2>
 <p>
   The figure below provides an overview of the behaviors that depend on this
@@ -99,24 +99,24 @@
   object.allocated_functional_exchanges.map("source.owner")
   + object.allocated_functional_exchanges.map("target.owner")
 %}
-{%- if fchains -%}
+{% if fchains %}
   <h2>Associated Functional Chains</h2>
   <p>
     {{ object.name }} can be associated to the following functional chains
     through involvements of functions and interactions.
   </p>
-  {%- for fchain in fchains -%}
+  {% for fchain in fchains %}
     <h3>{{ linked_name_with_icon(fchain) | safe }}</h3>
     <p>{{ description(fchain) | safe }}</p>
-    {%- set involved_caps = model.search("CapabilityRealization").by_involved_chains(fchain) -%}
-    {%- if involved_caps -%}
+    {% set involved_caps = model.search("CapabilityRealization").by_involved_chains(fchain) %}
+    {% if involved_caps %}
       <h4>Involving capabilities</h4>
       <ul>
-        {%- for cap in involved_caps -%}
+        {% for cap in involved_caps %}
           <li>{{ linked_name_with_icon(cap) | safe }}</li>
-        {%- endfor -%}
+        {% endfor %}
       </ul>
-    {%- endif -%}
+    {% endif %}
     <h4>Involved functions and interactions</h4>
     <table>
       <thead>
@@ -129,39 +129,39 @@
         <tr>
           <td>
             <ul>
-              {%- for fnc in fchain.involved_functions -%}
-                {%- if fnc.uuid in allocated_functions | map(attribute="uuid") -%}
+              {% for fnc in fchain.involved_functions %}
+                {% if fnc.uuid in allocated_functions | map(attribute="uuid") %}
                   <li>{{ linked_name_with_icon(fnc) | safe }}</li>
-                {%- endif -%}
-              {%- endfor -%}
+                {% endif %}
+              {% endfor %}
             </ul>
           </td>
           <td>
             <ul>
-              {%- for link in fchain.involved_links -%}
-                {%- if link.uuid in object.allocated_functional_exchanges | map(attribute="uuid") -%}
+              {% for link in fchain.involved_links %}
+                {% if link.uuid in object.allocated_functional_exchanges | map(attribute="uuid") %}
                   <li>{{ linked_name_with_icon(link) | safe }}</li>
-                {%- endif -%}
-              {%- endfor -%}
+                {% endif %}
+              {% endfor %}
             </ul>
           </td>
         </tr>
       </tbody>
     </table>
-  {%- endfor -%}
-{%- endif -%}
+  {% endfor %}
+{% endif %}
 
-{% if object.constraints -%}
+{% if object.constraints %}
   <h2>Constraints</h2>
   <ul>
-    {%- for constraint in object.constraints -%}
+    {% for constraint in object.constraints %}
       <li>
         <b>{{ linked_name_with_icon(constraint) | safe }}</b>:
         {{ constraint.specification["capella:linkedText"] | safe }}
       </li>
-    {%- endfor -%}
+    {% endfor %}
   </ul>
-{%- endif %}
+{% endif %}
 
 {{ display_property_values(object, heading="Additional properties") | safe }}
 

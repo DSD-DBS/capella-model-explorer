@@ -76,8 +76,8 @@
         <th>Value</th>
       </tr>
     </thead>
-    {%- for attr in object.__dir__() | sort if not attr.startswith("_") and attr not in excluded -%}
-      {%- set value = object[attr] -%}
+    {% for attr in object.__dir__() | sort if not attr.startswith("_") and attr not in excluded %}
+      {% set value = object[attr] %}
       {% if value %}
         <tr>
           {% if attr in attr_diff and attr_change == "modified" %}
@@ -85,36 +85,36 @@
               {{ attr }}
             </td>
             <td>
-              {%- if value is diagram -%}
+              {% if value is diagram %}
                 {{ value }}
-              {%- else -%}
+              {% else %}
                 {{ display_modified_changes(attr_diff[attr]) | safe }}
-              {%- endif -%}
+              {% endif %}
             </td>
             {{ attr_lst.remove(attr) }}
           {% else %}
             <td style="word-break:normal">{{ attr }}</td>
             <td>
-              {%- if value is diagram -%}
+              {% if value is diagram %}
                 {{ value }}
-              {%- elif value is iterable and value is not string -%}
+              {% elif value is iterable and value is not string %}
                 <ul>
                   {% for item in value %}
                     <li>{{ linked_name_with_icon(item) | safe }}</li>
                   {% endfor %}
                 </ul>
-              {%- elif value is modelelement -%}
+              {% elif value is modelelement %}
                 <p>{{ linked_name_with_icon(value) | safe }}</p>
-              {%- else -%}
+              {% else %}
                 <p>{{ value }}</p>
-              {%- endif -%}
+              {% endif %}
             </td>
           {% endif %}
         </tr>
       {% else %}
         {{ empty_attrs.append(attr) }}
       {% endif %}
-    {% endfor -%}
+    {% endfor %}
     {% if attr_lst and attr_change == "modified" %}
       {% for attr in attr_lst %}
         <td style="word-break:normal; background-color: red">{{ attr }}</td>
@@ -197,14 +197,14 @@
   {% endif %}
 {% endmacro %}
 
-{%- macro typed_name(object) -%}
+{% macro typed_name(object) %}
   <b>{{ object.__class__.__name__ }}</b>
   <a href="{{ object | make_href }}">{{ object.name  | trim }}</a>
-{%- endmacro -%}
+{% endmacro %}
 
-{%- macro linked_name(object) -%}
+{% macro linked_name(object) %}
   <a href="{{ object | make_href }}">{{ object.name  | trim }}</a>
-{%- endmacro -%}
+{% endmacro %}
 
 {% macro draw_icon(obj, size) %}
   {% if obj._get_icon %}
@@ -237,18 +237,18 @@
   {% endif %}
 {% endmacro %}
 
-{%- macro display_traceability(object, show_upper=True) -%}
-  {%- set realized_attrs = [] -%}
-  {%- set realizing_attrs = [] -%}
-  {%- for attr in object.__dir__() -%}
-    {%- if attr.startswith("realized_") -%}
-      {% set _none = realized_attrs.append(attr) %}
-    {%- elif attr.startswith("realizing_") -%}
-      {% set _none = realizing_attrs.append(attr) %}
-    {%- endif -%}
-  {%- endfor -%}
-  {%- set realized_objects = object[realized_attrs | first] if realized_attrs else [] -%}
-  {%- set realizing_objects = object[realizing_attrs | first] if realizing_attrs else [] -%}
+{% macro display_traceability(object, show_upper=True) %}
+  {% set realized_attrs = [] %}
+  {% set realizing_attrs = [] %}
+  {% for attr in object.__dir__() %}
+    {% if attr.startswith("realized_") %}
+      {{ realized_attrs.append(attr) }}
+    {% elif attr.startswith("realizing_") %}
+      {{ realizing_attrs.append(attr) }}
+    {% endif %}
+  {% endfor %}
+  {% set realized_objects = object[realized_attrs | first] if realized_attrs else [] %}
+  {% set realizing_objects = object[realizing_attrs | first] if realizing_attrs else [] %}
 
   <h2>Traceability</h2>
   {% if (realized_objects | length > 0 or realizing_objects | length > 0) and "realization_view" in object.__dir__() %}
@@ -263,33 +263,33 @@
       <p>{{ object.name }} realizes the following objects:</p>
       <p></p>
       <ul>
-        {%- for obj in realized_objects -%}
+        {% for obj in realized_objects %}
           <li style="display: block;">
             {{ linked_name_with_icon(obj) | safe }}
           </li>
-        {%- endfor -%}
+        {% endfor %}
       </ul>
-    {%- else -%}
+    {% else %}
       <p style="color: red;">
         {{ first_upper(object.name) }} doesn't seem to realize any object
       </p>
-    {%- endif -%}
+    {% endif %}
   {% endif %}
   {% if realizing_objects %}
     <p>{{ object.name }} is realized by the following objects:</p>
     <ul>
-      {%- for obj in realizing_objects -%}
+      {% for obj in realizing_objects %}
         <li style="display: block;">
           {{ linked_name_with_icon(obj) | safe }}
         </li>
-      {%- endfor -%}
+      {% endfor %}
     </ul>
-  {%- else -%}
+  {% else %}
     <p style="color: red;">
       {{ first_upper(object.name) }} doesn't seem to be realized by any object
     </p>
   {% endif %}
-{%- endmacro -%}
+{% endmacro %}
 
 {% macro display_property_values(object, heading="Property Value Packages") %}
   {% if object.property_value_groups %}
@@ -297,7 +297,7 @@
     {% for group in object.property_value_groups %}
       {% set prefix = group.name.split('.')[0] %}
       {% if prefix not in prefixes %}
-        {% set _ = prefixes.append(prefix) %}
+        {{ prefixes.append(prefix) }}
       {% endif %}
     {% endfor %}
     <h2>{{ heading }}</h2>
@@ -415,20 +415,20 @@
     <h3>{{ linked_name_with_icon(actor) | safe }}</h3>
     <p>{{ actor.description }}</p>
 
-    {%- set involving_caps = [] -%}
-    {%- for cap in capabilities -%}
-      {%- if actor in cap.involved_components -%}
-        {%- set _ = involving_caps.append(cap) -%}
-      {%- endif -%}
-    {%- endfor -%}
+    {% set involving_caps = [] %}
+    {% for cap in capabilities %}
+      {% if actor in cap.involved_components %}
+        {{ involving_caps.append(cap) }}
+      {% endif %}
+    {% endfor %}
 
     {% if involving_caps %}
       <p>
         <i>{{ actor.name }}</i> is involved in the following
         capabilities:&nbsp;
-        {%- for cap in involving_caps -%}
+        {% for cap in involving_caps %}
           {{ linked_name_with_icon(cap) | safe }}{% if not loop.last %},{% endif %}
-        {%- endfor -%}
+        {% endfor %}
       </p>
     {% endif %}
     {% set related_src_exchanges = actor.related_exchanges | selectattr("source.owner", "equalto", object) | list %}
@@ -441,9 +441,9 @@
         <i>{{ actor.name }}</i> via the following interfaces:
       </p>
       <ul>
-        {%- for exchange in related_exchanges -%}
+        {% for exchange in related_exchanges %}
           <li>{{ linked_name_with_icon(exchange) | safe }}</li>
-        {%- endfor -%}
+        {% endfor %}
       </ul>
     {% else %}
       <p style="color:red">
@@ -459,7 +459,7 @@
   {% set ends = object.physical_ports.map("links.ends.owner") - [object] %}
   {% set nodes = [] %}
   {% for end in ends if object._element not in end._model._loader.iterancestors(end._element) %}
-    {% set _ = nodes.append(end) %}
+    {{ nodes.append(end) }}
   {% endfor %}
 
   {% for node in nodes %}
@@ -472,19 +472,19 @@
     <h3>{{ linked_name_with_icon(node) | safe }}</h3>
     <p>{{ node.description }}</p>
 
-    {%- set involving_caps = [] -%}
-    {%- for cap in capabilities -%}
-      {%- if node in cap.involved_components -%}
-        {%- set _ = involving_caps.append(cap) -%}
-      {%- endif -%}
-    {%- endfor -%}
+    {% set involving_caps = [] %}
+    {% for cap in capabilities %}
+      {% if node in cap.involved_components %}
+        {{ involving_caps.append(cap) }}
+      {% endif %}
+    {% endfor %}
 
     {% if involving_caps %}
       <p>
         <i>{{ node.name }}</i> is involved in the following capabilities:&nbsp;
-        {%- for cap in involving_caps -%}
+        {% for cap in involving_caps %}
           {{ linked_name_with_icon(cap) | safe }}{% if not loop.last %},{% endif %}
-        {%- endfor -%}
+        {% endfor %}
       </p>
     {% endif %}
     {% set related_src_exchanges = node.physical_ports.map("links") | selectattr("source.owner", "equalto", object) | list %}
@@ -497,9 +497,9 @@
         <i>{{ node.name }}</i> via the following interfaces:
       </p>
       <ul>
-        {%- for exchange in related_exchanges -%}
+        {% for exchange in related_exchanges %}
           <li>{{ linked_name_with_icon(exchange) | safe }}</li>
-        {%- endfor -%}
+        {% endfor %}
       </ul>
     {% else %}
       <p style="color:red">
@@ -522,7 +522,7 @@
         </tr>
       </thead>
       <tbody>
-        {%- for exchange in exchanges -%}
+        {% for exchange in exchanges %}
           <tr>
             <td>
               <a href="{{ exchange | make_href }}"
@@ -532,7 +532,7 @@
             <td>{{ linked_name_with_icon(exchange) | safe }}</td>
             <td>{{ owner_decorator(exchange) | safe }}</td>
           </tr>
-        {%- endfor -%}
+        {% endfor %}
       </tbody>
     </table>
   {% endmacro %}
@@ -568,52 +568,52 @@
     {{ description(function) | safe }}
 
     {# Classify Functional IO #}
-    {%- set internal_inputs = [] -%}
-    {%- set external_inputs = [] -%}
-    {%- set undefined_owner_inputs = [] -%}
-    {%- set input_ports_with_no_exchanges = [] -%}
-    {%- set internal_outputs = [] -%}
-    {%- set external_outputs = [] -%}
-    {%- set undefined_owner_outputs = [] -%}
-    {%- set output_ports_with_no_exchanges = [] -%}
+    {% set internal_inputs = [] %}
+    {% set external_inputs = [] %}
+    {% set undefined_owner_inputs = [] %}
+    {% set input_ports_with_no_exchanges = [] %}
+    {% set internal_outputs = [] %}
+    {% set external_outputs = [] %}
+    {% set undefined_owner_outputs = [] %}
+    {% set output_ports_with_no_exchanges = [] %}
 
-    {%- if function.inputs -%}
-      {%- for input in function.inputs -%}
-        {%- if input.exchanges -%}
-          {%- for exchange in input.exchanges -%}
-            {%- set partner = exchange.source.owner.owner -%}
-            {%- if partner and partner != object -%}
-              {%- set none_ = external_inputs.append(exchange) -%}
-            {%- elif partner == object -%}
-              {%- set none_ = internal_inputs.append(exchange) -%}
-            {%- else -%}
-              {%- set none_ = undefined_owner_inputs.append(exchange) -%}
-            {%- endif -%}
-          {%- endfor -%}
-        {%- else -%}
-          {%- set none_ = input_ports_with_no_exchanges.append(input) -%}
-        {%- endif -%}
-      {%- endfor -%}
-    {%- endif -%}
+    {% if function.inputs %}
+      {% for input in function.inputs %}
+        {% if input.exchanges %}
+          {% for exchange in input.exchanges %}
+            {% set partner = exchange.source.owner.owner %}
+            {% if partner and partner != object %}
+              {{ external_inputs.append(exchange) }}
+            {% elif partner == object %}
+              {{ internal_inputs.append(exchange) }}
+            {% else %}
+              {{ undefined_owner_inputs.append(exchange) }}
+            {% endif %}
+          {% endfor %}
+        {% else %}
+          {{ input_ports_with_no_exchanges.append(input) }}
+        {% endif %}
+      {% endfor %}
+    {% endif %}
 
-    {%- if function.outputs -%}
-      {%- for output in function.outputs -%}
-        {%- if output.exchanges -%}
-          {%- for exchange in output.exchanges -%}
-            {%- set partner = exchange.target.owner.owner -%}
-            {%- if partner and partner != object -%}
-              {%- set none_ = external_outputs.append(exchange) -%}
-            {%- elif partner == object -%}
-              {%- set none_ = internal_outputs.append(exchange) -%}
-            {%- else -%}
-              {%- set none_ = undefined_owner_outputs.append(exchange) -%}
-            {%- endif -%}
-          {%- endfor -%}
-        {%- else -%}
-          {%- set none_ = output_ports_with_no_exchanges.append(output) -%}
-        {%- endif -%}
-      {%- endfor -%}
-    {%- endif -%}
+    {% if function.outputs %}
+      {% for output in function.outputs %}
+        {% if output.exchanges %}
+          {% for exchange in output.exchanges %}
+            {% set partner = exchange.target.owner.owner %}
+            {% if partner and partner != object %}
+              {{ external_outputs.append(exchange) }}
+            {% elif partner == object %}
+              {{ internal_outputs.append(exchange) }}
+            {% else %}
+              {{ undefined_owner_outputs.append(exchange) }}
+            {% endif %}
+          {% endfor %}
+        {% else %}
+          {{ output_ports_with_no_exchanges.append(output) }}
+        {% endif %}
+      {% endfor %}
+    {% endif %}
 
     {# Visualize Functional IO #}
 
@@ -640,12 +640,12 @@
           any entity:
         </p>
         <ul>
-          {%- for exchange in undefined_owner_inputs -%}
+          {% for exchange in undefined_owner_inputs %}
             <li>
               {{ linked_name_with_icon(exchange) | safe }}, an output of
               {{ linked_name_with_icon(exchange.source.owner) | safe }}
             </li>
-          {%- endfor -%}
+          {% endfor %}
         </ul>
       {% endif %}
 
@@ -654,9 +654,9 @@
           The following input ports have no incoming exchanges defined:
         </p>
         <ul>
-          {%- for port in input_ports_with_no_exchanges -%}
+          {% for port in input_ports_with_no_exchanges %}
             <li>{{ linked_name_with_icon(port) | safe }}</li>
-          {%- endfor -%}
+          {% endfor %}
         </ul>
       {% endif %}
     {% else %}
@@ -689,12 +689,12 @@
           entity:
         </p>
         <ul>
-          {%- for exchange in undefined_owner_outputs -%}
+          {% for exchange in undefined_owner_outputs %}
             <li>
               {{ linked_name_with_icon(exchange) | safe }}, an input of
               {{ linked_name_with_icon(exchange.target.owner) | safe }}
             </li>
-          {%- endfor -%}
+          {% endfor %}
         </ul>
       {% endif %}
 
@@ -703,9 +703,9 @@
           The following output ports have no outgoing exchanges defined:
         </p>
         <ul>
-          {%- for port in output_ports_with_no_exchanges -%}
+          {% for port in output_ports_with_no_exchanges %}
             <li>{{ linked_name_with_icon(port) | safe }}</li>
-          {%- endfor -%}
+          {% endfor %}
         </ul>
       {% endif %}
     {% else %}
@@ -730,9 +730,9 @@
         While performing <i>{{ function.name }}</i>,
         <i>{{ object.name }}</i> contributes to the following
         capabilities:&nbsp;
-        {%- for cap in function.involved_in -%}
+        {% for cap in function.involved_in %}
           {{ linked_name_with_icon(cap) | safe }}{% if not loop.last %},{% endif %}
-        {%- endfor -%}
+        {% endfor %}
       </p>
     {% endif %}
   {% else %}
@@ -742,10 +742,10 @@
 
 {% macro render_interfaces_section(object, interfaces, exchange_items_catalog) %}
   {% macro describe_exchange(object) %}
-    {%- set source_function = object.source.owner -%}
-    {%- set target_function = object.target.owner -%}
-    {%- set source = source_function.owner -%}
-    {%- set target = target_function.owner -%}
+    {% set source_function = object.source.owner %}
+    {% set target_function = object.target.owner %}
+    {% set source = source_function.owner %}
+    {% set target = target_function.owner %}
     The {{ linked_name_with_icon(source) | safe }} shall provide
     {{ linked_name_with_icon(object) | safe }} to
     {{ linked_name_with_icon(target) | safe }} so that the
@@ -802,9 +802,9 @@
                     <ul>
                       {% for item in exchange.exchange_items %}
                         <li>{{ linked_name_with_icon(item) | safe }}</li>
-                        {%- if item not in exchange_items_catalog -%}
-                          {%- set _ = exchange_items_catalog.append(item) -%}
-                        {%- endif -%}
+                        {% if item not in exchange_items_catalog %}
+                          {{ exchange_items_catalog.append(item) }}
+                        {% endif %}
                       {% endfor %}
                     </ul>
                   {% else %}
@@ -835,19 +835,19 @@
   </p>
   {% for item in exchange_items_catalog %}
     <h3>A.{{ loop.index }} {{ linked_name_with_icon(item) | safe }}</h3>
-    {%- if item.description -%}
+    {% if item.description %}
       {{ item.description | safe }}
-    {%- endif -%}
-    {%- if item.elements -%}
+    {% endif %}
+    {% if item.elements %}
       <h4>Composition</h4>
       <p>
         The exchange item "{{ item.name }}" is composed of the following
         elements:
       </p>
       <ul>
-        {%- for element in item.elements -%}
+        {% for element in item.elements %}
           <li>{{ display_property_label(item, element) | safe }}</li>
-        {%- endfor -%}
+        {% endfor %}
       </ul>
     {% endif %}
   {% endfor %}

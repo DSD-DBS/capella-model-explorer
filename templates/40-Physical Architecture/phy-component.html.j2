@@ -50,29 +50,29 @@
     </tr>
   </thead>
   <tbody>
-    {%- for port in object.physical_ports %}
-      {%- set cables = port.links %}
-      {%- if cables %}
-        {%- for cable in cables %}
+    {% for port in object.physical_ports %}
+      {% set cables = port.links %}
+      {% if cables %}
+        {% for cable in cables %}
           <tr>
-            {%- set other_port = cable.ends | reject("equalto", port) | first %}
-            {%- if loop.first %}
+            {% set other_port = cable.ends | reject("equalto", port) | first %}
+            {% if loop.first %}
               <td rowspan="{{ cables | length }}">
                 {{ linked_name_with_icon(port) | safe }}
               </td>
-            {%- endif %}
+            {% endif %}
             <td>{{ linked_name_with_icon(cable) | safe }}</td>
             <td>{{ linked_name_with_icon(other_port.owner) | safe }}</td>
             <td>{{ linked_name_with_icon(other_port) | safe }}</td>
           </tr>
-        {%- endfor %}
-      {%- else %}
+        {% endfor %}
+      {% else %}
         <tr>
           <td>{{ linked_name_with_icon(port) | safe }}</td>
           <td colspan="3">No cable connections planned</td>
         </tr>
-      {%- endif %}
-    {%- endfor %}
+      {% endif %}
+    {% endfor %}
   </tbody>
 </table>
 

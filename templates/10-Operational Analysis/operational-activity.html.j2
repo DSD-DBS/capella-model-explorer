@@ -6,19 +6,19 @@
 
 <h1>{{ object.name }}</h1>
 {{ description(object) | safe }}
-{%- set owner_label = '<span style="color: red">Unidentified entity</span>' -%}
-{%- if object.owner -%}{%- set owner_label = linked_name_with_icon(object.owner) -%}{%- endif -%}
+{% set owner_label = '<span style="color: red">Unidentified entity</span>' %}
+{% if object.owner %}{% set owner_label = linked_name_with_icon(object.owner) %}{% endif %}
 
 {% if object.owner %}
   <p>This activity is performed by {{ owner_label | safe }}.</p>
 
-  {%- if object.available_in_states -%}
+  {% if object.available_in_states %}
     <p>
       {{ owner_label | safe }} may {{ object.name }} while in one of the
       following modes or states:&nbsp;
-      {%- for state in object.available_in_states -%}
-        {{ linked_name_with_icon(state) | safe }}{%- if not loop.last -%},{% endif -%}
-      {%- endfor -%}
+      {% for state in object.available_in_states %}
+        {{ linked_name_with_icon(state) | safe }}{% if not loop.last %},{% endif %}
+      {% endfor %}
     </p>
   {% endif %}
 {% else %}
@@ -26,12 +26,12 @@
     No entity is responsible for performing this activity at the moment.
   </p>
 {% endif %}
-{%- set involving_capabilities = [] -%}
-{%- for cap in model.oa.all_capabilities -%}
-  {%- if object in cap.involved_activities -%}
-    {%- set _none = involving_capabilities.append(cap) -%}
-  {%- endif -%}
-{%- endfor -%}
+{% set involving_capabilities = [] %}
+{% for cap in model.oa.all_capabilities %}
+  {% if object in cap.involved_activities %}
+    {{ involving_capabilities.append(cap) }}
+  {% endif %}
+{% endfor %}
 
 {% if involving_capabilities %}
   <p>
@@ -56,11 +56,11 @@
   following entities:&nbsp;
   {% set ins = object.inputs | map(attribute="source") | selectattr("owner") | map(attribute="owner") | list %}
   {% set outs = object.outputs | map(attribute="target") | selectattr("owner") | map(attribute="owner") | list %}
-  {%- set partners = ins + outs -%}
-  {%- if object.owner -%}
+  {% set partners = ins + outs %}
+  {% if object.owner %}
     {% set partners = partners | rejectattr("uuid", "equalto", object.owner.uuid) | list %}
-  {%- endif -%}
-  {%- for partner in partners | unique(attribute="uuid") -%}{{ linked_name_with_icon(partner) | safe }},&nbsp;{%- endfor -%}
+  {% endif %}
+  {% for partner in partners | unique(attribute="uuid") %}{{ linked_name_with_icon(partner) | safe }},&nbsp;{% endfor %}
 </p>
 
 <h2>Operational Activity Context</h2>
@@ -72,7 +72,7 @@
 
 {{ object.context_diagram }}
 
-{%- if object.inputs -%}
+{% if object.inputs %}
   <h2>Inputs</h2>
   <p>
     To <i>{{ object.name }}</i> the
@@ -82,14 +82,14 @@
   <ul>
     {% for input in object.inputs %}
       <li>
-        {%- set act = input.source -%}
+        {% set act = input.source %}
         {{ linked_name_with_icon(input) | safe }}
         produced by "{{ linked_name_with_icon(act) | safe }}" activity of&nbsp;
-        {%- if act.owner -%}
+        {% if act.owner %}
           {{ linked_name_with_icon(act.owner) | safe }}
-        {%- else -%}
+        {% else %}
           <span style="color: red;">Unassigned entity</span>
-        {%- endif -%}
+        {% endif %}
         {% if input.exchange_items %}
           <p>
             This interaction is further detailed by the following exchange
@@ -100,7 +100,7 @@
       </li>
     {% endfor %}
   </ul>
-{%- endif -%}
+{% endif %}
 
 {% if object.outputs %}
   <h2>Outputs</h2>
@@ -111,12 +111,12 @@
   <ul>
     {% for output in object.outputs %}
       <li>
-        {%- set act = output.target -%}
-        {%- if act.owner -%}
+        {% set act = output.target %}
+        {% if act.owner %}
           {{ linked_name_with_icon(act.owner) | safe }}
-        {%- else -%}
+        {% else %}
           <span style="color: red;">Unassigned entity</span>
-        {%- endif -%}&nbsp;
+        {% endif %}&nbsp;
         may require {{ linked_name_with_icon(output) | safe }} to perform
         "{{ linked_name_with_icon(act) | safe }}" activity.
         {% if output.exchange_items %}
@@ -130,18 +130,18 @@
     {% endfor %}
   </ul>
 {% endif %}
-{%- set diagrams = [] -%}
-{%- for diagram in model.oa.diagrams -%}
-  {%- for node in diagram.nodes -%}
-    {%- if node == object -%}
-      {%- if not diagram in diagrams -%}{%- set _none = diagrams.append(diagram) -%}{%- endif -%}
-    {%- elif node.__class__.__name__ == "FunctionalChainInvolvementFunction" and node.involved == object -%}
-      {%- if not diagram in diagrams -%}{%- set _none = diagrams.append(diagram) -%}{%- endif -%}
-    {%- elif node.__class__.__name__ == "StateFragment" and object == node.function -%}
-      {%- if not diagram in diagrams -%}{%- set _none = diagrams.append(diagram) -%}{%- endif -%}
-    {%- endif -%}
-  {%- endfor -%}
-{%- endfor -%}
+{% set diagrams = [] %}
+{% for diagram in model.oa.diagrams %}
+  {% for node in diagram.nodes %}
+    {% if node == object %}
+      {% if not diagram in diagrams %}{{ diagrams.append(diagram) }}{% endif %}
+    {% elif node.__class__.__name__ == "FunctionalChainInvolvementFunction" and node.involved == object %}
+      {% if not diagram in diagrams %}{{ diagrams.append(diagram) }}{% endif %}
+    {% elif node.__class__.__name__ == "StateFragment" and object == node.function %}
+      {% if not diagram in diagrams %}{{ diagrams.append(diagram) }}{% endif %}
+    {% endif %}
+  {% endfor %}
+{% endfor %}
 
 {% if diagrams %}
   <h2>Referencing diagrams</h2>
