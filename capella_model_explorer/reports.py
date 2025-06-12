@@ -202,6 +202,9 @@ def _make_href(
 
 
 def finalize(markup: t.Any) -> object:
+    if markup is None:
+        return ""
+
     if isinstance(markup, m.AbstractDiagram):
         svg = markupsafe.Markup(
             "data:image/svg+xml;base64,"
