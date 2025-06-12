@@ -40,7 +40,10 @@ async def lifespan(_):
     logger.info("Loading templates from: %s", c.TEMPLATES_DIR)
     reports.load_templates()
     state.jinja_env = jinja2.Environment(
-        autoescape=True, loader=jinja2.FileSystemLoader(c.TEMPLATES_DIR)
+        autoescape=True,
+        loader=jinja2.FileSystemLoader(c.TEMPLATES_DIR),
+        lstrip_blocks=True,
+        trim_blocks=True,
     )
     state.jinja_env.finalize = reports.finalize
     state.jinja_env.filters["make_href"] = reports.make_href_filter

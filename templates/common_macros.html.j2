@@ -99,9 +99,9 @@
                 {{ value }}
               {%- elif value is iterable and value is not string -%}
                 <ul>
-                  {% for item in value %}
+                  {%- for item in value -%}
                     <li>{{ linked_name_with_icon(item) | safe }}</li>
-                  {% endfor %}
+                  {%- endfor -%}
                 </ul>
               {%- elif value is modelelement -%}
                 <p>{{ linked_name_with_icon(value) | safe }}</p>
@@ -242,9 +242,9 @@
   {%- set realizing_attrs = [] -%}
   {%- for attr in object.__dir__() -%}
     {%- if attr.startswith("realized_") -%}
-      {% set _none = realized_attrs.append(attr) %}
+      {{ realized_attrs.append(attr) }}
     {%- elif attr.startswith("realizing_") -%}
-      {% set _none = realizing_attrs.append(attr) %}
+      {{ realizing_attrs.append(attr) }}
     {%- endif -%}
   {%- endfor -%}
   {%- set realized_objects = object[realized_attrs | first] if realized_attrs else [] -%}
@@ -297,7 +297,7 @@
     {% for group in object.property_value_groups %}
       {% set prefix = group.name.split('.')[0] %}
       {% if prefix not in prefixes %}
-        {% set _ = prefixes.append(prefix) %}
+        {{ prefixes.append(prefix) }}
       {% endif %}
     {% endfor %}
     <h2>{{ heading }}</h2>
@@ -418,7 +418,7 @@
     {%- set involving_caps = [] -%}
     {%- for cap in capabilities -%}
       {%- if actor in cap.involved_components -%}
-        {%- set _ = involving_caps.append(cap) -%}
+        {{- involving_caps.append(cap) -}}
       {%- endif -%}
     {%- endfor -%}
 
@@ -459,7 +459,7 @@
   {% set ends = object.physical_ports.map("links.ends.owner") - [object] %}
   {% set nodes = [] %}
   {% for end in ends if object._element not in end._model._loader.iterancestors(end._element) %}
-    {% set _ = nodes.append(end) %}
+    {{ nodes.append(end) }}
   {% endfor %}
 
   {% for node in nodes %}
@@ -475,7 +475,7 @@
     {%- set involving_caps = [] -%}
     {%- for cap in capabilities -%}
       {%- if node in cap.involved_components -%}
-        {%- set _ = involving_caps.append(cap) -%}
+        {{- involving_caps.append(cap) -}}
       {%- endif -%}
     {%- endfor -%}
 
@@ -583,15 +583,15 @@
           {%- for exchange in input.exchanges -%}
             {%- set partner = exchange.source.owner.owner -%}
             {%- if partner and partner != object -%}
-              {%- set none_ = external_inputs.append(exchange) -%}
+              {{- external_inputs.append(exchange) -}}
             {%- elif partner == object -%}
-              {%- set none_ = internal_inputs.append(exchange) -%}
+              {{- internal_inputs.append(exchange) -}}
             {%- else -%}
-              {%- set none_ = undefined_owner_inputs.append(exchange) -%}
+              {{- undefined_owner_inputs.append(exchange) -}}
             {%- endif -%}
           {%- endfor -%}
         {%- else -%}
-          {%- set none_ = input_ports_with_no_exchanges.append(input) -%}
+          {{- input_ports_with_no_exchanges.append(input) -}}
         {%- endif -%}
       {%- endfor -%}
     {%- endif -%}
@@ -600,17 +600,17 @@
       {%- for output in function.outputs -%}
         {%- if output.exchanges -%}
           {%- for exchange in output.exchanges -%}
-            {%- set partner = exchange.target.owner.owner -%}
+            {{- exchange.target.owner.owner -}}
             {%- if partner and partner != object -%}
-              {%- set none_ = external_outputs.append(exchange) -%}
+              {{- external_outputs.append(exchange) -}}
             {%- elif partner == object -%}
-              {%- set none_ = internal_outputs.append(exchange) -%}
+              {{- internal_outputs.append(exchange) -}}
             {%- else -%}
-              {%- set none_ = undefined_owner_outputs.append(exchange) -%}
+              {{- undefined_owner_outputs.append(exchange) -}}
             {%- endif -%}
           {%- endfor -%}
         {%- else -%}
-          {%- set none_ = output_ports_with_no_exchanges.append(output) -%}
+          {{- output_ports_with_no_exchanges.append(output) -}}
         {%- endif -%}
       {%- endfor -%}
     {%- endif -%}
@@ -800,12 +800,12 @@
                       following Exchange Items:
                     </p>
                     <ul>
-                      {% for item in exchange.exchange_items %}
+                      {%- for item in exchange.exchange_items -%}
                         <li>{{ linked_name_with_icon(item) | safe }}</li>
                         {%- if item not in exchange_items_catalog -%}
-                          {%- set _ = exchange_items_catalog.append(item) -%}
+                          {{- exchange_items_catalog.append(item) -}}
                         {%- endif -%}
-                      {% endfor %}
+                      {%- endfor -%}
                     </ul>
                   {% else %}
                     <p>

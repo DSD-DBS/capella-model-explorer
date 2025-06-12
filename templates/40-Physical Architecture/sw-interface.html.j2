@@ -110,7 +110,7 @@
   {% set items = [] %}
   {% for exchange in object.allocated_functional_exchanges %}
     {% for item in exchange.exchange_items %}
-      {% set _none = items.append(item) %}
+      {{ items.append(item) }}
     {% endfor %}
   {% endfor %}
   {% for item in items | unique(attribute="uuid") %}

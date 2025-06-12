@@ -29,7 +29,7 @@
 {%- set involving_capabilities = [] -%}
 {%- for cap in model.oa.all_capabilities -%}
   {%- if object in cap.involved_activities -%}
-    {%- set _none = involving_capabilities.append(cap) -%}
+    {{- involving_capabilities.append(cap) -}}
   {%- endif -%}
 {%- endfor -%}
 
@@ -134,11 +134,11 @@
 {%- for diagram in model.oa.diagrams -%}
   {%- for node in diagram.nodes -%}
     {%- if node == object -%}
-      {%- if not diagram in diagrams -%}{%- set _none = diagrams.append(diagram) -%}{%- endif -%}
+      {%- if not diagram in diagrams -%}{{- diagrams.append(diagram) -}}{%- endif -%}
     {%- elif node.__class__.__name__ == "FunctionalChainInvolvementFunction" and node.involved == object -%}
-      {%- if not diagram in diagrams -%}{%- set _none = diagrams.append(diagram) -%}{%- endif -%}
+      {%- if not diagram in diagrams -%}{{- diagrams.append(diagram) -}}{%- endif -%}
     {%- elif node.__class__.__name__ == "StateFragment" and object == node.function -%}
-      {%- if not diagram in diagrams -%}{%- set _none = diagrams.append(diagram) -%}{%- endif -%}
+      {%- if not diagram in diagrams -%}{{- diagrams.append(diagram) -}}{%- endif -%}
     {%- endif -%}
   {%- endfor -%}
 {%- endfor -%}

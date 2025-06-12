@@ -141,7 +141,7 @@
             >
             {% set applicable_to = [] %}
             {% for obj_type in object_types if obj_type in rule.types -%}
-              {% set _none = applicable_to.append(obj_type) %}
+              {{ applicable_to.append(obj_type) }}
             {%- endfor %}
             <div>{{ show_compliance_score(rule_results) | safe }}</div>
             <p style="color:#999">
@@ -155,7 +155,7 @@
               <p><b>Recommended action:</b><br />{{ rule.action }}</p>
               {% set results = [] %}
               {% for result in rule_results | sort(attribute="object.name") if not result.passed %}
-                {% set _none = results.append(result) %}
+                {{ results.append(result) }}
               {% endfor %}
               {% if results %}
                 <p style="margin-left: 20px">
