@@ -48,7 +48,7 @@
 
 <h2>Context Diagram</h2>
 <p>The following shows {{ object.name }} in its system-level context:</p>
-{{ object.context_diagram | safe }}
+{{ render_diagram(object, "context_diagram") }}
 
 <h2>Interface Partners</h2>
 {% set partner_a = object.source.owner %}

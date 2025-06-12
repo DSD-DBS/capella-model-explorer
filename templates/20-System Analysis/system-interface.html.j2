@@ -55,7 +55,7 @@
   The functional interactions between interface partners via {{ object.name }}
   are summarized by the diagram below:
 </p>
-{{ object.context_diagram }}
+{{ render_diagram(object, "context_diagram") }}
 
 {{ display_traceability(object) | safe }}
 

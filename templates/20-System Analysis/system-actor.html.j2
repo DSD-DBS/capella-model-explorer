@@ -37,7 +37,7 @@
 
 <h2>Context</h2>
 <p>The context of {{ object.name }} is summarized by the diagram below:</p>
-{{ object.context_diagram.render(None, display_derived_interfaces=True) }}
+{{ render_diagram(object, "context_diagram", display_derived_interfaces=True) }}
 
 <h2>Functions</h2>
 {% if object.allocated_functions %}
