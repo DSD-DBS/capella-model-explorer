@@ -7,12 +7,10 @@ import base64
 import json
 import typing as t
 
-import capellambse
-import capellambse_context_diagrams
 from fasthtml import ft, svg
 
 import capella_model_explorer
-from capella_model_explorer import app, core, icons, reports, state
+from capella_model_explorer import app, icons, reports, state
 from capella_model_explorer import constants as c
 
 GITHUB_URL = "https://github.com/DSD-DBS/capella-model-explorer"
@@ -304,21 +302,8 @@ def report_placeholder(
         )
 
     else:
-        if model_revision := state.model.info.resources["\x00"].rev_hash:
-            render_environment = json.dumps(
-                {
-                    "model-explorer-version": capella_model_explorer.__version__,
-                    "capellambse-version": capellambse.__version__,
-                    "ctx-diags-version": capellambse_context_diagrams.__version__,
-                    "template-hash": core.compute_file_hash(
-                        str(template.path)
-                    ),
-                    "model-revision": model_revision,
-                }
-            )
-            hx_headers = json.dumps({"Render-Environment": render_environment})
-        else:
-            hx_headers = None
+        render_environment = reports.compute_cache_key(template)
+        headers = json.dumps({"Render-Environment": render_environment})
 
         ph_content = ft.Div(
             icons.spinner(),
@@ -327,7 +312,7 @@ def report_placeholder(
                 template_id=template.id,
                 model_element_uuid=model_element_uuid,
             ),
-            hx_headers=hx_headers,
+            hx_headers=headers,
             hx_target="#template_container",
             cls="flex justify-center place-items-center h-full w-full",
         )

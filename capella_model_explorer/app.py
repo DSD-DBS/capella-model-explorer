@@ -182,11 +182,10 @@ def rendered_report(template_id: str, model_element_uuid: str = "") -> t.Any:
         ),
         cls="prose svg-display dark:prose-invert",
     )
-    max_age = 31536000 if state.model.info.resources["\x00"].rev_hash else 0
     return (
         content,
-        fh.HttpHeader(k="Cache-Control", v=f"max-age={max_age}"),
-        fh.HttpHeader(k="Vary", v="Render-Environment"),
+        fh.HttpHeader("Cache-Control", f"max-age={c.CACHE_MAX_AGE}"),
+        fh.HttpHeader("Vary", "Render-Environment"),
     )
 
 
