@@ -17,9 +17,9 @@
     involved in the following operational capabilities:
   </p>
   <ul>
-    {%- for cap in object.capabilities -%}
+    {% for cap in object.capabilities %}
       <li>{{ linked_name_with_icon(cap) | safe }}</li>
-    {%- endfor -%}
+    {% endfor %}
   </ul>
 {% endif %}
 
@@ -65,22 +65,22 @@
     {% for activity in object.activities %}
       <li>
         {{ linked_name_with_icon(activity) | safe }}{{ ": " + activity.description | safe if activity.description else "" }}
-        {%- set involving_caps = [] -%}
-        {%- for cap in object.capabilities -%}
-          {%- if activity in cap.involved_activities -%}
-            {%- set _ = involving_caps.append(cap) -%}
-          {%- endif -%}
-        {%- endfor -%}
-        {%- if involving_caps -%}
+        {% set involving_caps = [] %}
+        {% for cap in object.capabilities %}
+          {% if activity in cap.involved_activities %}
+            {{ involving_caps.append(cap) }}
+          {% endif %}
+        {% endfor %}
+        {% if involving_caps %}
           <p>
             involving operational capabilities:
-            {%- for cap in object.capabilities -%}
-              {%- if activity in cap.involved_activities -%}
+            {% for cap in object.capabilities %}
+              {% if activity in cap.involved_activities %}
                 {{ linked_name_with_icon(cap) | safe }}{% if not loop.last %},{% endif %}
-              {%- endif -%}
-            {%- endfor -%}
+              {% endif %}
+            {% endfor %}
           </p>
-        {%- endif -%}
+        {% endif %}
       </li>
     {% endfor %}
   </ul>

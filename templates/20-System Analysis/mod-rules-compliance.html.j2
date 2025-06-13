@@ -6,8 +6,8 @@
     ?? filter val resultsby layer
 #}
 {% from 'common_macros.html.j2' import linked_name_with_icon %}
-{%- set results = model.sa.validation.validate() -%}
-{% set CATEGORIES = ["REQUIRED", "RECOMMENDED"] -%}
+{% set results = model.sa.validation.validate() %}
+{% set CATEGORIES = ["REQUIRED", "RECOMMENDED"] %}
 {%
   set object_types = [
     "SystemCapability",
@@ -17,21 +17,21 @@
     "ComponentExchange",
     "FunctionalExchange"
   ]
--%}
-{% set results = results.by_type(*object_types) -%}
+%}
+{% set results = results.by_type(*object_types) %}
 
-{% macro show_compliance_score(results, align=None) -%}
-  {% if results | count > 0 -%}
-    {% set total = results | count -%}
-    {% set passed = results.by_passed(True) | count -%}
-    {% set score = (passed / total * 100) | round(1) -%}
-    {% if score < 30 -%}
-      {% set color = "#bc2604" -%}
-    {% elif score < 70 -%}
-      {% set color = "#ae930d" -%}
-    {% else -%}
-      {% set color = "#0a6600" -%}
-    {% endif -%}
+{% macro show_compliance_score(results, align=None) %}
+  {% if results | count > 0 %}
+    {% set total = results | count %}
+    {% set passed = results.by_passed(True) | count %}
+    {% set score = (passed / total * 100) | round(1) %}
+    {% if score < 30 %}
+      {% set color = "#bc2604" %}
+    {% elif score < 70 %}
+      {% set color = "#ae930d" %}
+    {% else %}
+      {% set color = "#0a6600" %}
+    {% endif %}
     <span
       style="color: {{ color }}{% if align %}; float: {{ align }}{% endif %}"
     >
@@ -40,11 +40,11 @@
     <div
       style="margin: 0; height: 5px; background: linear-gradient(to right, green {{ score }}%, red {{ score }}%)"
     ></div>
-  {% else -%}
+  {% else %}
     <span style="color: #ccc">not applicable</span>
     <div style="margin: 0; height: 5px; background: #ccc"></div>
-  {% endif -%}
-{% endmacro -%}
+  {% endif %}
+{% endmacro %}
 
 <body>
   <h1>Modeling Rules Compliance Report for System Analysis Layer</h1>
@@ -63,18 +63,18 @@
     is:
   </p>
 
-  {% for category in CATEGORIES -%}
-    {% set category_results = results.by_category(category) -%}
-    {% set total = category_results | count -%}
-    {% set passed = category_results.by_passed(True) | count -%}
-    {% set score = (passed / total * 100) | round(1) if total else 100 -%}
-    {% if score < 30 -%}
-      {% set color = "#bc2604" -%}
-    {% elif score < 70 -%}
-      {% set color = "#ae930d" -%}
-    {% else -%}
-      {% set color = "#0a6600" -%}
-    {% endif -%}
+  {% for category in CATEGORIES %}
+    {% set category_results = results.by_category(category) %}
+    {% set total = category_results | count %}
+    {% set passed = category_results.by_passed(True) | count %}
+    {% set score = (passed / total * 100) | round(1) if total else 100 %}
+    {% if score < 30 %}
+      {% set color = "#bc2604" %}
+    {% elif score < 70 %}
+      {% set color = "#ae930d" %}
+    {% else %}
+      {% set color = "#0a6600" %}
+    {% endif %}
     {% if total != 0 %}
       <p>
         <span style="color: {{ color }}">{{ score }}%</span>
@@ -88,7 +88,7 @@
           evaluation.</span
         >
       </p>
-    {% endif -%}
+    {% endif %}
   {% endfor %}
 
   <table>
@@ -101,9 +101,9 @@
         </th>
       </tr>
       <tr>
-        {% for category in CATEGORIES -%}
+        {% for category in CATEGORIES %}
           <th>{{ category }}</th>
-        {% endfor -%}
+        {% endfor %}
       </tr>
     </thead>
     <tbody>
@@ -131,8 +131,8 @@
       </tr>
     </thead>
     <tbody>
-      {% for rule in results.iter_rules() | sort(attribute="id") | sort(attribute="category.value") -%}
-        {% set rule_results = results.by_rule(rule) -%}
+      {% for rule in results.iter_rules() | sort(attribute="id") | sort(attribute="category.value") %}
+        {% set rule_results = results.by_rule(rule) %}
         <tr>
           <th id="{{ rule.id }}">
             {{ rule.id }}<br />
@@ -140,9 +140,9 @@
               >{{ rule.category.name }}</span
             >
             {% set applicable_to = [] %}
-            {% for obj_type in object_types if obj_type in rule.types -%}
-              {% set _none = applicable_to.append(obj_type) %}
-            {%- endfor %}
+            {% for obj_type in object_types if obj_type in rule.types %}
+              {{ applicable_to.append(obj_type) }}
+            {% endfor %}
             <div>{{ show_compliance_score(rule_results) | safe }}</div>
             <p style="color:#999">
               Applies to: {{ applicable_to | join(", ") }}
@@ -155,7 +155,7 @@
               <p><b>Recommended action:</b><br />{{ rule.action }}</p>
               {% set results = [] %}
               {% for result in rule_results | sort(attribute="object.name") if not result.passed %}
-                {% set _none = results.append(result) %}
+                {{ results.append(result) }}
               {% endfor %}
               {% if results %}
                 <p style="margin-left: 20px">
@@ -164,9 +164,9 @@
                   rule:
                 </p>
                 <ul style="margin-left: 20px">
-                  {%- for result in results -%}
+                  {% for result in results %}
                     <li>{{ linked_name_with_icon(result.object) | safe }}</li>
-                  {%- endfor %}
+                  {% endfor %}
                 </ul>
               {% endif %}
             {% else %}
@@ -177,7 +177,7 @@
             {% endif %}
           </td>
         </tr>
-      {%- endfor %}
+      {% endfor %}
     </tbody>
   </table>
 </body>

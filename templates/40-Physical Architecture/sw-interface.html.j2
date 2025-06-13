@@ -13,10 +13,10 @@
 %}
 
 {% macro describe_exchange(object) %}
-  {%- set source_function = object.source.owner -%}
-  {%- set target_function = object.target.owner -%}
-  {%- set source = source_function.owner -%}
-  {%- set target = target_function.owner -%}
+  {% set source_function = object.source.owner %}
+  {% set target_function = object.target.owner %}
+  {% set source = source_function.owner %}
+  {% set target = target_function.owner %}
   The {{ linked_name(source) | safe }} shall provide
   {{ linked_name_with_icon(object) | safe }} to
   {{ linked_name_with_icon(target) | safe }} so that the
@@ -59,7 +59,7 @@
   The figure below provides an overview of the behaviors that depend on this
   interface:
 </p>
-{{ object.context_diagram }}
+{{ render_diagram(object, "context_diagram") }}
 <p>This interface enables the following interactions:</p>
 <table>
   <thead>
@@ -110,7 +110,7 @@
   {% set items = [] %}
   {% for exchange in object.allocated_functional_exchanges %}
     {% for item in exchange.exchange_items %}
-      {% set _none = items.append(item) %}
+      {{ items.append(item) }}
     {% endfor %}
   {% endfor %}
   {% for item in items | unique(attribute="uuid") %}
@@ -123,29 +123,29 @@
   interface.
 </p>
 
-{%- if object.allocating_physical_paths -%}
+{% if object.allocating_physical_paths %}
   <h3>Allocating Physical Paths</h3>
   <p>
     This section provides a detailed description of each physical path used
     within the interface.
   </p>
-  {%- for path in object.allocating_physical_paths -%}
+  {% for path in object.allocating_physical_paths %}
     <h4>{{ path.name }}</h4>
     <p>{{ description(path) | safe }}</p>
     <h5>Involved links:</h5>
     <ul>
-      {%- for link in path.involved_links -%}
+      {% for link in path.involved_links %}
         <li>{{ linked_name_with_icon(link) | safe }}</li>
-      {%- endfor -%}
+      {% endfor %}
     </ul>
     <h5>Involved nodes:</h5>
     <ul>
-      {%- for item in path.involved_items.map("type") -%}
+      {% for item in path.involved_items.map("type") %}
         <li>{{ linked_name_with_icon(item) | safe }}</li>
-      {%- endfor -%}
+      {% endfor %}
     </ul>
-  {%- endfor -%}
-{%- endif -%}
+  {% endfor %}
+{% endif %}
 
 {{ display_property_values(object, heading="Additional properties") | safe }}
 

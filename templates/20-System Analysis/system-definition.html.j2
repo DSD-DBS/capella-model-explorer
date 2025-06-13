@@ -61,7 +61,7 @@
   The figure below provides an overview of the system boundary and depicts all
   the Actors that the <i>{{ object.name }}</i> interacts with.
 </p>
-{{ object.context_diagram.render(None, display_derived_interfaces=True) }}
+{{ render_diagram(object, "context_diagram", display_derived_interfaces=True) }}
 {% set actors = model.sa.all_actors %}
 {% set caps = model.sa.all_capabilities %}
 {{ render_involved_actors_section(object, actors, caps) | safe }}

@@ -27,7 +27,7 @@
   The figure below provides an overview of <i>{{ object.name }}</i>'s boundary
   and depicts all the actors that it interacts with.
 </p>
-{{ object.context_diagram.render(None, display_derived_interfaces=True) }}
+{{ render_diagram(object, "context_diagram", display_derived_interfaces=True) }}
 {% set actors = object.context_diagram.nodes.by_is_actor(True) %}
 {{ render_involved_actors_section(object, actors, capabilities) | safe }}
 
