@@ -20,7 +20,7 @@ from fasthtml import common as fh
 from fasthtml import ft
 
 import capella_model_explorer.constants as c
-from capella_model_explorer import components, icons, reports, state
+from capella_model_explorer import components, reports, state
 
 logger = logging.getLogger(__name__)
 
@@ -103,23 +103,7 @@ def home(request) -> t.Any:
             components.reports_page(),
             cls="flex flex-col space-y-4 place-items-center mx-auto mb-4",
         ),
-        ft.Div(
-            ft.A(
-                ft.Div("Contribute on GitHub"),
-                icons.github_logo(),
-                href="https://github.com/DSD-DBS/capella-model-explorer",
-                target="_blank",
-                cls=(
-                    "dark:text-gray-300",
-                    "flex",
-                    "hover:underline",
-                    "max-w-fit",
-                    "place-items-center",
-                    "space-x-2",
-                ),
-            ),
-            cls="w-full pl-8 h-8 py-2 mx-auto my-8",
-        ),
+        components.bottom_bar(),
     )
     return _maybe_wrap_content(request, None, None, page_content)
 
