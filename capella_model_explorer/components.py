@@ -15,6 +15,8 @@ import capella_model_explorer
 from capella_model_explorer import app, core, icons, reports, state
 from capella_model_explorer import constants as c
 
+GITHUB_URL = "https://github.com/DSD-DBS/capella-model-explorer"
+
 
 def application_shell(
     *content: t.Any,
@@ -681,4 +683,35 @@ def template_sidebar(
             "top-0",
         ),
         hx_swap_oob=oob and "morph",
+    )
+
+
+def bottom_bar() -> ft.Div:
+    """Return container for bottom bar."""
+    version = capella_model_explorer.__version__
+    if "dev" in version:
+        version_element = ft.Span(
+            f"Capella-Model-Explorer: v{version}", cls="dark:text-gray-300"
+        )
+    else:
+        version_element = ft.A(
+            ft.Span(f"Capella-Model-Explorer: v{version}"),
+            href=f"{GITHUB_URL}/releases/v{version}",
+            target="_blank",
+            cls="hover:underline dark:text-gray-300",
+        )
+
+    return ft.Div(
+        ft.Div(version_element),
+        ft.Div(
+            ft.A(
+                ft.Span("Contribute on GitHub"),
+                icons.github_logo(),
+                href=GITHUB_URL,
+                target="_blank",
+                cls="flex items-center gap-2 hover:underline dark:text-gray-300",
+            ),
+            cls="md:w-fit md:mx-auto",
+        ),
+        cls="md:grid md:grid-cols-3 w-full px-2 pb-2",
     )
