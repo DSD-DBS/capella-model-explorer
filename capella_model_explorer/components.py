@@ -7,12 +7,10 @@ import base64
 import json
 import typing as t
 
-import capellambse
-import capellambse_context_diagrams
 from fasthtml import ft, svg
 
 import capella_model_explorer
-from capella_model_explorer import app, core, icons, reports, state
+from capella_model_explorer import app, icons, reports, state
 from capella_model_explorer import constants as c
 
 GITHUB_URL = "https://github.com/DSD-DBS/capella-model-explorer"
@@ -304,21 +302,8 @@ def report_placeholder(
         )
 
     else:
-        if model_revision := state.model.info.resources["\x00"].rev_hash:
-            render_environment = json.dumps(
-                {
-                    "model-explorer-version": capella_model_explorer.__version__,
-                    "capellambse-version": capellambse.__version__,
-                    "ctx-diags-version": capellambse_context_diagrams.__version__,
-                    "template-hash": core.compute_file_hash(
-                        str(template.path)
-                    ),
-                    "model-revision": model_revision,
-                }
-            )
-            hx_headers = json.dumps({"Render-Environment": render_environment})
-        else:
-            hx_headers = None
+        render_environment = reports.compute_cache_key(template)
+        headers = json.dumps({"Render-Environment": render_environment})
 
         ph_content = ft.Div(
             icons.spinner(),
@@ -327,7 +312,7 @@ def report_placeholder(
                 template_id=template.id,
                 model_element_uuid=model_element_uuid,
             ),
-            hx_headers=hx_headers,
+            hx_headers=headers,
             hx_target="#template_container",
             cls="flex justify-center place-items-center h-full w-full",
         )
@@ -413,6 +398,93 @@ def search_field(template: reports.Template, search: str) -> ft.Div:
 
 def template_card(template: reports.Template) -> ft.A:
     url = app.app.url_path_for("template_page", template_id=template.id)
+
+    chips = []
+    if template.isExperimental:
+        c = ft.Div(
+            icons.badge_experimental(),
+            ft.P("Experimental"),
+            cls=(
+                "bg-yellow-100",
+                "border",
+                "border-yellow-800",
+                "dark:border-yellow-600",
+                "dark:bg-yellow-900",
+                "dark:text-yellow-300",
+                "flex",
+                "flex-row",
+                "font-medium",
+                "max-h-7",
+                "me-2",
+                "px-2.5",
+                "py-1",
+                "rounded-full",
+                "space-x-2",
+                "text-xs",
+                "text-yellow-800",
+            ),
+        )
+        chips.append(c)
+
+    if template.isStable:
+        c = ft.Div(
+            icons.badge_stable(),
+            ft.P("Stable"),
+            cls=(
+                "bg-green-100",
+                "border",
+                "border-green-800",
+                "dark:bg-green-700",
+                "dark:border-green-500",
+                "dark:text-green-200",
+                "flex",
+                "flex-row",
+                "font-medium",
+                "max-h-7",
+                "me-2",
+                "px-2.5",
+                "py-1",
+                "rounded-full",
+                "space-x-2",
+                "text-green-800",
+                "text-xs",
+            ),
+        )
+        chips.append(c)
+
+    if template.isDocument:
+        c = ft.Div(
+            icons.badge_document(),
+            ft.P("Document"),
+            cls=(
+                "bg-blue-200",
+                "border",
+                "border-blue-800",
+                "dark:bg-blue-700",
+                "dark:border-blue-400",
+                "dark:text-blue-200",
+                "flex",
+                "flex-row",
+                "font-medium",
+                "max-h-7",
+                "me-2",
+                "px-2.5",
+                "py-1",
+                "rounded-full",
+                "space-x-2",
+                "text-blue-800",
+                "text-xs",
+            ),
+        )
+        chips.append(c)
+
+    if chips:
+        chip_container = ft.Div(
+            *chips, cls="flex flex-row grow place-items-end p-4"
+        )
+    else:
+        chip_container = None
+
     return ft.A(
         ft.Div(
             ft.Div(
@@ -458,88 +530,7 @@ def template_card(template: reports.Template) -> ft.A:
                 "text-neutral-800",
             ),
         ),
-        ft.Div(
-            ft.Div(
-                icons.badge_experimental(),
-                ft.P("Experimental"),
-                cls="hidden"
-                if not template.isExperimental
-                else (
-                    "bg-yellow-100",
-                    "border",
-                    "border-yellow-800",
-                    "dark:border-yellow-600",
-                    "dark:bg-yellow-900",
-                    "dark:text-yellow-300",
-                    "flex",
-                    "flex-row",
-                    "font-medium",
-                    "max-h-7",
-                    "me-2",
-                    "px-2.5",
-                    "py-1",
-                    "rounded-full",
-                    "space-x-2",
-                    "text-xs",
-                    "text-yellow-800",
-                ),
-            ),
-            ft.Div(
-                icons.badge_stable(),
-                ft.P("Stable"),
-                cls="hidden"
-                if not template.isStable
-                else (
-                    "bg-green-100",
-                    "border",
-                    "border-green-800",
-                    "dark:bg-green-700",
-                    "dark:border-green-500",
-                    "dark:text-green-200",
-                    "flex",
-                    "flex-row",
-                    "font-medium",
-                    "max-h-7",
-                    "me-2",
-                    "px-2.5",
-                    "py-1",
-                    "rounded-full",
-                    "space-x-2",
-                    "text-green-800",
-                    "text-xs",
-                ),
-            ),
-            ft.Div(
-                icons.badge_document(),
-                ft.P("Document"),
-                cls="hidden"
-                if not template.isDocument
-                else (
-                    "bg-blue-200",
-                    "border",
-                    "border-blue-800",
-                    "dark:bg-blue-700",
-                    "dark:border-blue-400",
-                    "dark:text-blue-200",
-                    "flex",
-                    "flex-row",
-                    "font-medium",
-                    "max-h-7",
-                    "me-2",
-                    "px-2.5",
-                    "py-1",
-                    "rounded-full",
-                    "space-x-2",
-                    "text-blue-800",
-                    "text-xs",
-                ),
-            ),
-            cls="hidden"
-            if not template.isDocument
-            and not template.isExperimental
-            and not template.isStable
-            else "flex flex-row grow place-items-end p-4",
-        ),
+        chip_container,
         cls=(
             "_template-card",
             "active:border-blue-600",

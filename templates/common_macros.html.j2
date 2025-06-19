@@ -57,6 +57,7 @@
 {% endmacro %}
 
 {% macro show_other_attributes(object, object_diff={}, display_modified_changes=None, excluded=[], hide_rules_check=False, hide_unset_attrs=False) %}
+  {% set excluded = ["from_model", "pvmt", "validate", "validation", "visible_on_diagrams"] + excluded %}
   {% set empty_attrs = [] %}
   <table style="width: 100%;">
     {% if object_diff %}
@@ -75,49 +76,43 @@
         <th>Value</th>
       </tr>
     </thead>
-    {%- for attr in object.__dir__() | sort if not attr.startswith("_") and attr not in ["from_model", "pvmt"] + excluded -%}
-      {% if attr in ["validation", "validate"] %}
-
+    {%- for attr in object.__dir__() | sort if not attr.startswith("_") and attr not in excluded -%}
+      {%- set value = object[attr] -%}
+      {% if value %}
+        <tr>
+          {% if attr in attr_diff and attr_change == "modified" %}
+            <td style="word-break:normal; background-color:rgb(255, 218, 148)">
+              {{ attr }}
+            </td>
+            <td>
+              {%- if value is diagram -%}
+                {{ render_diagram(object, attr) }}
+              {%- else -%}
+                {{ display_modified_changes(attr_diff[attr]) | safe }}
+              {%- endif -%}
+            </td>
+            {{ attr_lst.remove(attr) }}
+          {% else %}
+            <td style="word-break:normal">{{ attr }}</td>
+            <td>
+              {%- if value is diagram -%}
+                {{ render_diagram(object, attr) }}
+              {%- elif value is iterable and value is not string -%}
+                <ul>
+                  {%- for item in value -%}
+                    <li>{{ linked_name_with_icon(item) | safe }}</li>
+                  {%- endfor -%}
+                </ul>
+              {%- elif value is modelelement -%}
+                <p>{{ linked_name_with_icon(value) | safe }}</p>
+              {%- else -%}
+                <p>{{ value }}</p>
+              {%- endif -%}
+            </td>
+          {% endif %}
+        </tr>
       {% else %}
-        {%- set value = object[attr] -%}
-        {% if value %}
-          <tr>
-            {% if attr in attr_diff and attr_change == "modified" %}
-              <td
-                style="word-break:normal; background-color:rgb(255, 218, 148)"
-              >
-                {{ attr }}
-              </td>
-              <td>
-                {%- if value.as_svg -%}
-                  {{ value }}
-                {%- else -%}
-                  {{ display_modified_changes(attr_diff[attr]) | safe }}
-                {%- endif -%}
-              </td>
-              {{ attr_lst.remove(attr) }}
-            {% else %}
-              <td style="word-break:normal">{{ attr }}</td>
-              <td>
-                {%- if value.as_svg -%}
-                  {{ value }}
-                {%- elif value is iterable and value is not string -%}
-                  <ul>
-                    {% for item in value %}
-                      <li>{{ linked_name_with_icon(item) | safe }}</li>
-                    {% endfor %}
-                  </ul>
-                {%- elif value._short_html_ -%}
-                  <p>{{ linked_name_with_icon(value) | safe }}</p>
-                {%- else -%}
-                  <p>{{ value }}</p>
-                {%- endif -%}
-              </td>
-            {% endif %}
-          </tr>
-        {% else %}
-          {% set _none = empty_attrs.append(attr) %}
-        {% endif %}
+        {{ empty_attrs.append(attr) }}
       {% endif %}
     {% endfor -%}
     {% if attr_lst and attr_change == "modified" %}
@@ -129,17 +124,15 @@
       {% endfor %}
     {% endif %}
   </table>
-  {% if empty_attrs %}
-    {% if not hide_unset_attrs %}
-      <h3>Unset attributes</h3>
-      <p>
-        The object has the following attributes in unset state (empty values):
-        {{ ", ".join(empty_attrs) }}
-      </p>
-    {% endif %}
-    {% if not hide_rules_check %}
-      {{ show_compliance_to_modeling_rules(object) | safe }}
-    {% endif %}
+  {% if empty_attrs and not hide_unset_attrs %}
+    <h3>Unset attributes</h3>
+    <p>
+      The object has the following attributes in unset state (empty values):
+      {{ ", ".join(empty_attrs) }}
+    </p>
+  {% endif %}
+  {% if not hide_rules_check %}
+    {{ show_compliance_to_modeling_rules(object) | safe }}
   {% endif %}
 {% endmacro %}
 
@@ -249,9 +242,9 @@
   {%- set realizing_attrs = [] -%}
   {%- for attr in object.__dir__() -%}
     {%- if attr.startswith("realized_") -%}
-      {% set _none = realized_attrs.append(attr) %}
+      {{ realized_attrs.append(attr) }}
     {%- elif attr.startswith("realizing_") -%}
-      {% set _none = realizing_attrs.append(attr) %}
+      {{ realizing_attrs.append(attr) }}
     {%- endif -%}
   {%- endfor -%}
   {%- set realized_objects = object[realized_attrs | first] if realized_attrs else [] -%}
@@ -263,7 +256,7 @@
       The figure below provides an overview of objects that "{{ object.name }}"
       realizes but also those that realize "{{ object.name }}"
     </p>
-    {{ object.realization_view }}
+    {{ render_diagram(object, "realization_view") }}
   {% endif %}
   {% if show_upper %}
     {% if realized_objects %}
@@ -304,7 +297,7 @@
     {% for group in object.property_value_groups %}
       {% set prefix = group.name.split('.')[0] %}
       {% if prefix not in prefixes %}
-        {% set _ = prefixes.append(prefix) %}
+        {{ prefixes.append(prefix) }}
       {% endif %}
     {% endfor %}
     <h2>{{ heading }}</h2>
@@ -425,7 +418,7 @@
     {%- set involving_caps = [] -%}
     {%- for cap in capabilities -%}
       {%- if actor in cap.involved_components -%}
-        {%- set _ = involving_caps.append(cap) -%}
+        {{- involving_caps.append(cap) -}}
       {%- endif -%}
     {%- endfor -%}
 
@@ -466,7 +459,7 @@
   {% set ends = object.physical_ports.map("links.ends.owner") - [object] %}
   {% set nodes = [] %}
   {% for end in ends if object._element not in end._model._loader.iterancestors(end._element) %}
-    {% set _ = nodes.append(end) %}
+    {{ nodes.append(end) }}
   {% endfor %}
 
   {% for node in nodes %}
@@ -482,7 +475,7 @@
     {%- set involving_caps = [] -%}
     {%- for cap in capabilities -%}
       {%- if node in cap.involved_components -%}
-        {%- set _ = involving_caps.append(cap) -%}
+        {{- involving_caps.append(cap) -}}
       {%- endif -%}
     {%- endfor -%}
 
@@ -590,15 +583,15 @@
           {%- for exchange in input.exchanges -%}
             {%- set partner = exchange.source.owner.owner -%}
             {%- if partner and partner != object -%}
-              {%- set none_ = external_inputs.append(exchange) -%}
+              {{- external_inputs.append(exchange) -}}
             {%- elif partner == object -%}
-              {%- set none_ = internal_inputs.append(exchange) -%}
+              {{- internal_inputs.append(exchange) -}}
             {%- else -%}
-              {%- set none_ = undefined_owner_inputs.append(exchange) -%}
+              {{- undefined_owner_inputs.append(exchange) -}}
             {%- endif -%}
           {%- endfor -%}
         {%- else -%}
-          {%- set none_ = input_ports_with_no_exchanges.append(input) -%}
+          {{- input_ports_with_no_exchanges.append(input) -}}
         {%- endif -%}
       {%- endfor -%}
     {%- endif -%}
@@ -607,17 +600,17 @@
       {%- for output in function.outputs -%}
         {%- if output.exchanges -%}
           {%- for exchange in output.exchanges -%}
-            {%- set partner = exchange.target.owner.owner -%}
+            {{- exchange.target.owner.owner -}}
             {%- if partner and partner != object -%}
-              {%- set none_ = external_outputs.append(exchange) -%}
+              {{- external_outputs.append(exchange) -}}
             {%- elif partner == object -%}
-              {%- set none_ = internal_outputs.append(exchange) -%}
+              {{- internal_outputs.append(exchange) -}}
             {%- else -%}
-              {%- set none_ = undefined_owner_outputs.append(exchange) -%}
+              {{- undefined_owner_outputs.append(exchange) -}}
             {%- endif -%}
           {%- endfor -%}
         {%- else -%}
-          {%- set none_ = output_ports_with_no_exchanges.append(output) -%}
+          {{- output_ports_with_no_exchanges.append(output) -}}
         {%- endif -%}
       {%- endfor -%}
     {%- endif -%}
@@ -778,7 +771,7 @@
         The figure below provides an overview of the functional interactions
         enabled by this interface.
       </p>
-      {{ interface.context_diagram }}
+      {{ render_diagram(interface, "context_diagram") }}
 
       <p>
         The interface may be used for the following functional interactions:
@@ -807,12 +800,12 @@
                       following Exchange Items:
                     </p>
                     <ul>
-                      {% for item in exchange.exchange_items %}
+                      {%- for item in exchange.exchange_items -%}
                         <li>{{ linked_name_with_icon(item) | safe }}</li>
                         {%- if item not in exchange_items_catalog -%}
-                          {%- set _ = exchange_items_catalog.append(item) -%}
+                          {{- exchange_items_catalog.append(item) -}}
                         {%- endif -%}
-                      {% endfor %}
+                      {%- endfor -%}
                     </ul>
                   {% else %}
                     <p>

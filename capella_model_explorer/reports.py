@@ -4,6 +4,8 @@
 from __future__ import annotations
 
 import base64
+import json
+import logging
 import operator
 import pathlib
 import re
@@ -12,13 +14,35 @@ import typing as t
 
 import capellambse
 import capellambse.model as m
+import capellambse_context_diagrams
 import jinja2
 import markupsafe
 import pydantic as p
 import yaml
 
+import capella_model_explorer
 import capella_model_explorer.constants as c
-from capella_model_explorer import app, state
+from capella_model_explorer import app, core, state
+
+SVG_PLACEHOLDER_MARKUP = markupsafe.Markup(
+    '<div class="svg-container relative inline-block cursor-wait px-6 py-4 animate-pulse'
+    ' rounded-full bg-primary-500 text-neutral-300 dark:bg-primary-700 dark:text-neutral-400"'
+    ' hx-trigger="load" hx-get="{url}" hx-swap="outerHTML" hx-headers="{headers}">'
+    "Loading diagram..."
+    "</div>"
+)
+
+SVG_ERROR_MARKUP = markupsafe.Markup(
+    '<div class="svg-container relative inline-block px-6 py-4 w-full rounded-3xl bg-red-500'
+    ' text-neutral-300 dark:bg-red-700 dark:text-neutral-400">'
+    '<span class="cursor-pointer w-full"'
+    " hx-on:click=\"this.nextElementSibling.classList.toggle('hidden')\">"
+    "Error rendering diagram (click for details)"
+    "</span>"
+    '<div class="overflow-auto w-full hidden">'
+    '<pre class="mt-2 p-2 text-xs bg-red-800 text-white rounded-md overflow-auto w-full">{traceback}</pre>'
+    "</div></div>"
+)
 
 SVG_WRAP_MARKUP = markupsafe.Markup(
     '<div class="svg-container relative inline-block cursor-pointer"'
@@ -27,6 +51,8 @@ SVG_WRAP_MARKUP = markupsafe.Markup(
     ' class="transition hover:scale-105 hover:shadow-lg hover:shadow-normal-500/50">'
     "</div>"
 )
+
+logger = logging.getLogger(__name__)
 
 
 class Template(p.BaseModel):
@@ -202,23 +228,33 @@ def _make_href(
 
 
 def finalize(markup: t.Any) -> object:
+    if markup is None:
+        return ""
+
     if isinstance(markup, m.AbstractDiagram):
-        svg = markupsafe.Markup(
-            "data:image/svg+xml;base64,"
-            + base64.standard_b64encode(
-                markup.render("svg").encode(),
-            ).decode()
+        logger.warning(
+            (
+                "Synchronously rendering diagram inline, which is slow"
+                " - please update the template to use 'render_diagram()' instead:"
+                " %r (%s)"
+            ),
+            markup.name,
+            markup.uuid,
         )
-        return SVG_WRAP_MARKUP.format(svg_data=svg, title=markup.name)
+        return render_diagram(markup.render("svg"), markup.name)
 
     if isinstance(markup, capellambse.diagram.Diagram):
-        svg = markupsafe.Markup(
-            "data:image/svg+xml;base64,"
-            + base64.standard_b64encode(
-                m.diagram.convert_format(None, "svg", markup).encode(),
-            ).decode()
+        logger.warning(
+            (
+                "Placing synchronously rendered diagram inline, which is slow"
+                " - please update the template to use 'render_diagram()' instead:"
+                " %r (%s)"
+            ),
+            markup.name,
+            markup.uuid,
         )
-        return SVG_WRAP_MARKUP.format(svg_data=svg, title=markup.name)
+        svg = m.diagram.convert_format(None, "svg", markup)
+        return render_diagram(svg, markup.name)
 
     markup = markupsafe.escape(markup)
     return capellambse.helpers.replace_hlinks(markup, state.model, _make_href)
@@ -239,6 +275,63 @@ def make_href_filter(obj: object) -> str | None:
     return _make_href(obj)
 
 
+def diagram_placeholder(
+    parent: capellambse.model.ModelElement,
+    attr: str,
+    /,
+    **kw: t.Any,
+) -> t.Any:
+    logger.info(
+        "Generating diagram placeholder for %r on %r", attr, parent.uuid
+    )
+    if not isinstance(parent, capellambse.model.ModelElement):
+        raise TypeError("Parent object must be a model element")
+    if not isinstance(attr, str) or not attr.isidentifier():
+        raise TypeError("Attribute must be a Python identifier string")
+    try:
+        can_find = state.model.by_uuid(parent.uuid) == parent
+    except KeyError:
+        can_find = False
+    if not can_find:
+        raise TypeError(f"Cannot find object by its UUID: {parent!r}")
+
+    try:
+        diag = getattr(parent, attr)
+    except AttributeError:
+        raise TypeError(
+            f"Parent object ({type(parent).__name__})"
+            f" does not have an attribute {attr!r}"
+        ) from None
+    if not isinstance(diag, capellambse.model.AbstractDiagram):
+        raise TypeError(
+            f"Expected a diagram at {type(parent).__name__}.{attr},"
+            f" got {type(diag).__name__}"
+        )
+
+    url = app.app.url_path_for("render_diagram", parent=parent.uuid, attr=attr)
+    if kw:
+        try:
+            params = json.dumps(kw)
+        except Exception:
+            raise TypeError(
+                f"Render parameters must be JSON serializable: {kw!r}"
+            ) from None
+        url = f"{url}?params={params}"
+
+    render_environment = compute_cache_key(None)
+    headers = json.dumps({"Render-Environment": render_environment})
+
+    return SVG_PLACEHOLDER_MARKUP.format(url=url, headers=headers)
+
+
+def render_diagram(svg: str, title: str, /) -> markupsafe.Markup:
+    svg = markupsafe.Markup(
+        "data:image/svg+xml;base64,"
+        + base64.standard_b64encode(svg.encode("utf-8")).decode("ascii")
+    )
+    return SVG_WRAP_MARKUP.format(svg_data=svg, title=title)
+
+
 def load_templates() -> None:
     for idx_path in sorted(c.TEMPLATES_DIR.glob("**/*.yaml")):
         category = re.sub(r"^[A-Za-z0-9]{2}-", "", idx_path.parent.name)
@@ -251,3 +344,18 @@ def load_templates() -> None:
             template = Template(**template_def)
             state.templates.append(template)
         _register_template_category(category)
+
+
+def compute_cache_key(template: Template | None, /) -> str:
+    data = {
+        "model-explorer-version": capella_model_explorer.__version__,
+        "capellambse-version": capellambse.__version__,
+        "ctx-diags-version": capellambse_context_diagrams.__version__,
+    }
+    if template is not None:
+        data["template-hash"] = core.compute_file_hash(str(template.path))
+    if model_revision := state.model.info.resources["\x00"].rev_hash:
+        data["model-revision"] = model_revision
+    else:
+        data["launch-id"] = c.LAUNCH_ID
+    return json.dumps(data)

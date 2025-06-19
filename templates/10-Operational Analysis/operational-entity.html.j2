@@ -68,7 +68,7 @@
         {%- set involving_caps = [] -%}
         {%- for cap in object.capabilities -%}
           {%- if activity in cap.involved_activities -%}
-            {%- set _ = involving_caps.append(cap) -%}
+            {{- involving_caps.append(cap) -}}
           {%- endif -%}
         {%- endfor -%}
         {%- if involving_caps -%}
