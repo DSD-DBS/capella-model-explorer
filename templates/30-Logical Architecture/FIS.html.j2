@@ -14,7 +14,7 @@
 
 {% macro add_class_dependencies(cls, classes) %}
   {% if cls and cls.xtype == "org.polarsys.capella.core.data.information:Class" and not cls in classes %}
-    {% set _none = classes.append(cls) %}
+    {{ classes.append(cls) }}
     {% if cls.super %}
       {{ add_class_dependencies(cls.super, classes) }}
     {% endif %}
@@ -32,7 +32,7 @@
 {% macro insert_or_link(object, inserted) %}
   {% if object not in inserted %}
     {{ insert_work_item(object) | safe }}
-    {% set _ = inserted.append(object) %}
+    {{ inserted.append(object) }}
   {% else %}
     <p>{{ linked_name_with_icon(object) }}</p>
   {% endif %}
@@ -48,7 +48,7 @@
 
 <h2>Context Diagram</h2>
 <p>The following shows {{ object.name }} in its system-level context:</p>
-{{ object.context_diagram | safe }}
+{{ render_diagram(object, "context_diagram") }}
 
 <h2>Interface Partners</h2>
 {% set partner_a = object.source.owner %}
@@ -142,7 +142,7 @@
 {# {%- set classes = {} -%}
 {%- set inserted = [] -%}
 {% for direction, eis in exchange_items_by_direction.items() %}
-    {% set _ = classes.setdefault(direction, []) %}
+    {{- classes.setdefault(direction, []) -}}
     {{ heading(4, model.by_uuid(direction[0]).name + " → " + model.by_uuid(direction[1]).name, session) }}
     {% for ei in eis | unique %}
         {{ heading(5, work_item_field(ei, "id") + " - " + ei.name, session) }}

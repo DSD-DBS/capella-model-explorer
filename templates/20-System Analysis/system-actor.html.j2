@@ -20,7 +20,9 @@
 {{ description(object) | safe }}
 {%- set involving_caps = [] -%}
 {%- for cap in model.search("Capability", below=model.sa) -%}
-  {%- set _none = involving_caps.append(cap) if object in cap.involved_components else "" %}
+  {%- if object in cap.involved_components -%}
+    {{- involving_caps.append(cap) -}}
+  {%- endif -%}
 {%- endfor -%}
 
 {% if involving_caps %}
@@ -35,7 +37,7 @@
 
 <h2>Context</h2>
 <p>The context of {{ object.name }} is summarized by the diagram below:</p>
-{{ object.context_diagram.render(None, display_derived_interfaces=True) }}
+{{ render_diagram(object, "context_diagram", display_derived_interfaces=True) }}
 
 <h2>Functions</h2>
 {% if object.allocated_functions %}
@@ -97,5 +99,4 @@
 <h2>Other attributes</h2>
 
 {% set excluded = ["is_actor", "is_human", "name", "xtype", "allocated_functions", "description", "owner", "parent", "parts", "realized_components", "realized_entities", "realized_operational_entities", "realizing_components", "realizing_logical_components", "related_exchanges", "context_diagram", "requirements"] %}
-
 {{ show_other_attributes(object, excluded=excluded) | safe }}

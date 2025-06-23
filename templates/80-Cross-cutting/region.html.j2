@@ -88,7 +88,7 @@
   {% set substates = [] %}
   {% for region in state.regions %}
     {% for rstate in region.states %}
-      {% set none_ = substates.append(rstate) %}
+      {{ substates.append(rstate) }}
     {% endfor %}
   {% endfor %}
 

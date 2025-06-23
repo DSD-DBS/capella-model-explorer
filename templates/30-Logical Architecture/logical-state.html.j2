@@ -70,7 +70,7 @@
 {% set substates = [] %}
 {% for region in object.regions %}
   {% for rstate in object.states %}
-    {% set none_ = substates.append(rstate) %}
+    {{ substates.append(rstate) }}
   {% endfor %}
 {% endfor %}
 

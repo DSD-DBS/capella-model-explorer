@@ -13,7 +13,7 @@
       {%- if fex.name not in unique_exchange_names -%}
         <a href="{{ fex.source.owner | make_href }}">{{ fex.name }}</a
         >{% if not loop.last %},{% else %}{% endif %}
-        {%- set _none = unique_exchange_names.append(fex.name) -%}
+        {{- unique_exchange_names.append(fex.name) -}}
       {%- endif -%}
     {% endfor %}
     via <i>{{ interface.name }}</i> interface (component exchange) so that
@@ -36,9 +36,9 @@
 {% set target_provides = [] %}
 {%- for fex in object.allocated_functional_exchanges -%}
   {%- if fex.source.owner and fex.source.owner.owner and fex.source.owner.owner == object.source.owner -%}
-    {%- set _none = source_provides.append(fex) -%}
+    {{- source_provides.append(fex) -}}
   {% else %}
-    {%- set _none = target_provides.append(fex) -%}
+    {{- target_provides.append(fex) -}}
   {%- endif -%}
 {%- endfor -%}
 
@@ -55,7 +55,7 @@
   The functional interactions between interface partners via {{ object.name }}
   are summarized by the diagram below:
 </p>
-{{ object.context_diagram }}
+{{ render_diagram(object, "context_diagram") }}
 
 {{ display_traceability(object) | safe }}
 

@@ -12,7 +12,7 @@
       {% for i in attr_diff["current"] %}
         {% if i["uuid"] in diff %}
           {% set object = model.by_uuid(i["uuid"]) %}
-          {% set seen =  seen.append(i["uuid"]) %}
+          {% set seen = seen.append(i["uuid"]) %}
           <li>
             {{ linked_name_with_color_and_icon(object, diff[i["uuid"]]) | safe }}
           </li>

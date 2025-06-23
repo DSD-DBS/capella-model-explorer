@@ -59,7 +59,7 @@
   The figure below provides an overview of the behaviors that depend on this
   interface:
 </p>
-{{ object.context_diagram }}
+{{ render_diagram(object, "context_diagram") }}
 <p>This interface enables the following interactions:</p>
 <table>
   <thead>
@@ -110,7 +110,7 @@
   {% set items = [] %}
   {% for exchange in object.allocated_functional_exchanges %}
     {% for item in exchange.exchange_items %}
-      {% set _none = items.append(item) %}
+      {{ items.append(item) }}
     {% endfor %}
   {% endfor %}
   {% for item in items | unique(attribute="uuid") %}

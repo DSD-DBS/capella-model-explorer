@@ -187,7 +187,7 @@
     actors.
   </p>
 
-  {{ object.context_diagram }}
+  {{ render_diagram(object, "context_diagram") }}
   {{ describe_inputs(object) | safe }}
   {{ describe_outputs(object) | safe }}
   {{ display_property_values(object) | safe }}
