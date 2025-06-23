@@ -1,7 +1,7 @@
 # Copyright DB InfraGO AG and contributors
 # SPDX-License-Identifier: Apache-2.0
 
-- template: phy-component.html.j2
+- template: physical-component.html.j2
   id: physical-component
   name: Physical Component
   description: Defines a Physical Component
