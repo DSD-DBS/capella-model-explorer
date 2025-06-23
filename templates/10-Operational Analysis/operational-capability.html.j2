@@ -7,14 +7,14 @@
 <h1>{{ object.name }}</h1>
 {{ description(object) | safe }}
 
-<br /><b>Pre-condition</b>:
+<b>Pre-condition</b>:
 {% if object.precondition %}
   <p>{{ object.precondition.specification['capella:linkedText']|safe }}</p>
 {% else %}
   <p style="color:red">No pre-condition defined</p>
 {% endif %}
 
-<br /><b>Post-condition</b>:
+<b>Post-condition</b>:
 {% if object.postcondition %}
   <p>{{ object.postcondition.specification['capella:linkedText']|safe }}</p>
 {% else %}
@@ -53,7 +53,7 @@
 {# Q: should we resolve inherited activities and actors / explicitly indicate where an actor / activity got inherited #}
 {{ render_diagram(object, "context_diagram") }}
 
-<h2>Involved entities and activities</h2>
+<h2>Involved Entities and Activities</h2>
 To enable the Capability, the following entities and activities are involved:
 {%- set entities = object.involved_entities | list + object.involved_activities | map(attribute="owner") | unique(attribute="uuid") | list -%}
 {%- if entities -%}
