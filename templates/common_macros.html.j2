@@ -917,3 +917,16 @@
     {%- endif -%}
   {%- endfor -%}
 {%- endmacro %}
+
+{%- macro render_related_diagrams(object) -%}
+  {%- set related_diagrams = object.diagrams + object.visible_on_diagrams -%}
+  {%- set related_diagrams = related_diagrams | unique(attribute="uuid") | list -%}
+  {%- if related_diagrams -%}
+    <h2>Related Diagrams</h2>
+    <ul>
+      {%- for diagram in related_diagrams -%}
+        <li>{{ linked_name_with_icon(diagram) | safe }}</li>
+      {%- endfor -%}
+    </ul>
+  {%- endif -%}
+{%- endmacro -%}
