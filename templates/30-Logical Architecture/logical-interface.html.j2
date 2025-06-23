@@ -9,6 +9,7 @@
   linked_name,
   linked_name_with_icon,
   display_traceability,
+  render_related_diagrams,
   display_property_values
 %}
 
@@ -150,6 +151,8 @@
     </table>
   {%- endfor -%}
 {%- endif -%}
+
+{{ render_related_diagrams(object) | safe }}
 
 {% if object.constraints -%}
   <h2>Constraints</h2>
