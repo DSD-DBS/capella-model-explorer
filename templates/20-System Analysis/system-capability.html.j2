@@ -11,14 +11,14 @@
   <p style="color:red">No description available.</p>
 {% endif %}
 
-<br /><b>Pre-condition</b>:
+<b>Pre-condition</b>:
 {% if object.precondition %}
   <p>{{ object.precondition.specification['capella:linkedText']|safe }}</p>
 {% else %}
   <p style="color:red">No pre-condition defined</p>
 {% endif %}
 
-<br /><b>Post-condition</b>:
+<b>Post-condition</b>:
 {% if object.postcondition %}
   <p>{{ object.postcondition.specification['capella:linkedText']|safe }}</p>
 {% else %}
