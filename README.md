@@ -119,11 +119,10 @@ Navigate to `Menu` > `Settings` > `Tools` > `Add a new tool` and fill in the
 following configuration:
 
 ```yaml
-name: "Capella model explorer"
+name: Capella model explorer
 integrations:
   t4c: false
   pure_variants: false
-  jupyter: false
 config:
   resources:
     cpu:
@@ -135,27 +134,41 @@ config:
   environment:
     CME_MODEL:
       stage: before
-      value: "{CAPELLACOLLAB_SESSION_PROVISIONING[0][path]}"
+      value:
+        path: "{CAPELLACOLLAB_SESSION_PROVISIONING[0][path]}"
+        diagram_cache:
+          path: "{CAPELLACOLLAB_SESSION_PROVISIONING[0][diagram_cache]}"
+          password: "{CAPELLACOLLAB_SESSION_API_TOKEN}"
+          username: "{CAPELLACOLLAB_SESSION_REQUESTER_USERNAME}"
+        fallback_render_aird: "true"
+    CME_LOG_FILE: /var/log/session/model-explorer.log
+    CME_LIVE_MODE: "0"
     CME_ROUTE_PREFIX: "{CAPELLACOLLAB_SESSIONS_BASE_PATH}"
   connection:
     methods:
       - id: f51872a8-1a4f-4a4d-b4f4-b39cbd31a75b
         type: http
-        name: Direct Browser connection
-        sharing:
-          enabled: true
+        name: Browser connection
         ports:
           metrics: 8000
           http: 8000
+        sharing:
+          enabled: true
         redirect_url: "{CAPELLACOLLAB_SESSIONS_SCHEME}://{CAPELLACOLLAB_SESSIONS_HOST}:{CAPELLACOLLAB_SESSIONS_PORT}{CAPELLACOLLAB_SESSIONS_BASE_PATH}/"
   monitoring:
     prometheus:
       path: /metrics
+    logging:
+      enabled: true
   provisioning:
     directory: /models
     max_number_of_models: 1
+    required: true
+    provide_diagram_cache: true
   persistent_workspaces:
     mounting_enabled: false
+  supported_project_types:
+    - general
 ```
 
 You can tune the resources according to your needs.
