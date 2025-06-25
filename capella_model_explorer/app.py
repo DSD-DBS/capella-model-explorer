@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import contextlib
+import json
 import logging
 import pathlib
 import tempfile
@@ -308,11 +309,15 @@ def render_template(
 def render_diagram(
     parent: str,
     attr: str,
-    params: dict[str, t.Any] | None = None,
+    params: str = "",
 ) -> t.Any:
     """Request the rendering of a diagram."""
-    if params is None:
-        params = {}
+    if params:
+        dec_params = json.loads(params)
+    else:
+        dec_params = {}
+    del params
+
     try:
         parent_obj = state.model.by_uuid(parent)
     except KeyError:
@@ -326,7 +331,7 @@ def render_diagram(
 
     try:
         rendered = reports.render_diagram(
-            diag.render("svg", **params), diag.name
+            diag.render("svg", **dec_params), diag.name
         )
     except Exception:
         logger.exception("Error rendering diagram %r on %r", attr, parent)
