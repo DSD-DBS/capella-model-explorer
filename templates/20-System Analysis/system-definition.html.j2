@@ -69,7 +69,14 @@
 <h2>5 System Functions</h2>
 {{ render_allocated_functions(object) | safe }}
 
-<h2>6 System Interfaces</h2>
+<h2>6 Functional Chains</h2>
+{% for chain in model.sa.all_functional_chains %}
+  <h3>{{ linked_name_with_icon(chain) }}</h3>
+  {{ chain.context_diagram }}
+  <p>{{ description(chain) | safe }}</p>
+{% endfor %}
+
+<h2>7 System Interfaces</h2>
 {% set interfaces = object.related_exchanges %}
 {% set exchange_items_catalog = [] %}
 {{ render_interfaces_section(object, interfaces, exchange_items_catalog) | safe }}

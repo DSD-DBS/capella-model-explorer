@@ -130,7 +130,7 @@
     within the interface.
   </p>
   {%- for path in object.allocating_physical_paths -%}
-    <h4>{{ path.name }}</h4>
+    <h4>{{ linked_name(path) }}</h4>
     <p>{{ description(path) | safe }}</p>
     <h5>Involved links:</h5>
     <ul>
@@ -152,20 +152,20 @@
 {{ display_traceability(object) | safe }}
 
 <h2>Other attributes</h2>
-{%
+{%-
   set excluded = [
     "allocated_functional_exchanges",
+    "allocating_physical_paths",
     "applied_property_value_groups",
-    "property_value_groups",
     "context_diagram",
-    "parent",
+    "exchange_items",
     "name",
-    "uuid",
+    "parent",
+    "property_value_groups",
+    "realized_component_exchanges",
     "source",
     "target",
-    "exchange_items",
-    "allocating_physical_paths",
-    "realized_component_exchanges"
+    "uuid",
   ]
-%}
+-%}
 {{ show_other_attributes(object, excluded=excluded) | safe }}

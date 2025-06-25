@@ -24,3 +24,11 @@
   scope:
     type: OperationalActivity
     below: oa
+- template: operational-process.html.j2
+  id: operational-process
+  name: Operational Process
+  description: Specifies an operational Process.
+  isExperimental: true
+  scope:
+    type: OperationalProcess
+    below: oa
