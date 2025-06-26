@@ -600,7 +600,7 @@
       {%- for output in function.outputs -%}
         {%- if output.exchanges -%}
           {%- for exchange in output.exchanges -%}
-            {{- exchange.target.owner.owner -}}
+            {%- set partner = exchange.target.owner.owner -%}
             {%- if partner and partner != object -%}
               {{- external_outputs.append(exchange) -}}
             {%- elif partner == object -%}
