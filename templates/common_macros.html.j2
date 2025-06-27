@@ -404,11 +404,11 @@
   {% endfor %}
 {% endmacro %}
 
-{% macro render_involved_actors_section(object, actors, capabilities) %}
+{% macro render_involved_components_section(object, actors, capabilities) %}
   {% for actor in actors %}
     {% if loop.first %}
       <p>
-        The <i>{{ object.name }}</i> interacts with the actors described below.
+        The <i>{{ object.name }}</i> interacts with the components and actors described below.
       </p>
     {% endif %}
 
