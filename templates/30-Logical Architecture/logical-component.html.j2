@@ -10,7 +10,7 @@
   render_allocated_functions,
   render_capability_section,
   render_exchange_items_catalog,
-  render_involved_actors_section,
+  render_involved_components_section,
   render_interfaces_section,
   show_other_attributes
 %}
@@ -28,8 +28,9 @@
   and depicts all the actors that it interacts with.
 </p>
 {{ render_diagram(object, "context_diagram", display_derived_interfaces=True) }}
-{% set actors = object.context_diagram.nodes.by_is_actor(True) %}
-{{ render_involved_actors_section(object, actors, capabilities) | safe }}
+{% set actors = object.context_diagram.nodes.by_class("LogicalComponent") -%}
+{% set actors = actors - model.search(below=object) - [object] -%}
+{{ render_involved_components_section(object, actors, capabilities) | safe }}
 
 <h2>Allocated Functions</h2>
 {{ render_allocated_functions(object) | safe }}
