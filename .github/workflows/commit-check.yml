@@ -10,10 +10,10 @@ on:
 jobs:
   conventional-commits:
     runs-on: ubuntu-latest
+    if: github.actor != 'dependabot[bot]'
     concurrency:
       group: commit-check-pr-${{ github.event.pull_request.number }}
       cancel-in-progress: true
-    if: github.actor != 'dependabot[bot]'
     steps:
       - uses: actions/checkout@v4
         with:

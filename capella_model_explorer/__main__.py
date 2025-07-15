@@ -18,6 +18,7 @@ import typing as t
 import click
 import uvicorn
 
+import capella_model_explorer
 import capella_model_explorer.constants as c
 from capella_model_explorer import app
 
@@ -203,6 +204,11 @@ def _find_exe(name: str) -> str:
         " as understood by 'logging.config.dictConfig()'."
         " If passed, other '--log-*' arguments are ignored."
     ),
+)
+@click.version_option(
+    version=capella_model_explorer.__version__,
+    prog_name="capella-model-explorer",
+    message="%(prog)s %(version)s",
 )
 @click.pass_context
 def main(

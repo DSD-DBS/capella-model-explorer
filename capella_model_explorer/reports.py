@@ -152,6 +152,7 @@ class TemplateScope(p.BaseModel):
     )
 
     def applies_to(self, obj: m.ModelElement | m.AbstractDiagram) -> bool:
+        assert obj.xtype is not None
         if obj.xtype.rsplit(":", 1)[-1] != self.type:
             return False
 

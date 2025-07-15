@@ -11,7 +11,7 @@
 A webapp for exploring Capella models through simple "auto-generated" textual
 and graphical views.
 
-**Longer story**:
+## Longer story
 
 We see a larger non-MBSE crowd struggling with the things hidden in the model.
 With this app we expose model contents in an easy to review readable form with
@@ -19,7 +19,7 @@ basic graphical annotations. Under the hood it uses Jinja templates enabling
 the tooling teams to support their users with model-derived documents of any
 shape and form.
 
-**Use cases**:
+## Use cases
 
 - Provide insights into / "spell-out" the model for non-MBSE stakeholders via
   document-a-like dynamic views that describe model elements in a
@@ -30,40 +30,34 @@ shape and form.
 
 There are a few more use cases but we will reveal them a bit later.
 
-# Quick start
-
-## Installation
+# Installation
 
 You can install the latest released version directly from PyPI.
 
-```bash
+```sh
 pip install capella-model-explorer
 ```
 
 ## Run the app
 
-The app comes with a command line interface (CLI).
-Command `cme --help` to get help or `cme SUBCOMMAND --help` to get help for any
-subcommand.
+The app comes with a command line interface (CLI). Run `cme --help` to get help
+or `cme SUBCOMMAND --help` to get help for any subcommand.
 
-```bash
+```sh
 cme run --help
 ```
 
-explains the available run options.
-
-In all cases the running app will be served at a location (default:
-`http://localhost:8000`) that will be printed to the console.
+When running the app, the used IP address and port are printed to the console.
 
 ### Run the app locally
 
-```bash
+```sh
 cme run
 ```
 
 ### Build a Docker image and run the app in a container
 
-```bash
+```sh
 docker build -t capella-model-explorer .
 cme run --container --image capella-model-explorer
 ```
@@ -75,23 +69,20 @@ Stop the app via CTRL+C.
 
 ### Run the app in a container with a custom remote model
 
-```bash
+```sh
 export CME_MODEL='git+https://github.com/DSD-DBS/Capella-IFE-sample.git'
 export CME_PORT=5000  # optional, default is 8000
 cme run --container
 ```
 
 More information describing what kinds of values can be specified via the
-environment variable `CME_MODEL` can be found in the documentation of
-capellambse:
-
-https://dsd-dbs.github.io/py-capellambse/start/specifying-models.html
+environment variable `CME_MODEL` can be found in [the capellambse
+documentation](https://dsd-dbs.github.io/py-capellambse/start/specifying-models.html).
 
 ### Run the app in a container with a custom local model
 
-If you want to be able to explore a local Capella model you can mount a local
-model into the container. Live template reloading and rendering will be
-enabled.
+If you want to be able to explore a local Capella model, you can mount a local
+model into the container.
 
 ```bash
 export CME_MODEL=/path/on/host/to/model
@@ -111,12 +102,9 @@ cme run --container
 
 # Integration in the Capella Collaboration Manager
 
-The Capella Model Explorer can be integrated into the
-[Capella Collaboration Manager](https://github.com/DSD-DBS/capella-collab-manager).
-
-To do so, you need a running instance of the Capella Collaboration Manager.
-Navigate to `Menu` > `Settings` > `Tools` > `Add a new tool` and fill in the
-following configuration:
+The Capella Model Explorer can be integrated into the [Capella Collaboration
+Manager](https://github.com/DSD-DBS/capella-collab-manager). Navigate to
+`Settings` > `Tools`, then `Add a new tool` with the following configuration:
 
 ```yaml
 name: Capella model explorer
@@ -195,21 +183,22 @@ versions you want to support.
 
 When configured properly, users will be able to start read-only sessions for
 the Capella Model Explorer. More information about read-only sessions is
-available in the
-[Capella Collaboration Manager documentation](https://dsd-dbs.github.io/capella-collab-manager/user/sessions/types/read-only/).
+available in the [Capella Collaboration Manager
+documentation](https://dsd-dbs.github.io/capella-collab-manager/user/sessions/types/read-only/).
 
 # Theme
 
 The app comes with a default light and dark theme and the hue value for the
 primary color can be customized via the environment variable
 `CME_PRIMARY_COLOR_HUE`. The default hue value is 231 which corresponds to the
-purple/ blue color used as primary color in the
-[Capella Collaboration Manager documentation](https://dsd-dbs.github.io/capella-collab-manager).
+purple/ blue color used as primary color in the [Capella Collaboration Manager
+documentation](https://dsd-dbs.github.io/capella-collab-manager).
 
 # Contributing
 
 We'd love to see your bug reports and improvement suggestions! Please take a
-look at our [guidelines for contributors](CONTRIBUTING.md) for details.
+look at our [guidelines for contributors](CONTRIBUTING.md) for details. It also
+contains a short guide on how to set up a local development environment.
 
 # Licenses
 
