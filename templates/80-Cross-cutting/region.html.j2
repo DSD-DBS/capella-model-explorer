@@ -144,7 +144,7 @@
   {% endif %}
 {% endfor %}
 
-<h2>Related diagrams</h2>
+<h2>Related Diagrams</h2>
 
 {% for diagram in object.diagrams %}
   <h3>{{ diagram.name }}</h3>
@@ -152,5 +152,12 @@
 {% endfor %}
 
 <h2>Other properties of "{{ object.name }}"</h2>
-{% set excluded = ["name", "xtype", "transitions", "states"] %}
+{%-
+  set excluded = [
+    "name",
+    "states",
+    "transitions",
+    "xtype",
+  ]
+-%}
 {{ show_other_attributes(object, excluded=excluded) | safe }}

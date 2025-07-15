@@ -4,10 +4,6 @@
 #}
 {% from 'common_macros.html.j2' import show_other_attributes, description, typed_name, linked_name, linked_name_with_icon, display_traceability, render_requirements_table %}
 
-{# {%  macro linked_name_with_icon(obj) %}
-{% if obj.name %}{{ obj.name }}{% else %}{{ obj }}{% endif %}
-{% endmacro %} #}
-
 {% macro insert_work_item(object) %}
   {{ linked_name_with_icon(object) | safe }}
 {% endmacro %}
@@ -38,7 +34,7 @@
   {% endif %}
 {% endmacro %}
 
-<h1>{{ "Functional Interface Specification " + object.name }}</h1>
+<h1>Functional Interface Specification {{ object.name }}</h1>
 <h2>Introduction</h2>
 <p>
   This Functional Interface Specification (FIS) document specifies functional
@@ -58,9 +54,9 @@
   {{ linked_name_with_icon(partner_a) | safe }} and
   {{ linked_name_with_icon(partner_b) | safe }}.
 </p>
-<h3>{{ partner_a.name }}</h3>
+<h3>{{ linked_name(partner_a) }}</h3>
 {{ description(partner_a) | safe }}
-<h3>{{ partner_b.name }}</h3>
+<h3>{{ linked_name(partner_b) }}</h3>
 {{ description(partner_b) | safe }}
 <h2>Interface Description</h2>
 <p>The interface enables the following functional interactions:</p>
@@ -132,7 +128,7 @@
   This section identifies Exchange Items / Messages used within the interface.
 </p>
 {% for exi in object.exchange_items %}
-  <h4 id="exi-{{ exi.uuid }}">Exchange Item {{ exi.name }}</h4>
+  <h4 id="exi-{{ exi.uuid }}">Exchange Item {{ linked_name(exi) }}</h4>
   {{ description(exi) | safe }}
   {% for el in exi.elements %}
     {{ add_class_dependencies(el.abstract_type, classes[direction]) }}

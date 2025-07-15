@@ -111,5 +111,16 @@
 {% endif %}
 
 <h2>Other properties of "{{ object.name }}"</h2>
-{% set excluded = ["name", "xtype", "incoming_transitions", "outgoing_transitions", "related_transitions", "do_activity", "entry", "exit"] %}
+{%-
+  set excluded = [
+    "do_activity",
+    "entry",
+    "exit",
+    "incoming_transitions",
+    "name",
+    "outgoing_transitions",
+    "related_transitions",
+    "xtype",
+  ]
+-%}
 {{ show_other_attributes(object, excluded=excluded) | safe }}

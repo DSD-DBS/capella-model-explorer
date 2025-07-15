@@ -9,6 +9,8 @@
   linked_name,
   linked_name_with_icon,
   display_traceability,
+  render_constraints,
+  render_related_diagrams,
   display_property_values
 %}
 
@@ -151,38 +153,31 @@
   {%- endfor -%}
 {%- endif -%}
 
-{% if object.constraints -%}
-  <h2>Constraints</h2>
-  <ul>
-    {%- for constraint in object.constraints -%}
-      <li>
-        <b>{{ linked_name_with_icon(constraint) | safe }}</b>:
-        {{ constraint.specification["capella:linkedText"] | safe }}
-      </li>
-    {%- endfor -%}
-  </ul>
-{%- endif %}
+{{ render_related_diagrams(object) | safe }}
+
+{{ render_constraints(object) | safe }}
 
 {{ display_property_values(object, heading="Additional properties") | safe }}
 
 {{ display_traceability(object) | safe }}
 
 <h2>Other attributes</h2>
-{%
+{%-
   set excluded = [
     "allocated_functional_exchanges",
-    "constraints",
-    "context_diagram",
-    "uuid",
-    "parent",
-    "name",
-    "source",
-    "target",
-    "exchange_items",
-    "realizing_component_exchanges",
     "applied_property_value_groups",
     "applied_property_values",
-    "property_value_groups"
+    "constraints",
+    "context_diagram",
+    "exchange_items",
+    "name",
+    "parent",
+    "property_value_groups",
+    "realizing_component_exchanges",
+    "source",
+    "target",
+    "uuid",
+    "visible_on_diagrams",
   ]
-%}
+-%}
 {{ show_other_attributes(object, excluded=excluded) | safe }}

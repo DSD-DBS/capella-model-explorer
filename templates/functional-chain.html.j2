@@ -1,0 +1,36 @@
+{#
+    Copyright DB InfraGO AG and contributors
+    SPDX-License-Identifier: Apache-2.0
+#}
+{%
+  from 'common_macros.html.j2' import
+  render_functional_chain,
+  render_related_diagrams,
+  display_traceability,
+  show_other_attributes
+%}
+
+{{ render_functional_chain(object, "FunctionalChain", "functional chain") }}
+
+{{ display_traceability(object) | safe }}
+
+{{ render_related_diagrams(object) | safe }}
+
+<h2>Other attributes</h2>
+{%-
+  set excluded = [
+    "constraints",
+    "context_diagram",
+    "diagrams",
+    "involved",
+    "involved_chains",
+    "involved_functions",
+    "involved_links",
+    "involvements",
+    "involving_chains",
+    "name",
+    "parent",
+    "realizing_chains",
+  ]
+-%}
+{{ show_other_attributes(object, excluded=excluded) | safe }}
