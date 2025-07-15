@@ -20,7 +20,7 @@ RUN apt-get update && \
   graphviz \
   libcairo2-dev \
   libgirepository1.0-dev \
-  npm && \
+  nodejs && \
   apt-get autoremove --yes && \
   apt-get clean && \
   rm -rf /var/lib/apt/lists/*
@@ -30,16 +30,17 @@ USER 1000
 FROM base AS build
 
 USER root
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN curl -Lo /tmp/install.sh https://astral.sh/uv/install.sh && \
   chmod +x /tmp/install.sh && \
   UV_NO_MODIFY_PATH=1 sh /tmp/install.sh && \
   rm /tmp/install.sh
+RUN curl -fsSL https://get.pnpm.io/install.sh | ENV="$HOME/.bashrc" SHELL="$(which bash)" PNPM_HOME="$HOME/.local/bin" bash -
 
 COPY . /build
 
 WORKDIR /build
-RUN npm clean-install && \
-  uv run python3 -m capella_model_explorer build
+RUN uv run cme build
 
 RUN uv venv /app && \
   uv pip compile pyproject.toml >requirements.txt && \

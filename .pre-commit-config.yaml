@@ -38,7 +38,7 @@ repos:
       - id: insert-license
         name: Insert Apache license headers (shell-style comments)
         files: '(?:^|/)(?:.*\.(?:py|sh|toml|ya?ml)|Dockerfile|Makefile)$'
-        exclude: '(?:^|/)\..+|^docs/Makefile$'
+        exclude: '(?:^|/)(\..+|pnpm-[^/]+\.yaml)|^docs/Makefile$'
         args:
           - --detect-license-in-X-top-lines=15
           - --license-filepath
@@ -47,7 +47,7 @@ repos:
           - '#'
       - id: insert-license
         name: Insert CC0 license headers (shell-style comments)
-        files: '(?:^|/)(?:codeql-analysis.yml|dependabot.yml|\.(?:pre-commit-config.yaml|(?:git|helm|docker)ignore))$'
+        files: '(?:^|/)(?:codeql-analysis.yml|dependabot.yml|pnpm-[^/]+\.yaml|\.(?:pre-commit-config.yaml|(?:git|helm|docker)ignore))$'
         args:
           - --detect-license-in-X-top-lines=15
           - --license-filepath

@@ -26,8 +26,8 @@ logger = logging.getLogger(__name__)
 
 
 def _install_npm_pkgs() -> None:
-    npm = _find_exe("npm")
-    cmd = [npm, "clean-install"]
+    pm = _find_exe("pnpm")
+    cmd = [pm, "install", "--frozen-lockfile"]
     logger.info(shlex.join(cmd))
     subprocess.check_call(cmd)
 
@@ -132,8 +132,9 @@ def build_bundle(
         raise SystemExit(f"Input CSS file not found: {input_css}")
 
     tailwind_cmd = [
-        "npx",
-        "@tailwindcss/cli",
+        "pnpm",
+        "exec",
+        "tailwindcss",
         "--input",
         str(input_css),
         "--output",
@@ -141,7 +142,8 @@ def build_bundle(
         *(["--watch"] if watch else []),
     ]
     parcel_cmd = [
-        "npx",
+        "pnpm",
+        "exec",
         "parcel",
         "watch" if watch else "build",
         "--dist-dir=static/bundle",

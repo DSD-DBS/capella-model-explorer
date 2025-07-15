@@ -23,8 +23,8 @@ our style guidelines outlined below.
 
 Use [uv](https://docs.astral.sh/uv/) to set up a local development environment.
 
-Additionally, you need to have `npm` installed to build the JS/CSS bundles, and
-optionally Docker to build and run Docker images.
+Additionally, you need to have `pnpm` installed to build the JS/CSS bundles,
+and optionally Docker to build and run Docker images.
 
 ```sh
 git clone https://github.com/DSD-DBS/capella-model-explorer
@@ -126,7 +126,6 @@ The key differences are:
   typing related classes like `t.TypedDict`.
 
   Use the new syntax and classes for typing introduced with Python 3.10.
-
   - Instead of `t.Tuple`, `t.List` etc. use the builtin classes `tuple`, `list`
     etc.
   - For classes that are not builtin (e.g. `Iterable`),

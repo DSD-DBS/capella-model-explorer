@@ -55,6 +55,9 @@ jobs:
           enable-cache: true
           cache-dependency-glob: "**/pyproject.toml"
           python-version: "3.11"
+      - uses: pnpm/action-setup@v4.1.0
+        with:
+          version: latest
       - name: Install hadolint
         run: |-
           curl -Lo \
