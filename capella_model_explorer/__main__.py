@@ -421,7 +421,11 @@ def run(
 )
 def build(*, watch: bool) -> None:
     """Build the frontend script and style bundles."""
-    build_bundle(watch=watch)
+    procs = build_bundle(watch=watch)
+    if procs is not None:
+        tailwind, parcel = procs
+        with tailwind, parcel:
+            pass
 
 
 @main.command("pre-commit-setup")
