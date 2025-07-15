@@ -24,6 +24,7 @@ classifiers = [
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
+  "Typing :: Typed",
 ]
 dependencies = [
   "capellambse-context-diagrams>=0.7.11,<0.8",
@@ -45,16 +46,25 @@ cme = "capella_model_explorer.__main__:main"
 
 [dependency-groups]
 dev = [
-  "coverage>=7.8.0",
+  "coverage>=7.9.1",
+  "docformatter[tomli]==1.7.7",
+  "mypy==1.16.1",
   "pre-commit>=4.2.0",
-  "pytest>=8.3.5",
-  "pytest-cov>=6.1.1",
+  "pre-commit-uv>=4.1.4",
+  "pylsp-mypy>=0.7.0",
+  "pytest>=8.4.1",
+  "pytest-cov>=6.2.1",
   "python-dotenv>=1.1.0",
+  "python-lsp-server[rope]>=1.12.2",
+  "reuse==5.0.2",
+  "ruff==0.12.0",
+  "types-pyyaml>=6.0.12.20250516",
 ]
+
 docs = [
-    "furo>=2024.8.6",
-    "sphinx>=8.2.3",
-    "sphinx-copybutton>=0.5.2",
+  "furo>=2024.8.6",
+  "sphinx>=8.2.3",
+  "sphinx-copybutton>=0.5.2",
 ]
 
 [tool.coverage.run]
@@ -93,6 +103,7 @@ ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 addopts = """
+  -W error::pytest.PytestUnraisableExceptionWarning
   --import-mode=importlib
   --strict-config
   --strict-markers

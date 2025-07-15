@@ -18,6 +18,7 @@ import typing as t
 import click
 import uvicorn
 
+import capella_model_explorer
 import capella_model_explorer.constants as c
 from capella_model_explorer import app
 
@@ -25,8 +26,8 @@ logger = logging.getLogger(__name__)
 
 
 def _install_npm_pkgs() -> None:
-    npm = _find_exe("npm")
-    cmd = [npm, "clean-install"]
+    pm = _find_exe("pnpm")
+    cmd = [pm, "install", "--frozen-lockfile"]
     logger.info(shlex.join(cmd))
     subprocess.check_call(cmd)
 
@@ -131,8 +132,9 @@ def build_bundle(
         raise SystemExit(f"Input CSS file not found: {input_css}")
 
     tailwind_cmd = [
-        "npx",
-        "@tailwindcss/cli",
+        "pnpm",
+        "exec",
+        "tailwindcss",
         "--input",
         str(input_css),
         "--output",
@@ -140,7 +142,8 @@ def build_bundle(
         *(["--watch"] if watch else []),
     ]
     parcel_cmd = [
-        "npx",
+        "pnpm",
+        "exec",
         "parcel",
         "watch" if watch else "build",
         "--dist-dir=static/bundle",
@@ -203,6 +206,11 @@ def _find_exe(name: str) -> str:
         " as understood by 'logging.config.dictConfig()'."
         " If passed, other '--log-*' arguments are ignored."
     ),
+)
+@click.version_option(
+    version=capella_model_explorer.__version__,
+    prog_name="capella-model-explorer",
+    message="%(prog)s %(version)s",
 )
 @click.pass_context
 def main(
@@ -413,7 +421,11 @@ def run(
 )
 def build(*, watch: bool) -> None:
     """Build the frontend script and style bundles."""
-    build_bundle(watch=watch)
+    procs = build_bundle(watch=watch)
+    if procs is not None:
+        tailwind, parcel = procs
+        with tailwind, parcel:
+            pass
 
 
 @main.command("pre-commit-setup")

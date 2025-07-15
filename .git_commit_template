@@ -1,0 +1,23 @@
+
+
+# type(scope)[!]: <subject> (max 50 chars, do not end with period)
+# Conventional Commits: https://www.conventionalcommits.org/en/v1.0.0/#summary
+# Seven rules of commits: https://chris.beams.io/posts/git-commit/#seven-rules
+#
+# commit types:
+# - build    (anything related to the package build)
+# - chore    (cosmetic commits without behavioral changes to production code)
+# - ci       (anything related to the CI setup)
+# - docs     (anything related to the documentation)
+# - feat     (new feature)
+# - fix      (bug fix)
+# - merge    (merge commit)
+# - perf     (performance improvements)
+# - refactor (improvements without externally visible behavior changes)
+# - revert   (other commit(s) was/were reverted)
+# - test     (only changes to the test setup)
+
+# commit scopes:
+# - core code: (...)
+# - extensions: (...)
+# - (docs)

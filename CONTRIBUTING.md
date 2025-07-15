@@ -15,18 +15,34 @@ issue]. Or go ahead and [open a pull request] to contribute code. In order to
 reduce the burden on our maintainers, please make sure that your code follows
 our style guidelines outlined below.
 
+<!-- prettier-ignore -->
 [open an issue]: https://github.com/DSD-DBS/capella-model-explorer/issues
 [open a pull request]: https://github.com/DSD-DBS/capella-model-explorer/pulls
 
 ## Developing
 
-We recommend that you
-[develop inside of a virtual environment](README.md#installation). After you
-have set it up, simply run the unit tests to verify that everything is set up
-correctly:
+Use [uv](https://docs.astral.sh/uv/) to set up a local development environment.
+
+Additionally, you need to have `pnpm` installed to build the JS/CSS bundles,
+and optionally Docker to build and run Docker images.
 
 ```sh
-pytest
+git clone https://github.com/DSD-DBS/capella-model-explorer
+cd capella-model-explorer
+uv sync
+uv run cme pre-commit-setup
+
+# You may need to explicitly activate the project venv
+# to make code completion and tools available:
+source .venv/bin/activate.sh  # for Linux / Mac
+.venv\Scripts\activate  # for Windows
+```
+
+You can use `uv run <tool>` to avoid having to manually activate the project
+venv. For example, to view the built-in help for the `cme` command, run:
+
+```sh
+uv run cme --help
 ```
 
 We additionally recommend that you set up your editor / IDE as follows.
@@ -57,61 +73,10 @@ We additionally recommend that you set up your editor / IDE as follows.
   save. Language server clients are available for a wide range of editors, from
   Vim/Emacs to PyCharm/IDEA.
 
-### Preconditions
-
-- Python 3.11 or higher
-- Node package manager (npm)
-- Docker (to guarantee, that the app will continue to work in a container)
-
-### Quick start
-
-1. Clone the project, change into the project root directory, and install in
-   editable mode in the virtual environment:
-
-   ```bash
-   pip install -e ".[dev,docs,test]"
-   ```
-
-2. Install node packages (needed to build the CSS from TailwindCSS):
-
-   ```bash
-   npm clean-install
-   ```
-
-3. Optional:
-
-   Create a `.env` file in the root of the project and define any of the
-   environment variables decribed in the help `cme run -h`.
-
-   Example `.env` file:
-
-   ```bash
-   CME_MODEL={"path": "git+https://github.com/DSD-DBS/Capella-IFE-sample.git","revision": "master", "entrypoint": "In-Flight Entertainment System.aird"}
-   CME_PORT=5000
-   CME_ROUTE_PREFIX="/prefix"
-   ```
-
-4. Run the application in development mode with the following command executed
-   in the root directory of the project:
-
-   ```bash
-   dotenv run cme run # if you want to make use of the .env file
-   cme run # without .env file
-   ```
-
-`cme run local-dev` starts the TailwindCSS CLI and the FastHTML server in watch
-mode that reloads the backend and frontend on change of files with the
-extensions `*.css`, `*.j2` (templates), `*.js`, and `*.py`.
-
-The app will be available at the location printed to the terminal when
-the console confirms `Application startup complete.`.
-
-### Modifying the style of the frontend
-
 Always modify the style via TailwindCSS classes within the Python code.
 
 If not possible (because of collision with TailwindCSS' `prose` class), modify
-the file `static/css/input.css` directly.
+the file `frontend/input.css` directly.
 
 ## Code style
 
@@ -161,7 +126,6 @@ The key differences are:
   typing related classes like `t.TypedDict`.
 
   Use the new syntax and classes for typing introduced with Python 3.10.
-
   - Instead of `t.Tuple`, `t.List` etc. use the builtin classes `tuple`, `list`
     etc.
   - For classes that are not builtin (e.g. `Iterable`),
