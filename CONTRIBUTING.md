@@ -16,8 +16,8 @@ reduce the burden on our maintainers, please make sure that your code follows
 our style guidelines outlined below.
 
 <!-- prettier-ignore -->
-[open an issue]: https://github.com/DSD-DBS/capella-model-explorer/issues
-[open a pull request]: https://github.com/DSD-DBS/capella-model-explorer/pulls
+[open an issue]: https://github.com/dbinfrago/capella-model-explorer/issues
+[open a pull request]: https://github.com/dbinfrago/capella-model-explorer/pulls
 
 ## Developing
 
@@ -27,7 +27,7 @@ Additionally, you need to have `pnpm` installed to build the JS/CSS bundles,
 and optionally Docker to build and run Docker images.
 
 ```sh
-git clone https://github.com/DSD-DBS/capella-model-explorer
+git clone https://github.com/dbinfrago/capella-model-explorer
 cd capella-model-explorer
 uv sync
 uv run cme pre-commit-setup
