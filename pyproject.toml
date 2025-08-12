@@ -38,8 +38,8 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/DSD-DBS/capella-model-explorer"
-Documentation = "https://dsd-dbs.github.io/capella-model-explorer"
+Homepage = "https://github.com/dbinfrago/capella-model-explorer"
+Documentation = "https://dbinfrago.github.io/capella-model-explorer"
 
 [project.scripts]
 cme = "capella_model_explorer.__main__:main"

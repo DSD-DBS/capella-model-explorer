@@ -5,8 +5,8 @@
 
 # Capella Model Explorer
 
-![image](https://github.com/DSD-DBS/capella-model-explorer/actions/workflows/build-test-publish.yml/badge.svg)
-![image](https://github.com/DSD-DBS/capella-model-explorer/actions/workflows/lint.yml/badge.svg)
+![image](https://github.com/dbinfrago/capella-model-explorer/actions/workflows/build-test-publish.yml/badge.svg)
+![image](https://github.com/dbinfrago/capella-model-explorer/actions/workflows/lint.yml/badge.svg)
 
 A webapp for exploring Capella models through simple "auto-generated" textual
 and graphical views.
@@ -63,21 +63,21 @@ cme run --container --image capella-model-explorer
 ```
 
 Above will start the app with a sample model which can be found here:
-[In-Flight Entertainment System](https://github.com/DSD-DBS/Capella-IFE-sample)
+[In-Flight Entertainment System](https://github.com/dbinfrago/Capella-IFE-sample)
 
 Stop the app via CTRL+C.
 
 ### Run the app in a container with a custom remote model
 
 ```sh
-export CME_MODEL='git+https://github.com/DSD-DBS/Capella-IFE-sample.git'
+export CME_MODEL='git+https://github.com/dbinfrago/Capella-IFE-sample.git'
 export CME_PORT=5000  # optional, default is 8000
 cme run --container
 ```
 
 More information describing what kinds of values can be specified via the
 environment variable `CME_MODEL` can be found in [the capellambse
-documentation](https://dsd-dbs.github.io/py-capellambse/start/specifying-models.html).
+documentation](https://dbinfrago.github.io/py-capellambse/start/specifying-models.html).
 
 ### Run the app in a container with a custom local model
 
@@ -103,7 +103,7 @@ cme run --container
 # Integration in the Capella Collaboration Manager
 
 The Capella Model Explorer can be integrated into the [Capella Collaboration
-Manager](https://github.com/DSD-DBS/capella-collab-manager). Navigate to
+Manager](https://github.com/dbinfrago/capella-collab-manager). Navigate to
 `Settings` > `Tools`, then `Add a new tool` with the following configuration:
 
 ```yaml
@@ -172,7 +172,7 @@ config:
   is_deprecated: false
   sessions:
     persistent:
-      image: ghcr.io/dsd-dbs/capella-model-explorer/model-explorer:latest
+      image: ghcr.io/dbinfrago/capella-model-explorer/model-explorer:latest
   backups:
     image: null
   compatible_versions: [1, 2, 3, 4]
@@ -184,7 +184,7 @@ versions you want to support.
 When configured properly, users will be able to start read-only sessions for
 the Capella Model Explorer. More information about read-only sessions is
 available in the [Capella Collaboration Manager
-documentation](https://dsd-dbs.github.io/capella-collab-manager/user/sessions/types/read-only/).
+documentation](https://dbinfrago.github.io/capella-collab-manager/user/sessions/types/read-only/).
 
 # Theme
 
@@ -192,7 +192,7 @@ The app comes with a default light and dark theme and the hue value for the
 primary color can be customized via the environment variable
 `CME_PRIMARY_COLOR_HUE`. The default hue value is 231 which corresponds to the
 purple/ blue color used as primary color in the [Capella Collaboration Manager
-documentation](https://dsd-dbs.github.io/capella-collab-manager).
+documentation](https://dbinfrago.github.io/capella-collab-manager).
 
 # Contributing
 
